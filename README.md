@@ -27,3 +27,9 @@ The XR Study Whiteboard gives students a focused virtual study space where they 
 ## Key outcome
 
 Participants completed the writing, colour selection, erasing, tool switching, and clear-board interactions successfully. They were positive about being able to study in different locations while still feeling like they were in a class environment.
+
+## Digital XR Implementation
+
+The existing `Whiteboard` Unity project now contains the main scene at [`Whiteboard/Assets/XRStudyWhiteboard/Scenes/XRStudyClassroom.unity`](Whiteboard/Assets/XRStudyWhiteboard/Scenes/XRStudyClassroom.unity). It includes a lightweight classroom, a runtime whiteboard with black/red/blue/green marker colours, Marker/Eraser modes, clear-board confirmation, controller drawing, optional pinch drawing, teleportation, snap turning, and a grabbable marker.
+
+The implementation reuses the existing VR template XR Origin, OpenXR, XRI Starter Assets, XRI input actions, locomotion, and XR Hands infrastructure. See [`Whiteboard/Documentation/SETUP.md`](Whiteboard/Documentation/SETUP.md) for setup, [`Whiteboard/Documentation/CONTROLS.md`](Whiteboard/Documentation/CONTROLS.md) for controls, and [`Whiteboard/Documentation/IMPLEMENTATION_STATUS.md`](Whiteboard/Documentation/IMPLEMENTATION_STATUS.md) for testing status and limitations.

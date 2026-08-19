@@ -1,0 +1,23 @@
+# Unity generated data
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Aa]sset[Ss]tore[Tt]ools/
+.utmp/
+
+# IDE and generated project files
+.vs/
+.idea/
+.vscode/
+*.csproj
+*.sln
+*.slnx
+*.userprefs
+
+# OS files
+.DS_Store
+Thumbs.db
