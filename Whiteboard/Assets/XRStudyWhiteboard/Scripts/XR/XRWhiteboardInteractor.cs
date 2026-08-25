@@ -25,9 +25,11 @@ namespace XRStudyWhiteboard
         [SerializeField] private bool useMouseFallbackInEditor = true;
         [SerializeField] private InputActionAsset controllerInputActions;
         [SerializeField] private GraphicRaycaster desktopUiRaycaster;
-        // The line renderer already interpolates between UV samples. Keep the
-        // editor pointer responsive instead of adding a visible trailing lag.
-        [SerializeField, Range(0.1f, 1f)] private float desktopPointerSmoothing = 1f;
+        // The canvases interpolate between UV samples. A small amount of
+        // bounded desktop smoothing removes cursor quantisation without
+        // creating a visible trailing line behind the pointer.
+        [SerializeField, Range(0.35f, 1f)] private float desktopPointerSmoothing = 0.72f;
+        [SerializeField, Range(0.02f, 1f)] private float maximumDesktopUvJump = 0.18f;
         [SerializeField] private float desktopReleaseGraceSeconds = 0.32f;
         [SerializeField] private float controllerReleaseGraceSeconds = 0.08f;
         [SerializeField] private float surfaceMissGraceSeconds = 0.24f;
@@ -389,6 +391,15 @@ namespace XRStudyWhiteboard
             {
                 smoothedDesktopUv = point;
                 hasSmoothedDesktopUv = true;
+                return point;
+            }
+
+            if (Vector2.Distance(smoothedDesktopUv, point) > maximumDesktopUvJump)
+            {
+                // Do not smooth across a surface re-aim or editor pointer
+                // jump. Returning the raw point lets the canvas reject the
+                // discontinuity instead of drawing a long vertical segment.
+                hasSmoothedDesktopUv = false;
                 return point;
             }
 
