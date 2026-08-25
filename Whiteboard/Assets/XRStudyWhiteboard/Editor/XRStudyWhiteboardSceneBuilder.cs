@@ -458,7 +458,10 @@ namespace XRStudyWhiteboard.Editor
             eventSystemObject.AddComponent<EventSystem>();
             XRUIInputModule inputModule = eventSystemObject.AddComponent<XRUIInputModule>();
             inputModule.enableXRInput = true;
-            inputModule.enableMouseInput = false;
+            // The editor test must be able to operate the Device Simulator
+            // panel itself (including its collapse button) with the desktop
+            // mouse. XR controller and hand input remain enabled as well.
+            inputModule.enableMouseInput = true;
             inputModule.enableBuiltinActionsAsFallback = true;
 
             InputActionAsset actions = AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath);

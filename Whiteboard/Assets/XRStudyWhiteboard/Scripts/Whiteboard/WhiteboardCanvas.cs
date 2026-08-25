@@ -26,8 +26,8 @@ namespace XRStudyWhiteboard
         [SerializeField, Range(0.1f, 1f)] private float markerOpacity = 0.82f;
         [SerializeField] private float interpolationSpacing = 0.0006f;
         [SerializeField] private int maximumInterpolationSteps = 2048;
-        [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.18f;
-        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.68f;
+        [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.08f;
+        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.92f;
 
         private Texture2D boardTexture;
         private Color32[] pixels;
@@ -38,6 +38,8 @@ namespace XRStudyWhiteboard
         private Vector2 lastInputUv;
         private Vector2 filteredInputUv;
         private int inputSampleCount;
+        private Vector2 reacquireAnchorUv;
+        private int reacquireSampleCount;
         private bool textureDirty;
         private Transform crosshair;
         private readonly List<Renderer> crosshairRenderers = new List<Renderer>();
@@ -172,6 +174,7 @@ namespace XRStudyWhiteboard
         {
             hasPreviousPoint = false;
             inputSampleCount = 0;
+            reacquireSampleCount = 0;
             DrawPoint(uv);
         }
 
@@ -179,11 +182,12 @@ namespace XRStudyWhiteboard
         {
             if (!hasPreviousPoint)
             {
+                if (!TryReacquireSurface(uv))
+                    return;
+
                 DrawPoint(uv);
                 return;
             }
-
-            Vector2 filteredUv = FilterInputPoint(uv);
 
             float distance = Vector2.Distance(previousUv, uv);
             // A missed or re-aimed controller ray must not be joined with a
@@ -193,8 +197,12 @@ namespace XRStudyWhiteboard
             {
                 hasPreviousPoint = false;
                 inputSampleCount = 0;
+                reacquireAnchorUv = uv;
+                reacquireSampleCount = 1;
                 return;
             }
+
+            Vector2 filteredUv = FilterInputPoint(uv);
 
             distance = Vector2.Distance(previousUv, filteredUv);
             uv = filteredUv;
@@ -228,6 +236,7 @@ namespace XRStudyWhiteboard
         {
             hasPreviousPoint = false;
             inputSampleCount = 0;
+            reacquireSampleCount = 0;
         }
 
         public void ClearBoard()
@@ -300,6 +309,31 @@ namespace XRStudyWhiteboard
             filteredInputUv = uv;
             inputSampleCount = 1;
             textureDirty = true;
+        }
+
+        private bool TryReacquireSurface(Vector2 uv)
+        {
+            if (reacquireSampleCount <= 0)
+            {
+                reacquireAnchorUv = uv;
+                reacquireSampleCount = 1;
+                return false;
+            }
+
+            if (Vector2.Distance(reacquireAnchorUv, uv) > maximumUvJump)
+            {
+                reacquireAnchorUv = uv;
+                reacquireSampleCount = 1;
+                return false;
+            }
+
+            reacquireAnchorUv = uv;
+            reacquireSampleCount++;
+            if (reacquireSampleCount < 3)
+                return false;
+
+            reacquireSampleCount = 0;
+            return true;
         }
 
         private Vector2 FilterInputPoint(Vector2 uv)

@@ -545,15 +545,6 @@ namespace XRStudyWhiteboard
                 if (activateBothControllers != null)
                     activateBothControllers.Invoke(behaviour, null);
 
-                // Unity remembers the simulator panel's collapsed state in
-                // EditorPrefs.  Keep it visible for this project so the
-                // cursor-operated virtual controllers are obvious whenever
-                // the classroom starts in the editor.
-                MethodInfo openSimulatorPanel = behaviour.GetType().GetMethod(
-                    "OnClickOpenSimulatorUIPanel",
-                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-                if (openSimulatorPanel != null)
-                    openSimulatorPanel.Invoke(behaviour, null);
                 return;
             }
         }

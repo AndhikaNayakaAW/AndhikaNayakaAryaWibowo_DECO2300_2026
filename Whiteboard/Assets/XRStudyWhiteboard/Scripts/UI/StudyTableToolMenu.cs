@@ -109,13 +109,12 @@ namespace XRStudyWhiteboard
             menuObject.transform.SetParent(transform, false);
             // Put the button just beyond the paper's front-right corner. The
             // menu is presented face-up, so the same front side is visible to
-            // both the seated camera and an XR controller ray.
+            // Both the seated camera and an XR controller ray use this face.
             menuObject.transform.localPosition = new Vector3(-0.60f, 0.1f, 0.28f);
             menuObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            // A positive scale keeps the canvas and its raycast rectangles in
-            // the same orientation as the readable text. The previous
-            // negative horizontal scale made the button look mirrored and
-            // caused screen-space clicks to resolve on the back side.
+            // The tabletop-facing canvas keeps the validation and the
+            // controller ray on the same face. The glyphs are rotated in
+            // their own plane below so they remain upright to the seated user.
             menuObject.transform.localScale = Vector3.one * 0.00115f;
 
             Canvas canvas = menuObject.AddComponent<Canvas>();
@@ -352,12 +351,12 @@ namespace XRStudyWhiteboard
             textComponent.fontSize = fontSize;
             textComponent.color = colour;
             textComponent.alignment = alignment;
-            // The face-up canvas uses a mirrored local X axis when viewed
-            // from the seated camera. Flip only the text horizontally so it
-            // reads normally; rotating it as well makes the label upside
-            // down and was the source of the reversed TOOLS button.
-            textComponent.transform.localScale = new Vector3(-1f, 1f, 1f);
-            textComponent.transform.localRotation = Quaternion.identity;
+            textComponent.transform.localScale = Vector3.one;
+            // The seated camera approaches the desk from the opposite side
+            // of the face-up canvas' local Y axis. Rotate only the glyphs in
+            // the plane so the button rectangles keep their hitboxes while
+            // labels read upright from the intended table view.
+            textComponent.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
             textComponent.raycastTarget = false;
             return textComponent;
         }

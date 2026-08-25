@@ -24,8 +24,8 @@ namespace XRStudyWhiteboard
         [SerializeField] private float eraserSize = 0.032f;
         [SerializeField] private float interpolationSpacing = 0.00075f;
         [SerializeField] private int maximumInterpolationSteps = 1024;
-        [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.18f;
-        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.68f;
+        [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.08f;
+        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.92f;
 
         private Texture2D noteTexture;
         private Color32[] pixels;
@@ -35,6 +35,8 @@ namespace XRStudyWhiteboard
         private Vector2 lastInputUv;
         private Vector2 filteredInputUv;
         private int inputSampleCount;
+        private Vector2 reacquireAnchorUv;
+        private int reacquireSampleCount;
         private bool previousStrokeWasErasing;
         private bool textureDirty;
         private Transform crosshair;
@@ -128,8 +130,13 @@ namespace XRStudyWhiteboard
         public void DrawAtUV(Vector2 uv, bool erasing)
         {
             InitializeSurface();
-            if (!hasPreviousPoint || previousStrokeWasErasing != erasing)
+            if (!hasPreviousPoint)
             {
+                if (reacquireSampleCount > 0 && !TryReacquireSurface(uv))
+                {
+                    return;
+                }
+
                 previousStrokeWasErasing = erasing;
                 inputSampleCount = 0;
                 Stamp(uv, erasing);
@@ -139,11 +146,25 @@ namespace XRStudyWhiteboard
                 lastInputUv = uv;
                 filteredInputUv = uv;
                 inputSampleCount = 1;
+                reacquireSampleCount = 0;
                 textureDirty = true;
                 return;
             }
 
-            Vector2 filteredUv = FilterInputPoint(uv);
+            if (previousStrokeWasErasing != erasing)
+            {
+                previousStrokeWasErasing = erasing;
+                inputSampleCount = 0;
+                Stamp(uv, erasing);
+                previousUv = uv;
+                inputBeforeLastUv = uv;
+                lastInputUv = uv;
+                filteredInputUv = uv;
+                inputSampleCount = 1;
+                textureDirty = true;
+                return;
+            }
+
             float distance = Vector2.Distance(previousUv, uv);
             // Do not connect two unrelated controller hits with a long
             // segment when the thin paper collider is briefly missed.
@@ -151,8 +172,12 @@ namespace XRStudyWhiteboard
             {
                 hasPreviousPoint = false;
                 inputSampleCount = 0;
+                reacquireAnchorUv = uv;
+                reacquireSampleCount = 1;
                 return;
             }
+
+            Vector2 filteredUv = FilterInputPoint(uv);
 
             distance = Vector2.Distance(previousUv, filteredUv);
             uv = filteredUv;
@@ -172,6 +197,31 @@ namespace XRStudyWhiteboard
 
             previousUv = uv;
             textureDirty = true;
+        }
+
+        private bool TryReacquireSurface(Vector2 uv)
+        {
+            if (reacquireSampleCount <= 0)
+            {
+                reacquireAnchorUv = uv;
+                reacquireSampleCount = 1;
+                return false;
+            }
+
+            if (Vector2.Distance(reacquireAnchorUv, uv) > maximumUvJump)
+            {
+                reacquireAnchorUv = uv;
+                reacquireSampleCount = 1;
+                return false;
+            }
+
+            reacquireAnchorUv = uv;
+            reacquireSampleCount++;
+            if (reacquireSampleCount < 3)
+                return false;
+
+            reacquireSampleCount = 0;
+            return true;
         }
 
         public void UpdateCursor(Vector2 uv)
@@ -206,6 +256,7 @@ namespace XRStudyWhiteboard
         {
             hasPreviousPoint = false;
             inputSampleCount = 0;
+            reacquireSampleCount = 0;
         }
 
         public void ClearNote()
