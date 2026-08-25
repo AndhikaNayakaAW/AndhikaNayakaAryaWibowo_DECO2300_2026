@@ -234,6 +234,7 @@ namespace XRStudyWhiteboard
 
         public void EndStroke()
         {
+            CloseStrokeToLatestInput();
             hasPreviousPoint = false;
             inputSampleCount = 0;
             reacquireSampleCount = 0;
@@ -242,10 +243,10 @@ namespace XRStudyWhiteboard
         public void ClearBoard()
         {
             InitializeSurface();
+            EndStroke();
             Fill(Color.white);
             textureDirty = false;
             ApplyTexture();
-            EndStroke();
         }
 
         public void UpdateCursor(Vector2 uv)
@@ -361,6 +362,35 @@ namespace XRStudyWhiteboard
             filteredInputUv = filtered;
             inputSampleCount = Mathf.Min(inputSampleCount + 1, 3);
             return filtered;
+        }
+
+        private void CloseStrokeToLatestInput()
+        {
+            if (!hasPreviousPoint || inputSampleCount <= 0)
+                return;
+
+            Vector2 endpoint = lastInputUv;
+            float distance = Vector2.Distance(previousUv, endpoint);
+            if (distance > maximumUvJump)
+                return;
+
+            float brushDiameter = manager != null && manager.CurrentTool == WhiteboardTool.Eraser
+                ? eraserSize
+                : markerSize;
+            float brushRadiusInUv = (brushDiameter * 0.5f)
+                / Mathf.Max(boardWorldSize.x, boardWorldSize.y);
+            float spacing = Mathf.Min(
+                Mathf.Max(0.00025f, interpolationSpacing),
+                Mathf.Max(0.00025f, brushRadiusInUv * 0.4f));
+            int steps = Mathf.Clamp(
+                Mathf.CeilToInt(distance / spacing),
+                1,
+                Mathf.Max(1, maximumInterpolationSteps));
+            for (int i = 1; i <= steps; i++)
+                Stamp(Vector2.Lerp(previousUv, endpoint, i / (float)steps));
+
+            previousUv = endpoint;
+            textureDirty = true;
         }
 
         private static float Median(float a, float b, float c)

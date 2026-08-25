@@ -15,6 +15,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion.Teleportation;
 using UnityEngine.XR.Interaction.Toolkit.UI;
+using TMPro;
 using XRStudyWhiteboard;
 
 namespace XRStudyWhiteboard.Editor
@@ -376,6 +377,18 @@ namespace XRStudyWhiteboard.Editor
                 Check(HasContinuousPath(boardTexture), "Whiteboard circle smoke test is continuous", ref checks, ref errors);
                 board.ClearBoard();
                 Check(IsTextureBlank(boardTexture), "Whiteboard clear smoke test", ref checks, ref errors);
+                DrawLine(board, new Vector2(0.18f, 0.5f), new Vector2(0.82f, 0.5f));
+                InvokePrivate(board, "ApplyTexture");
+                Check(HasContinuousPath(boardTexture, CreateLinePoints(new Vector2(0.18f, 0.5f), new Vector2(0.82f, 0.5f))), "Whiteboard horizontal line is continuous", ref checks, ref errors);
+                Check(HasInkOnlyInCorridor(boardTexture, true), "Whiteboard horizontal line has no off-axis artifacts", ref checks, ref errors);
+                board.ClearBoard();
+                DrawLine(board, new Vector2(0.5f, 0.18f), new Vector2(0.5f, 0.82f));
+                InvokePrivate(board, "ApplyTexture");
+                Check(HasContinuousPath(boardTexture, CreateLinePoints(new Vector2(0.5f, 0.18f), new Vector2(0.5f, 0.82f))), "Whiteboard vertical line is continuous", ref checks, ref errors);
+                Check(HasInkOnlyInCorridor(boardTexture, false), "Whiteboard vertical line has no off-axis artifacts", ref checks, ref errors);
+                board.BeginStroke(new Vector2(0.2f, 0.2f));
+                board.ClearBoard();
+                Check(IsTextureBlank(boardTexture), "Whiteboard final clear smoke test", ref checks, ref errors);
 
                 PaperNoteCanvas paper = paperObject.AddComponent<PaperNoteCanvas>();
                 paper.Configure(paperObject.GetComponent<Renderer>(), paperObject.GetComponent<Collider>(), new Vector2(0.55f, 0.38f));
@@ -385,6 +398,19 @@ namespace XRStudyWhiteboard.Editor
                 InvokePrivate(paper, "ApplyTexture");
                 Texture2D paperTexture = GetPrivateField<Texture2D>(paper, "noteTexture");
                 Check(HasContinuousPath(paperTexture), "Paper circle smoke test is continuous", ref checks, ref errors);
+                paper.ClearNote();
+                DrawLine(paper, new Vector2(0.18f, 0.5f), new Vector2(0.82f, 0.5f));
+                InvokePrivate(paper, "ApplyTexture");
+                Check(HasContinuousPath(paperTexture, CreateLinePoints(new Vector2(0.18f, 0.5f), new Vector2(0.82f, 0.5f))), "Paper horizontal line is continuous", ref checks, ref errors);
+                Check(HasInkOnlyInCorridor(paperTexture, true), "Paper horizontal line has no off-axis artifacts", ref checks, ref errors);
+                paper.ClearNote();
+                DrawLine(paper, new Vector2(0.5f, 0.18f), new Vector2(0.5f, 0.82f));
+                InvokePrivate(paper, "ApplyTexture");
+                Check(HasContinuousPath(paperTexture, CreateLinePoints(new Vector2(0.5f, 0.18f), new Vector2(0.5f, 0.82f))), "Paper vertical line is continuous", ref checks, ref errors);
+                Check(HasInkOnlyInCorridor(paperTexture, false), "Paper vertical line has no off-axis artifacts", ref checks, ref errors);
+                paper.DrawAtUV(new Vector2(0.2f, 0.2f), false);
+                paper.ClearNote();
+                Check(IsTextureBlank(paperTexture), "Paper active-stroke clear smoke test", ref checks, ref errors);
                 PaperTool.Select(PaperToolKind.Eraser);
                 paper.DrawAtUV(new Vector2(0.5f, 0.2f), true);
                 paper.DrawAtUV(new Vector2(0.5f, 0.8f), true);
@@ -435,6 +461,11 @@ namespace XRStudyWhiteboard.Editor
                 Transform panelTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel") : null;
                 Button openButton = openTransform != null ? openTransform.GetComponent<Button>() : null;
                 Check(openButton != null && panelTransform != null && !panelTransform.gameObject.activeSelf, "Table tool panel starts closed", ref checks, ref errors);
+                TMP_Text openLabel = openTransform != null ? openTransform.Find("Label")?.GetComponent<TMP_Text>() : null;
+                Check(openLabel != null
+                    && openLabel.transform.localScale == Vector3.one
+                    && Quaternion.Angle(openLabel.transform.localRotation, Quaternion.Euler(0f, 0f, 180f)) < 0.1f,
+                    "Table tools label is not mirrored", ref checks, ref errors);
 
                 if (openButton != null && menuTransform != null)
                 {
@@ -451,6 +482,24 @@ namespace XRStudyWhiteboard.Editor
                 if (eraserButton != null)
                     eraserButton.onClick.Invoke();
                 Check(PaperTool.SelectedKind == PaperToolKind.Eraser, "Table eraser action selects the eraser", ref checks, ref errors);
+                Transform pencilTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel/Pencil") : null;
+                Button pencilButton = pencilTransform != null ? pencilTransform.GetComponent<Button>() : null;
+                if (pencilButton != null)
+                    pencilButton.onClick.Invoke();
+                Check(PaperTool.SelectedKind == PaperToolKind.Pencil, "Table pencil action selects the pencil", ref checks, ref errors);
+
+                paper.DrawAtUV(new Vector2(0.2f, 0.5f), false);
+                paper.DrawAtUV(new Vector2(0.8f, 0.5f), false);
+                paper.EndStroke();
+                Texture2D paperTexture = GetPrivateField<Texture2D>(paper, "noteTexture");
+                InvokePrivate(paper, "ApplyTexture");
+                Check(!IsTextureBlank(paperTexture), "Table pencil action writes on paper", ref checks, ref errors);
+
+                Transform clearTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel/ClearPaper") : null;
+                Button clearButton = clearTransform != null ? clearTransform.GetComponent<Button>() : null;
+                if (clearButton != null)
+                    clearButton.onClick.Invoke();
+                Check(IsTextureBlank(paperTexture), "Table clear action clears paper", ref checks, ref errors);
                 PaperTool.Select(PaperToolKind.Pencil);
             }
             finally
@@ -480,6 +529,33 @@ namespace XRStudyWhiteboard.Editor
             paper.EndStroke();
         }
 
+        private static void DrawLine(WhiteboardCanvas board, Vector2 start, Vector2 end)
+        {
+            const int points = 64;
+            board.BeginStroke(start);
+            for (int i = 1; i < points; i++)
+                board.ContinueStroke(Vector2.Lerp(start, end, i / (float)(points - 1)));
+            board.EndStroke();
+        }
+
+        private static void DrawLine(PaperNoteCanvas paper, Vector2 start, Vector2 end)
+        {
+            const int points = 64;
+            paper.DrawAtUV(start, false);
+            for (int i = 1; i < points; i++)
+                paper.DrawAtUV(Vector2.Lerp(start, end, i / (float)(points - 1)), false);
+            paper.EndStroke();
+        }
+
+        private static Vector2[] CreateLinePoints(Vector2 start, Vector2 end)
+        {
+            const int points = 64;
+            Vector2[] samples = new Vector2[points];
+            for (int i = 0; i < points; i++)
+                samples[i] = Vector2.Lerp(start, end, i / (float)(points - 1));
+            return samples;
+        }
+
         private static Vector2 CirclePoint(int index, int pointCount)
         {
             float angle = index / (float)pointCount * Mathf.PI * 2f;
@@ -492,15 +568,26 @@ namespace XRStudyWhiteboard.Editor
                 return false;
 
             const int pointCount = 64;
+            Vector2[] samples = new Vector2[pointCount];
             for (int i = 0; i < pointCount; i++)
+                samples[i] = CirclePoint(i, pointCount);
+            return HasContinuousPath(texture, samples);
+        }
+
+        private static bool HasContinuousPath(Texture2D texture, Vector2[] samples)
+        {
+            if (texture == null || samples == null || samples.Length == 0)
+                return false;
+
+            for (int i = 0; i < samples.Length; i++)
             {
-                Vector2 uv = CirclePoint(i, pointCount);
+                Vector2 uv = samples[i];
                 int x = Mathf.RoundToInt(uv.x * (texture.width - 1));
                 int y = Mathf.RoundToInt(uv.y * (texture.height - 1));
                 bool foundInk = false;
-                for (int offsetY = -8; offsetY <= 8 && !foundInk; offsetY++)
+                for (int offsetY = -5; offsetY <= 5 && !foundInk; offsetY++)
                 {
-                    for (int offsetX = -8; offsetX <= 8; offsetX++)
+                    for (int offsetX = -5; offsetX <= 5; offsetX++)
                     {
                         int sampleX = Mathf.Clamp(x + offsetX, 0, texture.width - 1);
                         int sampleY = Mathf.Clamp(y + offsetY, 0, texture.height - 1);
@@ -515,6 +602,32 @@ namespace XRStudyWhiteboard.Editor
 
                 if (!foundInk)
                     return false;
+            }
+
+            return true;
+        }
+
+        private static bool HasInkOnlyInCorridor(Texture2D texture, bool horizontal)
+        {
+            if (texture == null)
+                return false;
+
+            for (int y = 0; y < texture.height; y++)
+            {
+                for (int x = 0; x < texture.width; x++)
+                {
+                    Color32 pixel = texture.GetPixel(x, y);
+                    if (pixel.r >= 180 || pixel.g >= 180 || pixel.b >= 180)
+                        continue;
+
+                    float uvX = x / (float)(texture.width - 1);
+                    float uvY = y / (float)(texture.height - 1);
+                    bool inside = horizontal
+                        ? uvX >= 0.14f && uvX <= 0.86f && Mathf.Abs(uvY - 0.5f) <= 0.07f
+                        : uvY >= 0.14f && uvY <= 0.86f && Mathf.Abs(uvX - 0.5f) <= 0.07f;
+                    if (!inside)
+                        return false;
+                }
             }
 
             return true;
