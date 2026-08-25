@@ -192,9 +192,20 @@ namespace XRStudyWhiteboard
                 hitButton.onClick.Invoke();
 
             directControllerClickHeld = pressed;
-            // The ray is over this menu, so stop it reaching the paper or
-            // board even when it is between two menu buttons.
-            return true;
+            if (hitButton != null)
+                return true;
+
+            // A hidden menu must not block the paper. Only an open panel
+            // consumes the empty space between its buttons.
+            if (menuPanel != null && menuPanel.activeSelf)
+            {
+                RectTransform panelRect = menuPanel.transform as RectTransform;
+                if (panelRect != null && panelRect.rect.Contains(panelRect.InverseTransformPoint(worldPoint)))
+                    return true;
+            }
+
+            directControllerClickHeld = false;
+            return false;
         }
 
         private static bool IsRayNearButton(RectTransform buttonRect, Ray ray)

@@ -244,7 +244,7 @@ namespace XRStudyWhiteboard
                     : normal;
                 whiteboardUi.SetPositionAndRotation(
                     boardFrontCenter
-                    + right * (width * 0.5f + 0.10f)
+                    + right * (width * 0.5f + 0.42f)
                     + frontDirection * 0.14f
                     + up * 0.02f,
                     uiRotation);

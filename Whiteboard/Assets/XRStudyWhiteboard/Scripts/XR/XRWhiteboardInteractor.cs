@@ -28,7 +28,7 @@ namespace XRStudyWhiteboard
         [SerializeField, Range(0.1f, 1f)] private float desktopPointerSmoothing = 1f;
         [SerializeField] private float desktopReleaseGraceSeconds = 0.12f;
         [SerializeField] private float controllerReleaseGraceSeconds = 0.08f;
-        [SerializeField] private float surfaceMissGraceSeconds = 0.12f;
+        [SerializeField] private float surfaceMissGraceSeconds = 0.24f;
 
         private XRInputDevice rightController;
         private InputAction controllerTriggerAction;
@@ -43,6 +43,8 @@ namespace XRStudyWhiteboard
         private Camera gameplayCamera;
         private Vector2 desktopGameMousePosition;
         private bool hasDesktopGameMousePosition;
+        private Vector2 desktopGameViewOrigin;
+        private bool hasDesktopGameViewOrigin;
         private bool desktopMouseButtonHeld;
         private bool desktopRightMouseButtonHeld;
         private float desktopPressGraceTimer;
@@ -160,14 +162,26 @@ namespace XRStudyWhiteboard
                 // docked Game view needs coordinates relative to its viewport.
                 // Using the wrong origin is what made cursor drawing jump and
                 // miss samples around the board and paper.
-                Vector2 mousePosition = hasDesktopGameMousePosition
-                    ? new Vector2(
+                Vector2 mousePosition;
+                if (Mouse.current != null && hasDesktopGameViewOrigin)
+                {
+                    // Input System coordinates are display-global in the
+                    // macOS editor. The origin is measured from the same
+                    // IMGUI event that updates the pointer, so horizontal
+                    // drags remain horizontal in a docked Game view.
+                    mousePosition = Mouse.current.position.ReadValue() - desktopGameViewOrigin;
+                }
+                else if (hasDesktopGameMousePosition)
+                {
+                    mousePosition = new Vector2(
                         desktopGameMousePosition.x,
-                        Screen.height - desktopGameMousePosition.y)
-                    : Mouse.current.position.ReadValue();
-
-                if (!hasDesktopGameMousePosition)
+                        Screen.height - desktopGameMousePosition.y);
+                }
+                else
+                {
+                    mousePosition = Mouse.current.position.ReadValue();
                     mousePosition.y = Screen.height - mousePosition.y;
+                }
 
                 // XRUIInputModule's tracked-device raycaster is the correct
                 // path for a real controller and the Device Simulator.  A
@@ -364,6 +378,15 @@ namespace XRStudyWhiteboard
             {
                 desktopGameMousePosition = current.mousePosition;
                 hasDesktopGameMousePosition = true;
+
+                if (Mouse.current != null)
+                {
+                    Vector2 gamePoint = new Vector2(
+                        current.mousePosition.x,
+                        Screen.height - current.mousePosition.y);
+                    desktopGameViewOrigin = Mouse.current.position.ReadValue() - gamePoint;
+                    hasDesktopGameViewOrigin = true;
+                }
             }
 
             if (current.type == EventType.MouseDown && current.button == 0)
