@@ -25,6 +25,34 @@ namespace XRStudyWhiteboard
         private GameObject menuPanel;
         private TMP_Text selectedToolText;
         private bool directControllerClickHeld;
+        private bool desktopClickHeld;
+
+        public static bool TryHandleDesktopScreenPoint(Vector2 screenPoint, Camera eventCamera, bool pressed)
+        {
+            for (int i = ActiveMenus.Count - 1; i >= 0; i--)
+            {
+                StudyTableToolMenu menu = ActiveMenus[i];
+                if (menu == null)
+                {
+                    ActiveMenus.RemoveAt(i);
+                    continue;
+                }
+
+                if (menu.TryHandleDesktopScreenPointInternal(screenPoint, eventCamera, pressed))
+                    return true;
+            }
+
+            return false;
+        }
+
+        public static void EndDesktopPointer()
+        {
+            for (int i = 0; i < ActiveMenus.Count; i++)
+            {
+                if (ActiveMenus[i] != null)
+                    ActiveMenus[i].desktopClickHeld = false;
+            }
+        }
 
         public static bool TryHandleAnyRay(Ray ray, bool pressed)
         {
@@ -209,6 +237,51 @@ namespace XRStudyWhiteboard
             }
 
             directControllerClickHeld = false;
+            return false;
+        }
+
+        private bool TryHandleDesktopScreenPointInternal(Vector2 screenPoint, Camera eventCamera, bool pressed)
+        {
+            if (menuObject == null)
+                return false;
+
+            Button[] buttons = menuObject.GetComponentsInChildren<Button>(false);
+            Button hitButton = null;
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                Button button = buttons[i];
+                RectTransform buttonRect = button != null ? button.transform as RectTransform : null;
+                if (button == null
+                    || !button.isActiveAndEnabled
+                    || buttonRect == null
+                    || !RectTransformUtility.RectangleContainsScreenPoint(buttonRect, screenPoint, eventCamera))
+                    continue;
+
+                hitButton = button;
+                break;
+            }
+
+            if (hitButton != null)
+            {
+                if (pressed && !desktopClickHeld)
+                    hitButton.onClick.Invoke();
+
+                desktopClickHeld = pressed;
+                return true;
+            }
+
+            if (menuPanel != null && menuPanel.activeSelf)
+            {
+                RectTransform panelRect = menuPanel.transform as RectTransform;
+                if (panelRect != null
+                    && RectTransformUtility.RectangleContainsScreenPoint(panelRect, screenPoint, eventCamera))
+                {
+                    desktopClickHeld = pressed;
+                    return true;
+                }
+            }
+
+            desktopClickHeld = false;
             return false;
         }
 

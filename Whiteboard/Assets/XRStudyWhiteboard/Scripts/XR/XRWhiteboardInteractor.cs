@@ -43,6 +43,7 @@ namespace XRStudyWhiteboard
         private readonly List<Button> desktopButtons = new List<Button>();
         private Canvas whiteboardUiCanvas;
         private XRRayInteractor xrRayInteractor;
+        private XRStudyRoomLocomotion desktopLocomotion;
         private bool controllerUiClickHeld;
         private bool desktopUiClickHeld;
         private Camera gameplayCamera;
@@ -62,6 +63,7 @@ namespace XRStudyWhiteboard
                 rayOrigin = transform;
 
             manager = FindFirstObjectByType<XRStudyWhiteboardManager>();
+            desktopLocomotion = FindFirstObjectByType<XRStudyRoomLocomotion>();
             DisableEditorDeviceSimulatorForDesktopTest();
             ResolveXrRayOrigin();
             ResolveDesktopUiRaycaster();
@@ -141,8 +143,24 @@ namespace XRStudyWhiteboard
             if (canvas == null || drawer == null)
                 return;
 
+            // The room navigation pad is IMGUI, so it is not represented by
+            // the world-space GraphicRaycaster used for annotation controls.
+            // Consume its click state before resolving any board/paper ray;
+            // otherwise a docked Game-view coordinate mismatch can turn a
+            // TABLE or CENTER click into a long accidental paper stroke.
+            if (desktopLocomotion != null && desktopLocomotion.IsDesktopNavigationPointerHeld)
+            {
+                EndDrawing();
+                wasPressed = false;
+                surfaceMissGraceTimer = 0f;
+                return;
+            }
+
             if (Mouse.current == null || (!Mouse.current.leftButton.isPressed && !desktopMouseButtonHeld))
+            {
                 desktopUiClickHeld = false;
+                StudyTableToolMenu.EndDesktopPointer();
+            }
 
             Ray ray;
             bool pressed;
@@ -417,6 +435,16 @@ namespace XRStudyWhiteboard
                 ? Mouse.current.position.ReadValue()
                 : gameViewPoint;
 
+            Camera camera = GetGameplayCamera();
+            if (camera != null
+                && (StudyTableToolMenu.TryHandleDesktopScreenPoint(inputSystemPoint, camera, true)
+                    || StudyTableToolMenu.TryHandleDesktopScreenPoint(gameViewPoint, camera, true)))
+            {
+                EndDrawing();
+                current.Use();
+                return;
+            }
+
             Button[] candidates = FindObjectsByType<Button>(
                 FindObjectsInactive.Exclude,
                 FindObjectsSortMode.None);
@@ -581,16 +609,26 @@ namespace XRStudyWhiteboard
                 return false;
 
             ResolveDesktopUiRaycaster();
+            Camera camera = GetGameplayCamera();
+            if (camera == null)
+                return false;
+
+            // Table menus are generated world-space canvases and are not part
+            // of the whiteboard GraphicRaycaster. Check their real button
+            // rectangles first so a desktop click can open/select tools
+            // without falling through to the paper surface.
+            if (StudyTableToolMenu.TryHandleDesktopScreenPoint(screenPosition, camera, true))
+            {
+                desktopUiClickHeld = true;
+                return true;
+            }
+
             if (desktopUiRaycaster == null)
                 return false;
 
             if (desktopEventSystem == null)
                 desktopEventSystem = EventSystem.current;
             if (desktopEventSystem == null)
-                return false;
-
-            Camera camera = GetGameplayCamera();
-            if (camera == null)
                 return false;
 
             if (desktopPointerEventData == null)

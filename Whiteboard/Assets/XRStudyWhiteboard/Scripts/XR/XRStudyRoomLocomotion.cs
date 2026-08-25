@@ -78,6 +78,7 @@ namespace XRStudyWhiteboard
         private float desktopTeleportCooldown;
         private bool desktopMode;
         private bool seatedDesktopView;
+        private bool desktopNavigationPointerHeld;
         private XRInputDevice leftController;
         private XRInputDevice rightController;
         private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
@@ -85,6 +86,7 @@ namespace XRStudyWhiteboard
         private readonly List<FieldInfo> simulatorResetFields = new List<FieldInfo>();
 
         private bool IsDesktopMode => desktopMode;
+        public bool IsDesktopNavigationPointerHeld => desktopNavigationPointerHeld;
 
         public void SetOrigin(Transform origin)
         {
@@ -711,6 +713,32 @@ namespace XRStudyWhiteboard
             // clipped to the table-cell width.
             float actionGap = gap;
             float actionWidth = (navigationWidth - 2f * actionGap) / 3f;
+
+            // Desktop navigation is drawn with IMGUI rather than the
+            // world-space canvases. Latch its pointer here so a click on a
+            // teleport/table button cannot also be interpreted as a drawing
+            // press when the docked Game view reports a different coordinate
+            // space to the Input System.
+            if (Event.current.type == EventType.MouseDown
+                && Event.current.button == 0
+                && IsNavigationPointerInside(
+                    Event.current.mousePosition,
+                    tableCount,
+                    columns,
+                    buttonX,
+                    buttonY,
+                    buttonWidth,
+                    gap,
+                    actionWidth))
+            {
+                desktopNavigationPointerHeld = true;
+            }
+            else if (Event.current.type == EventType.MouseUp
+                && Event.current.button == 0)
+            {
+                desktopNavigationPointerHeld = false;
+            }
+
             if (Event.current.type == EventType.MouseUp
                 && (Event.current.button == 0 || Event.current.button < 0))
             {
@@ -765,6 +793,33 @@ namespace XRStudyWhiteboard
                     TryTeleportToTable(i);
             }
 
+        }
+
+        private static bool IsNavigationPointerInside(
+            Vector2 pointer,
+            int tableCount,
+            int columns,
+            float buttonX,
+            float buttonY,
+            float buttonWidth,
+            float gap,
+            float actionWidth)
+        {
+            if (new Rect(buttonX, buttonY, actionWidth, 32f).Contains(pointer)
+                || new Rect(buttonX + actionWidth + gap, buttonY, actionWidth, 32f).Contains(pointer)
+                || new Rect(buttonX + 2f * (actionWidth + gap), buttonY, actionWidth, 32f).Contains(pointer))
+                return true;
+
+            float tableTop = buttonY + 32f + gap;
+            for (int i = 0; i < tableCount; i++)
+            {
+                float x = buttonX + (i % columns) * (buttonWidth + gap);
+                float y = tableTop + (i / columns) * (32f + gap);
+                if (new Rect(x, y, buttonWidth, 32f).Contains(pointer))
+                    return true;
+            }
+
+            return false;
         }
 
         private void CenterView()
