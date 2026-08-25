@@ -13,7 +13,7 @@ namespace XRStudyWhiteboard
         private static readonly List<StudyTableTeleportPoint> ActivePoints = new List<StudyTableTeleportPoint>();
 
         [SerializeField] private PaperNoteCanvas paper;
-        [SerializeField] private float approachDistance = 0.82f;
+        [SerializeField] private float approachDistance = 1.4f;
         [SerializeField] private float floorHeight = 0f;
 
         public static IReadOnlyList<StudyTableTeleportPoint> Points => ActivePoints;

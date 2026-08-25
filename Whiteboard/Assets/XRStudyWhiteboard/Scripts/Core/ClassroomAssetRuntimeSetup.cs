@@ -235,21 +235,38 @@ namespace XRStudyWhiteboard
                 // the opposite side from this imported board normal. The
                 // old rotation therefore displayed every label backwards.
                 Quaternion uiRotation = boardRotation * Quaternion.Euler(0f, 180f, 0f);
-                // Keep the control panel completely outside the board
-                // collider and slightly toward the room.  The previous
-                // 0.35 m side gap left the panel's left edge overlapping the
-                // board, so controller rays hit the whiteboard first and the
-                // colour/tool buttons became impossible to select.
+                // Keep the control panel just outside the board collider but
+                // close enough to remain in the seated whiteboard view. A
+                // large side gap pushed the status/colour labels beyond the
+                // Game view and made the panel look clipped.
                 Vector3 frontDirection = boardFrontOffset.sqrMagnitude > 0.01f
                     ? boardFrontOffset.normalized
                     : normal;
                 whiteboardUi.SetPositionAndRotation(
                     boardFrontCenter
-                    + right * (width * 0.5f + 0.72f)
+                    + right * (width * 0.5f + 0.10f)
                     + frontDirection * 0.14f
                     + up * 0.02f,
                     uiRotation);
+                ApplyWhiteboardUiLayout(whiteboardUi);
             }
+        }
+
+        private static void ApplyWhiteboardUiLayout(Transform whiteboardUi)
+        {
+            // Scenes built before the compact panel layout still contain the
+            // old heading anchors. Apply the same safe in-panel positions at
+            // runtime so an existing classroom scene is fixed without
+            // requiring the user to rebuild the imported room.
+            SetUiAnchoredPosition(whiteboardUi.Find("ToolPanel/ColourHeading"), new Vector2(-180f, 180f));
+            SetUiAnchoredPosition(whiteboardUi.Find("ToolPanel/ToolHeading"), new Vector2(-180f, 45f));
+        }
+
+        private static void SetUiAnchoredPosition(Transform target, Vector2 position)
+        {
+            RectTransform rect = target as RectTransform;
+            if (rect != null)
+                rect.anchoredPosition = position;
         }
 
         private void DisableOriginalBoard(Transform model)

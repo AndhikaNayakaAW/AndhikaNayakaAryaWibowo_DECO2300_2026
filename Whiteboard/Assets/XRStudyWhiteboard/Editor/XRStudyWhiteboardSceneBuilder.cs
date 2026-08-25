@@ -494,25 +494,28 @@ namespace XRStudyWhiteboard.Editor
             panelImage.raycastTarget = false;
 
             TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
-            CreateText(panelObject.transform, "Title", "XR STUDY\nWHITEBOARD", font, new Vector2(0f, 315f), new Vector2(560f, 105f), 39f, TextAlignmentOptions.Center, new Color(0.62f, 0.92f, 1f));
-            CreateText(panelObject.transform, "Subtitle", "Today's Study Session", font, new Vector2(0f, 245f), new Vector2(560f, 45f), 25f, TextAlignmentOptions.Center, Color.white);
-            CreateText(panelObject.transform, "ColourHeading", "COLOUR", font, new Vector2(-240f, 180f), new Vector2(220f, 36f), 23f, TextAlignmentOptions.Left, new Color(0.55f, 0.72f, 0.8f));
+            CreateText(panelObject.transform, "Title", "XR STUDY\nWHITEBOARD", font, new Vector2(0f, 315f), new Vector2(560f, 105f), 34f, TextAlignmentOptions.Center, new Color(0.62f, 0.92f, 1f));
+            CreateText(panelObject.transform, "Subtitle", "Today's Study Session", font, new Vector2(0f, 245f), new Vector2(560f, 45f), 21f, TextAlignmentOptions.Center, Color.white);
+            // Keep the heading inside the panel's -320 px left edge. The
+            // previous -240/220 combination started 30 px outside the
+            // background, which made COLOUR and TOOL look detached.
+            CreateText(panelObject.transform, "ColourHeading", "COLOUR", font, new Vector2(-180f, 180f), new Vector2(190f, 36f), 20f, TextAlignmentOptions.Left, new Color(0.55f, 0.72f, 0.8f));
 
             WhiteboardColourButton black = CreateColourButton(panelObject.transform, "Black", WhiteboardColour.Black, manager, font, new Vector2(-175f, 120f));
             WhiteboardColourButton red = CreateColourButton(panelObject.transform, "Red", WhiteboardColour.Red, manager, font, new Vector2(-55f, 120f));
             WhiteboardColourButton blue = CreateColourButton(panelObject.transform, "Blue", WhiteboardColour.Blue, manager, font, new Vector2(65f, 120f));
             WhiteboardColourButton green = CreateColourButton(panelObject.transform, "Green", WhiteboardColour.Green, manager, font, new Vector2(185f, 120f));
 
-            CreateText(panelObject.transform, "ToolHeading", "TOOL", font, new Vector2(-240f, 45f), new Vector2(220f, 36f), 23f, TextAlignmentOptions.Left, new Color(0.55f, 0.72f, 0.8f));
-            WhiteboardToolButton marker = CreateToolButton(panelObject.transform, "Marker", WhiteboardTool.Marker, manager, font, new Vector2(-140f, -15f));
-            WhiteboardToolButton eraser = CreateToolButton(panelObject.transform, "Eraser", WhiteboardTool.Eraser, manager, font, new Vector2(140f, -15f));
+            CreateText(panelObject.transform, "ToolHeading", "TOOL", font, new Vector2(-180f, 45f), new Vector2(190f, 36f), 20f, TextAlignmentOptions.Left, new Color(0.55f, 0.72f, 0.8f));
+            WhiteboardToolButton marker = CreateToolButton(panelObject.transform, "Marker", WhiteboardTool.Marker, manager, font, new Vector2(-125f, -15f));
+            WhiteboardToolButton eraser = CreateToolButton(panelObject.transform, "Eraser", WhiteboardTool.Eraser, manager, font, new Vector2(125f, -15f));
 
             GameObject statusObject = NewObject("Status", panelObject.transform);
             statusObject.AddComponent<RectTransform>().sizeDelta = new Vector2(560f, 135f);
             statusObject.GetComponent<RectTransform>().anchoredPosition = new Vector2(0f, -135f);
-            TMP_Text toolText = CreateText(statusObject.transform, "ToolStatus", "CURRENT TOOL\nMARKER", font, new Vector2(-175f, 0f), new Vector2(190f, 100f), 22f, TextAlignmentOptions.Left, Color.white);
-            TMP_Text colourText = CreateText(statusObject.transform, "ColourStatus", "COLOUR\nBLACK", font, new Vector2(0f, 0f), new Vector2(160f, 100f), 22f, TextAlignmentOptions.Left, Color.white);
-            TMP_Text inputText = CreateText(statusObject.transform, "InputStatus", "INPUT\nCONTROLLER / HANDS", font, new Vector2(190f, 0f), new Vector2(200f, 100f), 17f, TextAlignmentOptions.Left, new Color(0.7f, 0.82f, 0.87f));
+            TMP_Text toolText = CreateText(statusObject.transform, "ToolStatus", "CURRENT TOOL\nMARKER", font, new Vector2(-180f, 0f), new Vector2(170f, 100f), 18f, TextAlignmentOptions.Left, Color.white);
+            TMP_Text colourText = CreateText(statusObject.transform, "ColourStatus", "COLOUR\nBLACK", font, new Vector2(-5f, 0f), new Vector2(145f, 100f), 18f, TextAlignmentOptions.Left, Color.white);
+            TMP_Text inputText = CreateText(statusObject.transform, "InputStatus", "INPUT\nCONTROLLER / HANDS", font, new Vector2(185f, 0f), new Vector2(185f, 100f), 14f, TextAlignmentOptions.Left, new Color(0.7f, 0.82f, 0.87f));
             statusDisplay = statusObject.AddComponent<WhiteboardStatusDisplay>();
             statusDisplay.Initialize(toolText, colourText, inputText, null);
 
@@ -552,10 +555,16 @@ namespace XRStudyWhiteboard.Editor
             RectTransform swatchRect = swatchObject.AddComponent<RectTransform>();
             swatchRect.anchorMin = new Vector2(0f, 0.5f);
             swatchRect.anchorMax = new Vector2(0f, 0.5f);
-            swatchRect.anchoredPosition = new Vector2(23f, 0f);
+            swatchRect.anchoredPosition = new Vector2(14f, 0f);
             swatchRect.sizeDelta = new Vector2(24f, 24f);
             Image swatch = swatchObject.AddComponent<Image>();
             swatch.color = XRStudyWhiteboardManager.GetColour(colour);
+            TMP_Text label = buttonObject.transform.Find("Label")?.GetComponent<TMP_Text>();
+            if (label != null)
+            {
+                label.rectTransform.sizeDelta = new Vector2(68f, 54f);
+                label.rectTransform.anchoredPosition = new Vector2(20f, 0f);
+            }
             Outline outline = buttonObject.GetComponent<Outline>();
             colourButton.Initialize(manager, colour, swatch, outline);
             return colourButton;
@@ -633,7 +642,11 @@ namespace XRStudyWhiteboard.Editor
             textComponent.fontSize = fontSize;
             textComponent.color = colour;
             textComponent.alignment = alignment;
-            textComponent.textWrappingMode = TextWrappingModes.Normal;
+            textComponent.enableAutoSizing = true;
+            textComponent.fontSizeMin = Mathf.Max(10f, fontSize * 0.55f);
+            textComponent.fontSizeMax = fontSize;
+            textComponent.overflowMode = TextOverflowModes.Ellipsis;
+            textComponent.textWrappingMode = TextWrappingModes.NoWrap;
             textComponent.raycastTarget = false;
             return textComponent;
         }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,6 +14,7 @@ namespace XRStudyWhiteboard
     /// </summary>
     public sealed class StudyTableToolMenu : MonoBehaviour
     {
+        private static readonly List<StudyTableToolMenu> ActiveMenus = new List<StudyTableToolMenu>();
         private static readonly Color PanelColour = new Color(0.035f, 0.075f, 0.12f, 0.97f);
         private static readonly Color ButtonColour = new Color(0.09f, 0.14f, 0.19f, 1f);
         private static readonly Color AccentColour = new Color(0.25f, 0.75f, 0.92f, 1f);
@@ -22,25 +24,50 @@ namespace XRStudyWhiteboard
         private GameObject menuObject;
         private GameObject menuPanel;
         private TMP_Text selectedToolText;
+        private bool directControllerClickHeld;
+
+        public static bool TryHandleAnyRay(Ray ray, bool pressed)
+        {
+            for (int i = ActiveMenus.Count - 1; i >= 0; i--)
+            {
+                StudyTableToolMenu menu = ActiveMenus[i];
+                if (menu == null)
+                {
+                    ActiveMenus.RemoveAt(i);
+                    continue;
+                }
+
+                if (menu.TryHandleRay(ray, pressed))
+                    return true;
+            }
+
+            return false;
+        }
 
         public void Initialize(PaperNoteCanvas paperNote)
         {
             paper = paperNote;
+            if (!ActiveMenus.Contains(this))
+                ActiveMenus.Add(this);
             BuildMenu();
         }
 
         private void OnEnable()
         {
+            if (!ActiveMenus.Contains(this))
+                ActiveMenus.Add(this);
             PaperTool.SelectionChanged += RefreshSelection;
         }
 
         private void OnDisable()
         {
+            ActiveMenus.Remove(this);
             PaperTool.SelectionChanged -= RefreshSelection;
         }
 
         private void OnDestroy()
         {
+            ActiveMenus.Remove(this);
             PaperTool.SelectionChanged -= RefreshSelection;
         }
 
@@ -52,35 +79,48 @@ namespace XRStudyWhiteboard
             TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
             menuObject = new GameObject("TableToolMenu");
             menuObject.transform.SetParent(transform, false);
-            menuObject.transform.localPosition = new Vector3(0.32f, 0.1f, 0.2f);
-            // The top of the table is the most comfortable aiming surface for
-            // both a Quest ray and the editor simulator's controller ray.
-            menuObject.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-            menuObject.transform.localScale = Vector3.one * 0.00115f;
+            // Put the button just beyond the paper's front-right corner. The
+            // student teleport anchor approaches from +Z, so placing it at
+            // -Z put the old button behind the paper and under the simulator
+            // controller ray.
+            menuObject.transform.localPosition = new Vector3(-0.38f, 0.1f, 0.28f);
+            // The canvas lies flat on the tabletop.  Its readable side must
+            // face the student sitting at +Z; the previous -90 rotation put
+            // the screen's top edge away from the student and made TOOLS look
+            // upside down in the headset/editor view.
+            menuObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            // World-space canvases on the tabletop are viewed from their
+            // back side by the seated camera. Flip only the horizontal UI
+            // axis so the readable side remains visible and TOOLS is not
+            // mirrored, while preserving the table-facing ray plane.
+            menuObject.transform.localScale = new Vector3(-0.00115f, 0.00115f, 0.00115f);
 
             Canvas canvas = menuObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
             canvas.sortingOrder = 20;
+            canvas.worldCamera = Camera.main;
             menuObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            menuObject.AddComponent<GraphicRaycaster>();
-            menuObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+            GraphicRaycaster graphicRaycaster = menuObject.AddComponent<GraphicRaycaster>();
+            graphicRaycaster.ignoreReversedGraphics = false;
+            TrackedDeviceGraphicRaycaster trackedRaycaster = menuObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+            trackedRaycaster.ignoreReversedGraphics = false;
 
             RectTransform canvasRect = menuObject.GetComponent<RectTransform>();
             canvasRect.sizeDelta = new Vector2(420f, 330f);
 
-            menuPanel = CreatePanel(menuObject.transform, "FloatingToolPanel", new Vector2(0f, 75f), new Vector2(410f, 205f), PanelColour);
-            CreateText(menuPanel.transform, "MenuTitle", "PAPER TOOLS", font, new Vector2(0f, 73f), new Vector2(360f, 40f), 23f, TextAlignmentOptions.Center, AccentColour);
-            CreateButton(menuPanel.transform, "Pencil", "PENCIL", font, new Vector2(-125f, 7f), new Vector2(112f, 62f), () => SelectTool(PaperToolKind.Pencil));
-            CreateButton(menuPanel.transform, "Eraser", "ERASER", font, new Vector2(0f, 7f), new Vector2(112f, 62f), () => SelectTool(PaperToolKind.Eraser));
-            CreateButton(menuPanel.transform, "ClearPaper", "CLEAR PAPER", font, new Vector2(125f, 7f), new Vector2(112f, 62f), ClearPaper);
-            selectedToolText = CreateText(menuPanel.transform, "SelectedTool", "PENCIL READY", font, new Vector2(0f, -70f), new Vector2(360f, 34f), 17f, TextAlignmentOptions.Center, Color.white);
+            menuPanel = CreatePanel(menuObject.transform, "FloatingToolPanel", new Vector2(0f, 84f), new Vector2(470f, 224f), PanelColour);
+            CreateText(menuPanel.transform, "MenuTitle", "PAPER TOOLS", font, new Vector2(0f, 78f), new Vector2(410f, 40f), 23f, TextAlignmentOptions.Center, AccentColour);
+            CreateButton(menuPanel.transform, "Pencil", "PENCIL", font, new Vector2(-145f, 8f), new Vector2(130f, 66f), () => SelectTool(PaperToolKind.Pencil));
+            CreateButton(menuPanel.transform, "Eraser", "ERASER", font, new Vector2(0f, 8f), new Vector2(130f, 66f), () => SelectTool(PaperToolKind.Eraser));
+            CreateButton(menuPanel.transform, "ClearPaper", "CLEAR PAPER", font, new Vector2(145f, 8f), new Vector2(130f, 66f), ClearPaper);
+            selectedToolText = CreateText(menuPanel.transform, "SelectedTool", "PENCIL READY", font, new Vector2(0f, -76f), new Vector2(410f, 34f), 17f, TextAlignmentOptions.Center, Color.white);
 
-            GameObject openButton = CreatePanel(menuObject.transform, "OpenToolsButton", new Vector2(0f, -90f), new Vector2(210f, 62f), ButtonColour);
+            GameObject openButton = CreatePanel(menuObject.transform, "OpenToolsButton", new Vector2(0f, -104f), new Vector2(250f, 72f), ButtonColour);
             Button open = openButton.AddComponent<Button>();
             Image openImage = openButton.GetComponent<Image>();
             open.targetGraphic = openImage;
             SetButtonColours(open, ButtonColour);
-            CreateText(openButton.transform, "Label", "TOOLS", font, Vector2.zero, new Vector2(190f, 52f), 20f, TextAlignmentOptions.Center, Color.white);
+            CreateText(openButton.transform, "Label", "TOOLS", font, Vector2.zero, new Vector2(230f, 60f), 20f, TextAlignmentOptions.Center, Color.white);
             open.onClick.AddListener(ToggleMenu);
 
             menuPanel.SetActive(false);
@@ -94,6 +134,81 @@ namespace XRStudyWhiteboard
 
             menuPanel.SetActive(!menuPanel.activeSelf);
             ControllerHaptics.PulseRightController();
+        }
+
+        private void LateUpdate()
+        {
+            if (menuObject == null)
+                return;
+
+            // Camera.main can be assigned after runtime XR startup. Keeping
+            // it on the world canvas makes both the standard XRUI module and
+            // the editor GraphicRaycaster use the same event camera.
+            Canvas canvas = menuObject.GetComponent<Canvas>();
+            if (canvas != null && canvas.worldCamera == null)
+                canvas.worldCamera = Camera.main;
+        }
+
+        private bool TryHandleRay(Ray ray, bool pressed)
+        {
+            if (menuObject == null)
+                return false;
+
+            Canvas canvas = menuObject.GetComponent<Canvas>();
+            RectTransform canvasRect = menuObject.GetComponent<RectTransform>();
+            if (canvas == null || canvasRect == null)
+                return false;
+
+            Plane menuPlane = new Plane(menuObject.transform.forward, menuObject.transform.position);
+            if (!menuPlane.Raycast(ray, out float distance) || distance < 0f)
+            {
+                directControllerClickHeld = false;
+                return false;
+            }
+
+            Vector3 worldPoint = ray.GetPoint(distance);
+
+            Button[] buttons = menuObject.GetComponentsInChildren<Button>(false);
+            Button hitButton = null;
+            for (int i = 0; i < buttons.Length; i++)
+            {
+                Button button = buttons[i];
+                if (button == null || !button.isActiveAndEnabled)
+                    continue;
+
+                RectTransform buttonRect = button.transform as RectTransform;
+                if (buttonRect == null)
+                    continue;
+
+                Vector2 buttonPoint = buttonRect.InverseTransformPoint(worldPoint);
+                if (buttonRect.rect.Contains(buttonPoint) || IsRayNearButton(buttonRect, ray))
+                {
+                    hitButton = button;
+                    break;
+                }
+            }
+
+            if (hitButton != null && pressed && !directControllerClickHeld)
+                hitButton.onClick.Invoke();
+
+            directControllerClickHeld = pressed;
+            // The ray is over this menu, so stop it reaching the paper or
+            // board even when it is between two menu buttons.
+            return true;
+        }
+
+        private static bool IsRayNearButton(RectTransform buttonRect, Ray ray)
+        {
+            Vector3[] corners = new Vector3[4];
+            buttonRect.GetWorldCorners(corners);
+            Vector3 center = (corners[0] + corners[2]) * 0.5f;
+            float alongRay = Vector3.Dot(center - ray.origin, ray.direction);
+            if (alongRay < 0f)
+                return false;
+
+            Vector3 closest = ray.origin + ray.direction * alongRay;
+            float halfDiagonal = Vector3.Distance(corners[0], corners[2]) * 0.5f;
+            return Vector3.Distance(closest, center) <= halfDiagonal;
         }
 
         private void SelectTool(PaperToolKind tool)
@@ -168,6 +283,12 @@ namespace XRStudyWhiteboard
             textComponent.fontSize = fontSize;
             textComponent.color = colour;
             textComponent.alignment = alignment;
+            // The tabletop canvas is intentionally viewed from its back
+            // side so it can sit above the paper without z-fighting. Flip
+            // the glyph layer back to normal reading order; the button
+            // rectangle itself remains in the correct raycast position.
+            textComponent.transform.localScale = new Vector3(-1f, 1f, 1f);
+            textComponent.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
             textComponent.raycastTarget = false;
             return textComponent;
         }

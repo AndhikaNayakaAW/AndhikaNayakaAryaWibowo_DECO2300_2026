@@ -63,6 +63,7 @@ namespace XRStudyWhiteboard.Editor
             }
 
             RunDrawingSmokeTests(ref checks, ref errors);
+            RunTableToolMenuSmokeTests(ref checks, ref errors);
 
             if (errors == 0)
             {
@@ -393,6 +394,68 @@ namespace XRStudyWhiteboard.Editor
             finally
             {
                 UnityEngine.Object.DestroyImmediate(boardObject);
+                UnityEngine.Object.DestroyImmediate(paperObject);
+            }
+        }
+
+        private static void RunTableToolMenuSmokeTests(ref int checks, ref int errors)
+        {
+            GameObject tableObject = new GameObject("Table Tool Menu Smoke Test");
+            GameObject paperObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            tableObject.hideFlags = HideFlags.HideAndDontSave;
+            paperObject.hideFlags = HideFlags.HideAndDontSave;
+
+            try
+            {
+                PaperNoteCanvas paper = paperObject.AddComponent<PaperNoteCanvas>();
+                paper.Configure(
+                    paperObject.GetComponent<Renderer>(),
+                    paperObject.GetComponent<Collider>(),
+                    new Vector2(0.55f, 0.38f));
+
+                StudyTableToolMenu menu = tableObject.AddComponent<StudyTableToolMenu>();
+                menu.Initialize(paper);
+                Transform menuTransform = tableObject.transform.Find("TableToolMenu");
+                Canvas menuCanvas = menuTransform != null ? menuTransform.GetComponent<Canvas>() : null;
+                Check(menuTransform != null, "Table tool menu canvas is created", ref checks, ref errors);
+                Check(menuCanvas != null, "Table tool menu has a world canvas", ref checks, ref errors);
+                if (menuTransform != null)
+                {
+                    Check(Vector3.Dot(menuTransform.forward, Vector3.down) > 0.9f, "Table tool menu faces the tabletop", ref checks, ref errors);
+                    Check(menuTransform.GetComponent<GraphicRaycaster>() != null, "Table tool menu has a desktop raycaster", ref checks, ref errors);
+                    Check(menuTransform.GetComponent<TrackedDeviceGraphicRaycaster>() != null, "Table tool menu has a tracked-device raycaster", ref checks, ref errors);
+                }
+
+                Button[] buttons = menuTransform != null
+                    ? menuTransform.GetComponentsInChildren<Button>(true)
+                    : Array.Empty<Button>();
+                Check(buttons.Length == 4, "Table tool menu exposes tools, pencil, eraser, and clear buttons", ref checks, ref errors);
+
+                Transform openTransform = menuTransform != null ? menuTransform.Find("OpenToolsButton") : null;
+                Transform panelTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel") : null;
+                Button openButton = openTransform != null ? openTransform.GetComponent<Button>() : null;
+                Check(openButton != null && panelTransform != null && !panelTransform.gameObject.activeSelf, "Table tool panel starts closed", ref checks, ref errors);
+
+                if (openButton != null && menuTransform != null)
+                {
+                    RectTransform openRect = openButton.transform as RectTransform;
+                    Vector3 openPoint = openRect.TransformPoint(openRect.rect.center);
+                    Ray menuRay = new Ray(openPoint - menuTransform.forward * 0.5f, menuTransform.forward);
+                    Check(StudyTableToolMenu.TryHandleAnyRay(menuRay, true), "Controller ray reaches the table tools button", ref checks, ref errors);
+                    StudyTableToolMenu.TryHandleAnyRay(menuRay, false);
+                    Check(panelTransform.gameObject.activeSelf, "Controller ray opens the table tool panel", ref checks, ref errors);
+                }
+
+                Transform eraserTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel/Eraser") : null;
+                Button eraserButton = eraserTransform != null ? eraserTransform.GetComponent<Button>() : null;
+                if (eraserButton != null)
+                    eraserButton.onClick.Invoke();
+                Check(PaperTool.SelectedKind == PaperToolKind.Eraser, "Table eraser action selects the eraser", ref checks, ref errors);
+                PaperTool.Select(PaperToolKind.Pencil);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(tableObject);
                 UnityEngine.Object.DestroyImmediate(paperObject);
             }
         }

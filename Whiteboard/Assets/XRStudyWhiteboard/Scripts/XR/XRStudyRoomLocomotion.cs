@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -80,6 +81,8 @@ namespace XRStudyWhiteboard
         private XRInputDevice leftController;
         private XRInputDevice rightController;
         private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
+        private readonly List<MonoBehaviour> simulatorResetTargets = new List<MonoBehaviour>();
+        private readonly List<FieldInfo> simulatorResetFields = new List<FieldInfo>();
 
         private bool IsDesktopMode => desktopMode;
 
@@ -354,9 +357,10 @@ namespace XRStudyWhiteboard
                 new Vector2(point.x, point.z),
                 new Vector2(target.x, target.z));
             float pitch = Mathf.Atan2(desktopSeatedHeight - target.y, Mathf.Max(0.1f, horizontalDistance)) * Mathf.Rad2Deg;
-            // A slight downward look centres the paper while leaving the
-            // board visible above it for orientation and study context.
-            return Mathf.Clamp(pitch, 8f, 18f);
+            // The paper is below the eye line. A deeper downward pitch keeps
+            // the paper, its tool button, and the chair in one table view,
+            // while the board remains visible in the upper part of the view.
+            return Mathf.Clamp(pitch, 10f, 18f);
         }
 
         private void TeleportDesktop(Vector3 point, Vector3 target, float targetHeight, bool seated, float? seatedPitchOverride = null)
@@ -670,12 +674,16 @@ namespace XRStudyWhiteboard
                         StandFromSeat();
                         Event.current.Use();
                         break;
+                    case KeyCode.C:
+                        CenterView();
+                        Event.current.Use();
+                        break;
                 }
             }
 
             GUI.Box(
                 new Rect(16f, 16f, 520f, 172f),
-                "DESKTOP TEST CONTROLS\n\nWASD: move   Q/E or arrows: turn\nJ: stand/jump from a table   Right-drag: look\nScroll: closer/farther   R: reset\n1: whiteboard   2-9: table views facing the paper\nL Mouse: draw/trigger   R Mouse: erase in desktop test\nTable menu: choose pencil, eraser, or clear paper\nBuilt-in XR Device Simulator: select Controller; hold Space to pose it\nVR: aim the built-in controller ray at the floor and press the trigger to teleport");
+                "DESKTOP TEST CONTROLS\n\nWASD: move   Q/E or arrows: turn\nJ: stand/jump from a table   C: center view\nRight-drag: look   Scroll: closer/farther   R: reset\n1: whiteboard   2-9: table views facing the paper\nL Mouse: draw/trigger   R Mouse: erase in desktop test\nTable menu: choose pencil, eraser, or clear paper\nBuilt-in XR Device Simulator: select Controller; hold Space to pose it\nVR: aim the built-in controller ray at the floor and press the trigger to teleport");
 
             // Clickable fallbacks are deliberately visible in the Game view.
             // They are especially useful when the simulator panel currently
@@ -684,29 +692,101 @@ namespace XRStudyWhiteboard
             // Keep the navigation pad in the upper-right corner, away from
             // the whiteboard and its world-space tool panel. The official
             // simulator and help text occupy the left side of the Game view.
-            float buttonX = Mathf.Max(16f, Screen.width - 360f);
-            // Put the desktop navigation pad below the world-space board
-            // panel.  The old top-right position was rendered behind the
-            // imported board/UI overlap and hid the WHITEBOARD shortcut.
-            float buttonY = Mathf.Max(16f, Screen.height - 132f);
-            float buttonWidth = 108f;
-            float gap = 6f;
-            if (GUI.Button(new Rect(buttonX, buttonY, buttonWidth, 32f), "WHITEBOARD"))
-                TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
-            if (GUI.Button(new Rect(buttonX + buttonWidth + gap, buttonY, buttonWidth, 32f), "STAND / JUMP"))
-                StandFromSeat();
-
-            buttonY += 38f;
             RefreshTablePoints();
             int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
+            int columns = tableCount > 9 ? 4 : 3;
+            float buttonWidth = tableCount > 9 ? 84f : 108f;
+            float gap = tableCount > 9 ? 5f : 6f;
+            float navigationWidth = columns * buttonWidth + (columns - 1) * gap;
+            float buttonX = Mathf.Max(16f, Screen.width - navigationWidth - 16f);
+            int tableRows = Mathf.CeilToInt(tableCount / (float)columns);
+            float navigationHeight = 32f + gap + tableRows * 32f + Mathf.Max(0, tableRows - 1) * gap;
+            // Anchor the complete navigation pad to the bottom edge. The old
+            // fixed y-position placed the last table row below short Game
+            // views, so TABLE 7-9 were visibly cut off.
+            float buttonY = Mathf.Max(16f, Screen.height - navigationHeight - 16f);
+            // The table grid becomes four columns in the imported room. Give
+            // the three action buttons their own wider row so WHITEBOARD,
+            // STAND / JUMP, and CENTER VIEW remain readable instead of being
+            // clipped to the table-cell width.
+            float actionGap = gap;
+            float actionWidth = (navigationWidth - 2f * actionGap) / 3f;
+            if (GUI.Button(new Rect(buttonX, buttonY, actionWidth, 32f), "WHITEBOARD"))
+                TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
+            if (GUI.Button(new Rect(buttonX + actionWidth + actionGap, buttonY, actionWidth, 32f), "STAND / JUMP"))
+                StandFromSeat();
+            if (GUI.Button(new Rect(buttonX + 2f * (actionWidth + actionGap), buttonY, actionWidth, 32f), "CENTER VIEW"))
+                CenterView();
+
+            buttonY += 32f + gap;
             for (int i = 0; i < tableCount; i++)
             {
-                float x = buttonX + (i % 3) * (buttonWidth + gap);
-                float y = buttonY + (i / 3) * 38f;
+                float x = buttonX + (i % columns) * (buttonWidth + gap);
+                float y = buttonY + (i / columns) * (32f + gap);
                 if (GUI.Button(new Rect(x, y, buttonWidth, 32f), "TABLE " + (i + 1).ToString()))
                     TryTeleportToTable(i);
             }
 
+        }
+
+        private void CenterView()
+        {
+            if (desktopMode)
+            {
+                ResetView();
+                ResetSimulatorControllers();
+                return;
+            }
+
+            // A real headset owns the controller poses; recentering should
+            // realign the player's view without trying to move tracked hands
+            // away from their physical positions.
+            List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
+            SubsystemManager.GetSubsystems(subsystems);
+            for (int i = 0; i < subsystems.Count; i++)
+            {
+                if (subsystems[i] != null && subsystems[i].running)
+                    subsystems[i].TryRecenter();
+            }
+        }
+
+        private void ResetSimulatorControllers()
+        {
+            simulatorResetTargets.Clear();
+            simulatorResetFields.Clear();
+
+            MonoBehaviour[] behaviours = Resources.FindObjectsOfTypeAll<MonoBehaviour>();
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                MonoBehaviour behaviour = behaviours[i];
+                if (behaviour == null
+                    || !behaviour.gameObject.scene.IsValid()
+                    || behaviour.GetType().Name.IndexOf("Simulator", System.StringComparison.OrdinalIgnoreCase) < 0)
+                    continue;
+
+                FieldInfo resetField = behaviour.GetType().GetField(
+                    "m_ResetInput",
+                    BindingFlags.Instance | BindingFlags.NonPublic);
+                if (resetField == null || resetField.FieldType != typeof(bool))
+                    continue;
+
+                resetField.SetValue(behaviour, true);
+                simulatorResetTargets.Add(behaviour);
+                simulatorResetFields.Add(resetField);
+            }
+
+            if (simulatorResetTargets.Count > 0)
+                StartCoroutine(ClearSimulatorResetFlags());
+        }
+
+        private IEnumerator ClearSimulatorResetFlags()
+        {
+            yield return new WaitForSecondsRealtime(0.1f);
+            for (int i = 0; i < simulatorResetTargets.Count && i < simulatorResetFields.Count; i++)
+            {
+                if (simulatorResetTargets[i] != null)
+                    simulatorResetFields[i].SetValue(simulatorResetTargets[i], false);
+            }
         }
     }
 }

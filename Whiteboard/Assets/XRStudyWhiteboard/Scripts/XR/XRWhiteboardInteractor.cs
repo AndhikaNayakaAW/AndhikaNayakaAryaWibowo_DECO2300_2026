@@ -28,6 +28,7 @@ namespace XRStudyWhiteboard
         [SerializeField, Range(0.1f, 1f)] private float desktopPointerSmoothing = 1f;
         [SerializeField] private float desktopReleaseGraceSeconds = 0.12f;
         [SerializeField] private float controllerReleaseGraceSeconds = 0.08f;
+        [SerializeField] private float surfaceMissGraceSeconds = 0.12f;
 
         private XRInputDevice rightController;
         private InputAction controllerTriggerAction;
@@ -46,6 +47,7 @@ namespace XRStudyWhiteboard
         private bool desktopRightMouseButtonHeld;
         private float desktopPressGraceTimer;
         private float controllerPressGraceTimer;
+        private float surfaceMissGraceTimer;
         private bool desktopEraseWasActive;
         private WhiteboardTool toolBeforeDesktopErase;
         private bool usingDesktopCursor;
@@ -227,8 +229,26 @@ namespace XRStudyWhiteboard
                 desktopEraseWasActive = false;
             }
 
+            // Use the same ray fallback for the desktop cursor as for a real
+            // controller. This avoids depending on docked Game-view UI
+            // coordinates when the table canvas is viewed at an angle.
+            if (StudyTableToolMenu.TryHandleAnyRay(ray, pressed))
+            {
+                EndDrawing();
+                surfaceMissGraceTimer = 0f;
+                wasPressed = pressed;
+                return;
+            }
+
             if (PaperNoteCanvas.TryGetNearest(ray, maxRayDistance, out PaperNoteCanvas paper, out Vector2 paperUv))
             {
+                // A table paper and the main board use separate stroke
+                // buffers. End a board stroke before switching surfaces so a
+                // controller sweep cannot connect the two textures.
+                if (activePaper == null)
+                    drawer.EndStroke();
+
+                surfaceMissGraceTimer = surfaceMissGraceSeconds;
                 paperUv = SmoothDesktopPoint(paperUv, pressed && wasPressed);
                 paper.UpdateCursor(paperUv);
                 if (activePaper != paper)
@@ -256,18 +276,43 @@ namespace XRStudyWhiteboard
 
             if (activePaper != null)
             {
+                // Controller rays can miss the thin paper collider for one
+                // or two frames while the hand is moving. Keep the current
+                // paper stroke alive during that tiny gap; when the ray
+                // returns DrawAtUV interpolates across it instead of making
+                // a row of isolated dots. A hit on the board below still
+                // switches surfaces immediately.
+                if (pressed && surfaceMissGraceTimer > 0f)
+                {
+                    surfaceMissGraceTimer -= Time.unscaledDeltaTime;
+                    wasPressed = pressed;
+                    return;
+                }
+
                 activePaper.EndStroke();
                 activePaper = null;
             }
 
             if (!canvas.TryGetUV(ray, maxRayDistance, out Vector2 uv))
             {
-                if (wasPressed || !pressed)
-                    drawer.EndStroke();
+                if (pressed && surfaceMissGraceTimer > 0f)
+                {
+                    // Do not terminate the stroke on a transient ray miss.
+                    // The next valid UV is joined by WhiteboardCanvas's
+                    // segment interpolation.
+                    surfaceMissGraceTimer -= Time.unscaledDeltaTime;
+                }
+                else
+                {
+                    EndDrawing();
+                    surfaceMissGraceTimer = 0f;
+                }
+
                 wasPressed = pressed;
                 return;
             }
 
+            surfaceMissGraceTimer = surfaceMissGraceSeconds;
             uv = SmoothDesktopPoint(uv, pressed && wasPressed);
             canvas.UpdateCursor(uv);
             if (pressed)
