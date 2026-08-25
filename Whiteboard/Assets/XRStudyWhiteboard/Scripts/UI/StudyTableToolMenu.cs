@@ -181,7 +181,11 @@ namespace XRStudyWhiteboard
                     continue;
 
                 Vector2 buttonPoint = buttonRect.InverseTransformPoint(worldPoint);
-                if (buttonRect.rect.Contains(buttonPoint) || IsRayNearButton(buttonRect, ray))
+                // Require the ray-plane hit to be inside the actual button.
+                // The old broad “near button” tolerance also matched rays
+                // aimed at the paper, so the menu consumed every paper
+                // stroke before PaperNoteCanvas could receive it.
+                if (buttonRect.rect.Contains(buttonPoint))
                 {
                     hitButton = button;
                     break;
@@ -206,20 +210,6 @@ namespace XRStudyWhiteboard
 
             directControllerClickHeld = false;
             return false;
-        }
-
-        private static bool IsRayNearButton(RectTransform buttonRect, Ray ray)
-        {
-            Vector3[] corners = new Vector3[4];
-            buttonRect.GetWorldCorners(corners);
-            Vector3 center = (corners[0] + corners[2]) * 0.5f;
-            float alongRay = Vector3.Dot(center - ray.origin, ray.direction);
-            if (alongRay < 0f)
-                return false;
-
-            Vector3 closest = ray.origin + ray.direction * alongRay;
-            float halfDiagonal = Vector3.Distance(corners[0], corners[2]) * 0.5f;
-            return Vector3.Distance(closest, center) <= halfDiagonal;
         }
 
         private void SelectTool(PaperToolKind tool)

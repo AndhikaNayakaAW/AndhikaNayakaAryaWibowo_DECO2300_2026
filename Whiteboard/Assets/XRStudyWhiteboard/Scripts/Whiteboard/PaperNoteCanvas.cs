@@ -24,11 +24,15 @@ namespace XRStudyWhiteboard
         [SerializeField] private float eraserSize = 0.032f;
         [SerializeField] private float interpolationSpacing = 0.00075f;
         [SerializeField] private int maximumInterpolationSteps = 1024;
+        [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.18f;
 
         private Texture2D noteTexture;
         private Color32[] pixels;
         private Vector2 previousUv;
         private bool hasPreviousPoint;
+        private Vector2 inputBeforeLastUv;
+        private Vector2 lastInputUv;
+        private int inputSampleCount;
         private bool previousStrokeWasErasing;
         private bool textureDirty;
         private Transform crosshair;
@@ -120,23 +124,42 @@ namespace XRStudyWhiteboard
             if (paperCollider == null)
                 return false;
 
-            if (!paperCollider.Raycast(ray, out RaycastHit hit, maxDistance))
-                return false;
-
             // The generated papers use BoxColliders.  RaycastHit.textureCoord
             // is only reliable for mesh colliders, so calculate the point on
             // the paper's local X/Z plane for the box case.  This keeps
             // writing correct even after a paper has been grabbed and moved.
             if (paperCollider is BoxCollider box)
             {
-                Vector3 localPoint = box.transform.InverseTransformPoint(hit.point);
                 Vector3 halfSize = box.size * 0.5f;
+                // Intersect the ray with the paper's top plane instead of
+                // accepting a side face of the very thin box. A controller
+                // ray that grazes an edge can otherwise alternate between
+                // top and side hits, which turns a smooth stroke into dots
+                // and near-vertical jumps.
+                Vector3 topLocalPoint = box.center + Vector3.up * halfSize.y;
+                Plane paperPlane = new Plane(
+                    box.transform.TransformDirection(Vector3.up),
+                    box.transform.TransformPoint(topLocalPoint));
+                if (!paperPlane.Raycast(ray, out float planeDistance)
+                    || planeDistance < 0f
+                    || planeDistance > maxDistance)
+                    return false;
+
+                Vector3 localPoint = box.transform.InverseTransformPoint(ray.GetPoint(planeDistance));
+                if (localPoint.x < box.center.x - halfSize.x
+                    || localPoint.x > box.center.x + halfSize.x
+                    || localPoint.z < box.center.z - halfSize.z
+                    || localPoint.z > box.center.z + halfSize.z)
+                    return false;
+
                 uv = new Vector2(
                     Mathf.InverseLerp(box.center.x - halfSize.x, box.center.x + halfSize.x, localPoint.x),
                     Mathf.InverseLerp(box.center.z - halfSize.z, box.center.z + halfSize.z, localPoint.z));
             }
             else
             {
+                if (!paperCollider.Raycast(ray, out RaycastHit hit, maxDistance))
+                    return false;
                 uv = hit.textureCoord;
             }
 
@@ -149,14 +172,31 @@ namespace XRStudyWhiteboard
             if (!hasPreviousPoint || previousStrokeWasErasing != erasing)
             {
                 previousStrokeWasErasing = erasing;
+                inputSampleCount = 0;
                 Stamp(uv, erasing);
                 previousUv = uv;
                 hasPreviousPoint = true;
+                inputBeforeLastUv = uv;
+                lastInputUv = uv;
+                inputSampleCount = 1;
                 textureDirty = true;
                 return;
             }
 
+            Vector2 filteredUv = FilterInputPoint(uv);
             float distance = Vector2.Distance(previousUv, uv);
+            // Do not connect two unrelated controller hits with a long
+            // segment when the thin paper collider is briefly missed.
+            if (distance > maximumUvJump)
+            {
+                hasPreviousPoint = false;
+                inputSampleCount = 0;
+                return;
+            }
+
+            distance = Vector2.Distance(previousUv, filteredUv);
+            uv = filteredUv;
+
             float brushDiameter = erasing ? eraserSize : pencilSize;
             float brushRadiusInUv = (brushDiameter * 0.5f)
                 / Mathf.Max(paperWorldSize.x, paperWorldSize.y);
@@ -205,6 +245,7 @@ namespace XRStudyWhiteboard
         public void EndStroke()
         {
             hasPreviousPoint = false;
+            inputSampleCount = 0;
         }
 
         public void ClearNote()
@@ -274,6 +315,37 @@ namespace XRStudyWhiteboard
                         pixels[y * textureWidth + x] = colour;
                 }
             }
+        }
+
+        private Vector2 FilterInputPoint(Vector2 uv)
+        {
+            if (inputSampleCount <= 0)
+            {
+                inputBeforeLastUv = uv;
+                lastInputUv = uv;
+                inputSampleCount = 1;
+                return uv;
+            }
+
+            if (inputSampleCount == 1)
+            {
+                inputBeforeLastUv = lastInputUv;
+                lastInputUv = uv;
+                inputSampleCount = 2;
+                return uv;
+            }
+
+            Vector2 filtered = new Vector2(
+                Median(inputBeforeLastUv.x, lastInputUv.x, uv.x),
+                Median(inputBeforeLastUv.y, lastInputUv.y, uv.y));
+            inputBeforeLastUv = lastInputUv;
+            lastInputUv = uv;
+            return filtered;
+        }
+
+        private static float Median(float a, float b, float c)
+        {
+            return a + b + c - Mathf.Min(a, Mathf.Min(b, c)) - Mathf.Max(a, Mathf.Max(b, c));
         }
 
         private void EnsureCrosshair()

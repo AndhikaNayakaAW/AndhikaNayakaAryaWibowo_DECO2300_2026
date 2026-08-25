@@ -34,6 +34,23 @@ namespace XRStudyWhiteboard
 
         private void Update()
         {
+            // The editor Device Simulator can expose a hand subsystem while
+            // the desktop mouse is already driving the controller test ray.
+            // Running both writers at once produces the characteristic
+            // vertical spikes over an otherwise correct mouse circle. Keep
+            // this optional path for a real headset, where it is needed.
+            // The editor Device Simulator can report an active XR runtime
+            // even though the desktop/controller test is the intended input
+            // source. Letting this secondary hand path run at the same time
+            // creates the duplicate vertical strokes seen in the Game view.
+            if (Application.isEditor)
+            {
+                if (wasPinching && drawer != null)
+                    drawer.EndStroke();
+                wasPinching = false;
+                return;
+            }
+
             if (canvas == null || drawer == null || handSubsystems.Count == 0)
                 return;
 

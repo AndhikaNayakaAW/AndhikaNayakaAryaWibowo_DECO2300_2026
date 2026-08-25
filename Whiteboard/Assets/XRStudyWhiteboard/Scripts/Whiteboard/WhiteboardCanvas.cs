@@ -26,12 +26,16 @@ namespace XRStudyWhiteboard
         [SerializeField, Range(0.1f, 1f)] private float markerOpacity = 0.82f;
         [SerializeField] private float interpolationSpacing = 0.0006f;
         [SerializeField] private int maximumInterpolationSteps = 2048;
+        [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.18f;
 
         private Texture2D boardTexture;
         private Color32[] pixels;
         private XRStudyWhiteboardManager manager;
         private Vector2 previousUv;
         private bool hasPreviousPoint;
+        private Vector2 inputBeforeLastUv;
+        private Vector2 lastInputUv;
+        private int inputSampleCount;
         private bool textureDirty;
         private Transform crosshair;
         private readonly List<Renderer> crosshairRenderers = new List<Renderer>();
@@ -150,6 +154,7 @@ namespace XRStudyWhiteboard
         public void BeginStroke(Vector2 uv)
         {
             hasPreviousPoint = false;
+            inputSampleCount = 0;
             DrawPoint(uv);
         }
 
@@ -161,7 +166,22 @@ namespace XRStudyWhiteboard
                 return;
             }
 
+            Vector2 filteredUv = FilterInputPoint(uv);
+
             float distance = Vector2.Distance(previousUv, uv);
+            // A missed or re-aimed controller ray must not be joined with a
+            // long straight segment. That segment is what appears as the
+            // unwanted vertical line after a simulator pose jump.
+            if (distance > maximumUvJump)
+            {
+                hasPreviousPoint = false;
+                inputSampleCount = 0;
+                return;
+            }
+
+            distance = Vector2.Distance(previousUv, filteredUv);
+            uv = filteredUv;
+
             float brushDiameter = manager != null && manager.CurrentTool == WhiteboardTool.Eraser
                 ? eraserSize
                 : markerSize;
@@ -190,6 +210,7 @@ namespace XRStudyWhiteboard
         public void EndStroke()
         {
             hasPreviousPoint = false;
+            inputSampleCount = 0;
         }
 
         public void ClearBoard()
@@ -257,7 +278,41 @@ namespace XRStudyWhiteboard
             Stamp(uv);
             previousUv = uv;
             hasPreviousPoint = true;
+            inputBeforeLastUv = uv;
+            lastInputUv = uv;
+            inputSampleCount = 1;
             textureDirty = true;
+        }
+
+        private Vector2 FilterInputPoint(Vector2 uv)
+        {
+            if (inputSampleCount <= 0)
+            {
+                inputBeforeLastUv = uv;
+                lastInputUv = uv;
+                inputSampleCount = 1;
+                return uv;
+            }
+
+            if (inputSampleCount == 1)
+            {
+                inputBeforeLastUv = lastInputUv;
+                lastInputUv = uv;
+                inputSampleCount = 2;
+                return uv;
+            }
+
+            Vector2 filtered = new Vector2(
+                Median(inputBeforeLastUv.x, lastInputUv.x, uv.x),
+                Median(inputBeforeLastUv.y, lastInputUv.y, uv.y));
+            inputBeforeLastUv = lastInputUv;
+            lastInputUv = uv;
+            return filtered;
+        }
+
+        private static float Median(float a, float b, float c)
+        {
+            return a + b + c - Mathf.Min(a, Mathf.Min(b, c)) - Mathf.Max(a, Mathf.Max(b, c));
         }
 
         private void Stamp(Vector2 uv)

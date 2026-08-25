@@ -244,10 +244,15 @@ namespace XRStudyWhiteboard
                     : normal;
                 whiteboardUi.SetPositionAndRotation(
                     boardFrontCenter
-                    + right * (width * 0.5f + 0.42f)
+                    + right * (width * 0.5f + 0.24f)
                     + frontDirection * 0.14f
                     + up * 0.02f,
                     uiRotation);
+                // Keep the complete colour/tool/status panel inside the
+                // seated desktop view while leaving the writing surface
+                // unobstructed. The original 640px canvas at 0.00135 world
+                // scale was clipped at the right edge of the Game view.
+                whiteboardUi.localScale = Vector3.one * 0.00105f;
                 ApplyWhiteboardUiLayout(whiteboardUi);
             }
         }

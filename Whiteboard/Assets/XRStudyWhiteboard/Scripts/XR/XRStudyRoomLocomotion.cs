@@ -711,6 +711,44 @@ namespace XRStudyWhiteboard
             // clipped to the table-cell width.
             float actionGap = gap;
             float actionWidth = (navigationWidth - 2f * actionGap) / 3f;
+            if (Event.current.type == EventType.MouseUp
+                && (Event.current.button == 0 || Event.current.button < 0))
+            {
+                Vector2 pointer = Event.current.mousePosition;
+                Rect whiteboardRect = new Rect(buttonX, buttonY, actionWidth, 32f);
+                Rect standRect = new Rect(buttonX + actionWidth + actionGap, buttonY, actionWidth, 32f);
+                Rect centerRect = new Rect(buttonX + 2f * (actionWidth + actionGap), buttonY, actionWidth, 32f);
+                if (whiteboardRect.Contains(pointer))
+                {
+                    TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
+                    Event.current.Use();
+                }
+                else if (standRect.Contains(pointer))
+                {
+                    StandFromSeat();
+                    Event.current.Use();
+                }
+                else if (centerRect.Contains(pointer))
+                {
+                    CenterView();
+                    Event.current.Use();
+                }
+                else
+                {
+                    for (int i = 0; i < tableCount; i++)
+                    {
+                        float x = buttonX + (i % columns) * (buttonWidth + gap);
+                        float y = buttonY + 32f + gap + (i / columns) * (32f + gap);
+                        if (!new Rect(x, y, buttonWidth, 32f).Contains(pointer))
+                            continue;
+
+                        TryTeleportToTable(i);
+                        Event.current.Use();
+                        break;
+                    }
+                }
+            }
+
             if (GUI.Button(new Rect(buttonX, buttonY, actionWidth, 32f), "WHITEBOARD"))
                 TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
             if (GUI.Button(new Rect(buttonX + actionWidth + actionGap, buttonY, actionWidth, 32f), "STAND / JUMP"))
