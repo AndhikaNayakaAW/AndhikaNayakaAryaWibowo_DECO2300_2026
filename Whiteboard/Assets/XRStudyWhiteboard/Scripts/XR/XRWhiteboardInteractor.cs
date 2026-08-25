@@ -329,21 +329,14 @@ namespace XRStudyWhiteboard
 
             if (activePaper != null)
             {
-                // Controller rays can miss the thin paper collider for one
-                // or two frames while the hand is moving. Keep the current
-                // paper stroke alive during that tiny gap; when the ray
-                // returns DrawAtUV interpolates across it instead of making
-                // a row of isolated dots. A hit on the board below still
-                // switches surfaces immediately.
-                if (pressed && surfaceMissGraceTimer > 0f)
-                {
-                    surfaceMissGraceTimer -= Time.unscaledDeltaTime;
-                    wasPressed = pressed;
-                    return;
-                }
-
+                // Paper is a thin, angled surface. If its top-plane hit is
+                // lost, ending the paper stroke immediately is safer than
+                // joining the next hit across the miss. The old grace window
+                // could turn a controller/cursor miss into a long vertical
+                // connector on the note.
                 activePaper.EndStroke();
                 activePaper = null;
+                surfaceMissGraceTimer = 0f;
             }
 
             if (!canvas.TryGetUV(ray, maxRayDistance, out Vector2 uv))
@@ -442,14 +435,9 @@ namespace XRStudyWhiteboard
             Vector2 gameViewPoint = new Vector2(
                 current.mousePosition.x,
                 Screen.height - current.mousePosition.y);
-            Vector2 inputSystemPoint = Mouse.current != null
-                ? Mouse.current.position.ReadValue()
-                : gameViewPoint;
-
             Camera camera = GetGameplayCamera();
             if (camera != null
-                && (StudyTableToolMenu.TryHandleDesktopScreenPoint(inputSystemPoint, camera, true)
-                    || StudyTableToolMenu.TryHandleDesktopScreenPoint(gameViewPoint, camera, true)))
+                && StudyTableToolMenu.TryHandleDesktopScreenPoint(gameViewPoint, camera, true))
             {
                 EndDrawing();
                 current.Use();
@@ -472,9 +460,7 @@ namespace XRStudyWhiteboard
                 if (rect == null)
                     continue;
 
-                bool inside = IsScreenPointInside(rect, inputSystemPoint);
-                if (!inside && inputSystemPoint != gameViewPoint)
-                    inside = IsScreenPointInside(rect, gameViewPoint);
+                bool inside = IsScreenPointInside(rect, gameViewPoint);
                 if (!inside)
                     continue;
 

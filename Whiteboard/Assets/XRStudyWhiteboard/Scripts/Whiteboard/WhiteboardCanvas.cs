@@ -27,6 +27,7 @@ namespace XRStudyWhiteboard
         [SerializeField] private float interpolationSpacing = 0.0006f;
         [SerializeField] private int maximumInterpolationSteps = 2048;
         [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.18f;
+        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.68f;
 
         private Texture2D boardTexture;
         private Color32[] pixels;
@@ -35,6 +36,7 @@ namespace XRStudyWhiteboard
         private bool hasPreviousPoint;
         private Vector2 inputBeforeLastUv;
         private Vector2 lastInputUv;
+        private Vector2 filteredInputUv;
         private int inputSampleCount;
         private bool textureDirty;
         private Transform crosshair;
@@ -116,18 +118,31 @@ namespace XRStudyWhiteboard
             if (surfaceCollider == null)
                 return false;
 
-            if (!surfaceCollider.Raycast(ray, out RaycastHit hit, maxDistance))
-                return false;
-
-            // DrawingSurface is a generated BoxCollider.  textureCoord on a
-            // cube depends on which face was hit and may be horizontally
-            // mirrored after the board is rotated to face an imported room.
-            // Use the board's local X/Y plane instead so the visible canvas,
-            // cursor, and controller ray always agree left-to-right.
+            // DrawingSurface is a very thin generated BoxCollider. A ray
+            // grazing its edge can hit a side face for one frame; treating
+            // that side point as a front-face UV creates the characteristic
+            // vertical spikes and long joins in an otherwise good circle.
+            // Intersect only the visible +Z face, matching the cursor plane,
+            // and reject every side/back hit.
             if (surfaceCollider is BoxCollider box)
             {
-                Vector3 localPoint = box.transform.InverseTransformPoint(hit.point);
                 Vector3 halfSize = box.size * 0.5f;
+                Vector3 frontLocalPoint = box.center + Vector3.forward * halfSize.z;
+                Plane boardPlane = new Plane(
+                    box.transform.TransformDirection(Vector3.forward),
+                    box.transform.TransformPoint(frontLocalPoint));
+                if (!boardPlane.Raycast(ray, out float planeDistance)
+                    || planeDistance < 0f
+                    || planeDistance > maxDistance)
+                    return false;
+
+                Vector3 localPoint = box.transform.InverseTransformPoint(ray.GetPoint(planeDistance));
+                if (localPoint.x < box.center.x - halfSize.x
+                    || localPoint.x > box.center.x + halfSize.x
+                    || localPoint.y < box.center.y - halfSize.y
+                    || localPoint.y > box.center.y + halfSize.y)
+                    return false;
+
                 float physicalX = Mathf.InverseLerp(
                     box.center.x - halfSize.x,
                     box.center.x + halfSize.x,
@@ -146,6 +161,8 @@ namespace XRStudyWhiteboard
             }
             else
             {
+                if (!surfaceCollider.Raycast(ray, out RaycastHit hit, maxDistance))
+                    return false;
                 uv = hit.textureCoord;
             }
             return uv.x >= 0f && uv.x <= 1f && uv.y >= 0f && uv.y <= 1f;
@@ -280,6 +297,7 @@ namespace XRStudyWhiteboard
             hasPreviousPoint = true;
             inputBeforeLastUv = uv;
             lastInputUv = uv;
+            filteredInputUv = uv;
             inputSampleCount = 1;
             textureDirty = true;
         }
@@ -290,23 +308,24 @@ namespace XRStudyWhiteboard
             {
                 inputBeforeLastUv = uv;
                 lastInputUv = uv;
+                filteredInputUv = uv;
                 inputSampleCount = 1;
                 return uv;
             }
 
-            if (inputSampleCount == 1)
-            {
-                inputBeforeLastUv = lastInputUv;
-                lastInputUv = uv;
-                inputSampleCount = 2;
-                return uv;
-            }
-
-            Vector2 filtered = new Vector2(
-                Median(inputBeforeLastUv.x, lastInputUv.x, uv.x),
-                Median(inputBeforeLastUv.y, lastInputUv.y, uv.y));
+            Vector2 candidate = inputSampleCount == 1
+                ? uv
+                : new Vector2(
+                    Median(inputBeforeLastUv.x, lastInputUv.x, uv.x),
+                    Median(inputBeforeLastUv.y, lastInputUv.y, uv.y));
+            // Median filtering removes one-frame ray outliers; the bounded
+            // low-pass step removes the remaining controller/cursor jitter
+            // without reconnecting a missed surface hit.
+            Vector2 filtered = Vector2.Lerp(filteredInputUv, candidate, strokePointSmoothing);
             inputBeforeLastUv = lastInputUv;
             lastInputUv = uv;
+            filteredInputUv = filtered;
+            inputSampleCount = Mathf.Min(inputSampleCount + 1, 3);
             return filtered;
         }
 
@@ -325,15 +344,15 @@ namespace XRStudyWhiteboard
                 ? new Color32(255, 255, 255, 255)
                 : (Color32)(manager != null ? manager.GetCurrentInkColour() : Color.black);
             float diameter = erasing ? eraserSize : markerSize;
-            int radiusX = Mathf.Max(1, Mathf.RoundToInt((diameter / boardWorldSize.x) * textureWidth * 0.5f));
-            int radiusY = Mathf.Max(1, Mathf.RoundToInt((diameter / boardWorldSize.y) * textureHeight * 0.5f));
-            int centerX = Mathf.RoundToInt(Mathf.Clamp01(uv.x) * (textureWidth - 1));
-            int centerY = Mathf.RoundToInt(Mathf.Clamp01(uv.y) * (textureHeight - 1));
+            float radiusX = Mathf.Max(1f, (diameter / boardWorldSize.x) * textureWidth * 0.5f);
+            float radiusY = Mathf.Max(1f, (diameter / boardWorldSize.y) * textureHeight * 0.5f);
+            float centerX = Mathf.Clamp01(uv.x) * (textureWidth - 1);
+            float centerY = Mathf.Clamp01(uv.y) * (textureHeight - 1);
 
-            int minX = Mathf.Max(0, centerX - radiusX);
-            int maxX = Mathf.Min(textureWidth - 1, centerX + radiusX);
-            int minY = Mathf.Max(0, centerY - radiusY);
-            int maxY = Mathf.Min(textureHeight - 1, centerY + radiusY);
+            int minX = Mathf.Max(0, Mathf.FloorToInt(centerX - radiusX - 1f));
+            int maxX = Mathf.Min(textureWidth - 1, Mathf.CeilToInt(centerX + radiusX + 1f));
+            int minY = Mathf.Max(0, Mathf.FloorToInt(centerY - radiusY - 1f));
+            int maxY = Mathf.Min(textureHeight - 1, Mathf.CeilToInt(centerY + radiusY + 1f));
 
             float radiusXSquared = radiusX * radiusX;
             float radiusYSquared = radiusY * radiusY;
@@ -343,18 +362,29 @@ namespace XRStudyWhiteboard
                 for (int x = minX; x <= maxX; x++)
                 {
                     float dx = x - centerX;
-                    if ((dx * dx) / radiusXSquared + (dy * dy) / radiusYSquared > 1f)
+                    float normalizedDistance = Mathf.Sqrt(
+                        (dx * dx) / radiusXSquared + (dy * dy) / radiusYSquared);
+                    if (normalizedDistance > 1.05f)
                         continue;
+
+                    float coverage = normalizedDistance <= 0.86f
+                        ? 1f
+                        : 1f - Mathf.InverseLerp(0.86f, 1.05f, normalizedDistance);
 
                     int pixelIndex = y * textureWidth + x;
                     if (erasing)
                     {
-                        pixels[pixelIndex] = colour;
+                        Color32 erasingExisting = pixels[pixelIndex];
+                        pixels[pixelIndex] = new Color32(
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(erasingExisting.r, colour.r, coverage)),
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(erasingExisting.g, colour.g, coverage)),
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(erasingExisting.b, colour.b, coverage)),
+                            255);
                         continue;
                     }
 
                     Color32 existing = pixels[pixelIndex];
-                    float opacity = Mathf.Clamp01(markerOpacity);
+                    float opacity = Mathf.Clamp01(markerOpacity) * coverage;
                     pixels[pixelIndex] = new Color32(
                         (byte)Mathf.RoundToInt(Mathf.Lerp(existing.r, colour.r, opacity)),
                         (byte)Mathf.RoundToInt(Mathf.Lerp(existing.g, colour.g, opacity)),

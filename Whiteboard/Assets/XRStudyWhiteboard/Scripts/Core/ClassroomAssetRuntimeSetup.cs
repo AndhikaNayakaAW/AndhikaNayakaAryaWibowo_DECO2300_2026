@@ -244,7 +244,10 @@ namespace XRStudyWhiteboard
                     : normal;
                 whiteboardUi.SetPositionAndRotation(
                     boardFrontCenter
-                    + right * (width * 0.5f + 0.24f)
+                    // The panel is roughly 0.67m wide at the runtime scale.
+                    // Leave enough clearance for its left edge to stay off
+                    // the board instead of covering the writing surface.
+                    + right * (width * 0.5f + 0.48f)
                     + frontDirection * 0.14f
                     + up * 0.02f,
                     uiRotation);

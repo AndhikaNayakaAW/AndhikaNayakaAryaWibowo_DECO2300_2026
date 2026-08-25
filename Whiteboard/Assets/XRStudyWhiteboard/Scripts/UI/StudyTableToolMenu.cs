@@ -108,20 +108,15 @@ namespace XRStudyWhiteboard
             menuObject = new GameObject("TableToolMenu");
             menuObject.transform.SetParent(transform, false);
             // Put the button just beyond the paper's front-right corner. The
-            // student teleport anchor approaches from +Z, so placing it at
-            // -Z put the old button behind the paper and under the simulator
-            // controller ray.
-            menuObject.transform.localPosition = new Vector3(-0.38f, 0.1f, 0.28f);
-            // The canvas lies flat on the tabletop.  Its readable side must
-            // face the student sitting at +Z; the previous -90 rotation put
-            // the screen's top edge away from the student and made TOOLS look
-            // upside down in the headset/editor view.
+            // menu is presented face-up, so the same front side is visible to
+            // both the seated camera and an XR controller ray.
+            menuObject.transform.localPosition = new Vector3(-0.60f, 0.1f, 0.28f);
             menuObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            // World-space canvases on the tabletop are viewed from their
-            // back side by the seated camera. Flip only the horizontal UI
-            // axis so the readable side remains visible and TOOLS is not
-            // mirrored, while preserving the table-facing ray plane.
-            menuObject.transform.localScale = new Vector3(-0.00115f, 0.00115f, 0.00115f);
+            // A positive scale keeps the canvas and its raycast rectangles in
+            // the same orientation as the readable text. The previous
+            // negative horizontal scale made the button look mirrored and
+            // caused screen-space clicks to resolve on the back side.
+            menuObject.transform.localScale = Vector3.one * 0.00115f;
 
             Canvas canvas = menuObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
@@ -357,12 +352,12 @@ namespace XRStudyWhiteboard
             textComponent.fontSize = fontSize;
             textComponent.color = colour;
             textComponent.alignment = alignment;
-            // The tabletop canvas is intentionally viewed from its back
-            // side so it can sit above the paper without z-fighting. Flip
-            // the glyph layer back to normal reading order; the button
-            // rectangle itself remains in the correct raycast position.
+            // The face-up canvas uses a mirrored local X axis when viewed
+            // from the seated camera. Flip only the text horizontally so it
+            // reads normally; rotating it as well makes the label upside
+            // down and was the source of the reversed TOOLS button.
             textComponent.transform.localScale = new Vector3(-1f, 1f, 1f);
-            textComponent.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
+            textComponent.transform.localRotation = Quaternion.identity;
             textComponent.raycastTarget = false;
             return textComponent;
         }

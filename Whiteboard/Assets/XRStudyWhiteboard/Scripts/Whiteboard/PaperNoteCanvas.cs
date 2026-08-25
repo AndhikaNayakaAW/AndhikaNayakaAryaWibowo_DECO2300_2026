@@ -25,6 +25,7 @@ namespace XRStudyWhiteboard
         [SerializeField] private float interpolationSpacing = 0.00075f;
         [SerializeField] private int maximumInterpolationSteps = 1024;
         [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.18f;
+        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.68f;
 
         private Texture2D noteTexture;
         private Color32[] pixels;
@@ -32,6 +33,7 @@ namespace XRStudyWhiteboard
         private bool hasPreviousPoint;
         private Vector2 inputBeforeLastUv;
         private Vector2 lastInputUv;
+        private Vector2 filteredInputUv;
         private int inputSampleCount;
         private bool previousStrokeWasErasing;
         private bool textureDirty;
@@ -120,50 +122,7 @@ namespace XRStudyWhiteboard
 
         public bool TryGetUV(Ray ray, float maxDistance, out Vector2 uv)
         {
-            uv = default;
-            if (paperCollider == null)
-                return false;
-
-            // The generated papers use BoxColliders.  RaycastHit.textureCoord
-            // is only reliable for mesh colliders, so calculate the point on
-            // the paper's local X/Z plane for the box case.  This keeps
-            // writing correct even after a paper has been grabbed and moved.
-            if (paperCollider is BoxCollider box)
-            {
-                Vector3 halfSize = box.size * 0.5f;
-                // Intersect the ray with the paper's top plane instead of
-                // accepting a side face of the very thin box. A controller
-                // ray that grazes an edge can otherwise alternate between
-                // top and side hits, which turns a smooth stroke into dots
-                // and near-vertical jumps.
-                Vector3 topLocalPoint = box.center + Vector3.up * halfSize.y;
-                Plane paperPlane = new Plane(
-                    box.transform.TransformDirection(Vector3.up),
-                    box.transform.TransformPoint(topLocalPoint));
-                if (!paperPlane.Raycast(ray, out float planeDistance)
-                    || planeDistance < 0f
-                    || planeDistance > maxDistance)
-                    return false;
-
-                Vector3 localPoint = box.transform.InverseTransformPoint(ray.GetPoint(planeDistance));
-                if (localPoint.x < box.center.x - halfSize.x
-                    || localPoint.x > box.center.x + halfSize.x
-                    || localPoint.z < box.center.z - halfSize.z
-                    || localPoint.z > box.center.z + halfSize.z)
-                    return false;
-
-                uv = new Vector2(
-                    Mathf.InverseLerp(box.center.x - halfSize.x, box.center.x + halfSize.x, localPoint.x),
-                    Mathf.InverseLerp(box.center.z - halfSize.z, box.center.z + halfSize.z, localPoint.z));
-            }
-            else
-            {
-                if (!paperCollider.Raycast(ray, out RaycastHit hit, maxDistance))
-                    return false;
-                uv = hit.textureCoord;
-            }
-
-            return uv.x >= 0f && uv.x <= 1f && uv.y >= 0f && uv.y <= 1f;
+            return TryGetPaperIntersection(ray, maxDistance, out _, out uv);
         }
 
         public void DrawAtUV(Vector2 uv, bool erasing)
@@ -178,6 +137,7 @@ namespace XRStudyWhiteboard
                 hasPreviousPoint = true;
                 inputBeforeLastUv = uv;
                 lastInputUv = uv;
+                filteredInputUv = uv;
                 inputSampleCount = 1;
                 textureDirty = true;
                 return;
@@ -272,18 +232,65 @@ namespace XRStudyWhiteboard
                     continue;
                 }
 
-                if (!candidate.TryGetUV(ray, nearestDistance, out Vector2 candidateUv))
+                if (!candidate.TryGetPaperIntersection(
+                        ray,
+                        nearestDistance,
+                        out float candidateDistance,
+                        out Vector2 candidateUv))
                     continue;
 
-                if (!candidate.paperCollider.Raycast(ray, out RaycastHit hit, nearestDistance))
-                    continue;
-
-                nearestDistance = hit.distance;
+                nearestDistance = candidateDistance;
                 note = candidate;
                 uv = candidateUv;
             }
 
             return note != null;
+        }
+
+        private bool TryGetPaperIntersection(Ray ray, float maxDistance, out float distance, out Vector2 uv)
+        {
+            distance = 0f;
+            uv = default;
+            if (paperCollider == null)
+                return false;
+
+            // The generated papers use BoxColliders. RaycastHit.textureCoord
+            // is only reliable for mesh colliders, so calculate both the
+            // nearest hit distance and UV on the top plane. Keeping these
+            // values from the same intersection prevents a side-face hit
+            // from selecting the paper while the UV comes from its top.
+            if (paperCollider is BoxCollider box)
+            {
+                Vector3 halfSize = box.size * 0.5f;
+                Vector3 topLocalPoint = box.center + Vector3.up * halfSize.y;
+                Plane paperPlane = new Plane(
+                    box.transform.TransformDirection(Vector3.up),
+                    box.transform.TransformPoint(topLocalPoint));
+                if (!paperPlane.Raycast(ray, out distance)
+                    || distance < 0f
+                    || distance > maxDistance)
+                    return false;
+
+                Vector3 localPoint = box.transform.InverseTransformPoint(ray.GetPoint(distance));
+                if (localPoint.x < box.center.x - halfSize.x
+                    || localPoint.x > box.center.x + halfSize.x
+                    || localPoint.z < box.center.z - halfSize.z
+                    || localPoint.z > box.center.z + halfSize.z)
+                    return false;
+
+                uv = new Vector2(
+                    Mathf.InverseLerp(box.center.x - halfSize.x, box.center.x + halfSize.x, localPoint.x),
+                    Mathf.InverseLerp(box.center.z - halfSize.z, box.center.z + halfSize.z, localPoint.z));
+            }
+            else
+            {
+                if (!paperCollider.Raycast(ray, out RaycastHit hit, maxDistance))
+                    return false;
+                distance = hit.distance;
+                uv = hit.textureCoord;
+            }
+
+            return uv.x >= 0f && uv.x <= 1f && uv.y >= 0f && uv.y <= 1f;
         }
 
         private void Stamp(Vector2 uv, bool erasing)
@@ -293,15 +300,15 @@ namespace XRStudyWhiteboard
 
             Color32 colour = erasing ? new Color32(255, 255, 255, 255) : new Color32(20, 25, 35, 255);
             float diameter = erasing ? eraserSize : pencilSize;
-            int radiusX = Mathf.Max(1, Mathf.RoundToInt((diameter / paperWorldSize.x) * textureWidth * 0.5f));
-            int radiusY = Mathf.Max(1, Mathf.RoundToInt((diameter / paperWorldSize.y) * textureHeight * 0.5f));
-            int centerX = Mathf.RoundToInt(Mathf.Clamp01(uv.x) * (textureWidth - 1));
-            int centerY = Mathf.RoundToInt(Mathf.Clamp01(uv.y) * (textureHeight - 1));
+            float radiusX = Mathf.Max(1f, (diameter / paperWorldSize.x) * textureWidth * 0.5f);
+            float radiusY = Mathf.Max(1f, (diameter / paperWorldSize.y) * textureHeight * 0.5f);
+            float centerX = Mathf.Clamp01(uv.x) * (textureWidth - 1);
+            float centerY = Mathf.Clamp01(uv.y) * (textureHeight - 1);
 
-            int minX = Mathf.Max(0, centerX - radiusX);
-            int maxX = Mathf.Min(textureWidth - 1, centerX + radiusX);
-            int minY = Mathf.Max(0, centerY - radiusY);
-            int maxY = Mathf.Min(textureHeight - 1, centerY + radiusY);
+            int minX = Mathf.Max(0, Mathf.FloorToInt(centerX - radiusX - 1f));
+            int maxX = Mathf.Min(textureWidth - 1, Mathf.CeilToInt(centerX + radiusX + 1f));
+            int minY = Mathf.Max(0, Mathf.FloorToInt(centerY - radiusY - 1f));
+            int maxY = Mathf.Min(textureHeight - 1, Mathf.CeilToInt(centerY + radiusY + 1f));
             float radiusXSquared = radiusX * radiusX;
             float radiusYSquared = radiusY * radiusY;
 
@@ -311,8 +318,21 @@ namespace XRStudyWhiteboard
                 for (int x = minX; x <= maxX; x++)
                 {
                     float dx = x - centerX;
-                    if ((dx * dx) / radiusXSquared + (dy * dy) / radiusYSquared <= 1f)
-                        pixels[y * textureWidth + x] = colour;
+                    float normalizedDistance = Mathf.Sqrt(
+                        (dx * dx) / radiusXSquared + (dy * dy) / radiusYSquared);
+                    if (normalizedDistance > 1.05f)
+                        continue;
+
+                    float coverage = normalizedDistance <= 0.86f
+                        ? 1f
+                        : 1f - Mathf.InverseLerp(0.86f, 1.05f, normalizedDistance);
+                    int pixelIndex = y * textureWidth + x;
+                    Color32 existing = pixels[pixelIndex];
+                    pixels[pixelIndex] = new Color32(
+                        (byte)Mathf.RoundToInt(Mathf.Lerp(existing.r, colour.r, coverage)),
+                        (byte)Mathf.RoundToInt(Mathf.Lerp(existing.g, colour.g, coverage)),
+                        (byte)Mathf.RoundToInt(Mathf.Lerp(existing.b, colour.b, coverage)),
+                        255);
                 }
             }
         }
@@ -323,23 +343,21 @@ namespace XRStudyWhiteboard
             {
                 inputBeforeLastUv = uv;
                 lastInputUv = uv;
+                filteredInputUv = uv;
                 inputSampleCount = 1;
                 return uv;
             }
 
-            if (inputSampleCount == 1)
-            {
-                inputBeforeLastUv = lastInputUv;
-                lastInputUv = uv;
-                inputSampleCount = 2;
-                return uv;
-            }
-
-            Vector2 filtered = new Vector2(
-                Median(inputBeforeLastUv.x, lastInputUv.x, uv.x),
-                Median(inputBeforeLastUv.y, lastInputUv.y, uv.y));
+            Vector2 candidate = inputSampleCount == 1
+                ? uv
+                : new Vector2(
+                    Median(inputBeforeLastUv.x, lastInputUv.x, uv.x),
+                    Median(inputBeforeLastUv.y, lastInputUv.y, uv.y));
+            Vector2 filtered = Vector2.Lerp(filteredInputUv, candidate, strokePointSmoothing);
             inputBeforeLastUv = lastInputUv;
             lastInputUv = uv;
+            filteredInputUv = filtered;
+            inputSampleCount = Mathf.Min(inputSampleCount + 1, 3);
             return filtered;
         }
 
