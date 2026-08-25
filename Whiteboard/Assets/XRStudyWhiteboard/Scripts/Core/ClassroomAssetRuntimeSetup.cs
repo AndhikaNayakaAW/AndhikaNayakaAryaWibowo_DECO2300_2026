@@ -468,27 +468,21 @@ namespace XRStudyWhiteboard
             setObject.transform.position = new Vector3(deskBounds.center.x, tabletopHeight, deskBounds.center.z);
 
             Material paperMaterial = CreateRuntimeMaterial("Student Paper", Color.white);
-            Material pencilMaterial = CreateRuntimeMaterial("Student Pencil", new Color(0.88f, 0.72f, 0.18f));
-            Material eraserMaterial = CreateRuntimeMaterial("Student Eraser", new Color(0.95f, 0.36f, 0.48f));
 
-            // Do not create a visible tray/block underneath the tools.  The
-            // paper, pencil, and eraser are intentionally placed directly on
-            // the imported tabletop so they can be seen and grabbed.
+            // Keep the tabletop clear: the paper is the only physical study
+            // item. Pencil, eraser, and clear-paper actions are provided by
+            // the small floating table menu beside it.
             GameObject paper = CreatePrimitive("Paper Note", PrimitiveType.Cube, setObject.transform, new Vector3(0f, 0.015f, 0f), new Vector3(0.55f, 0.018f, 0.38f), paperMaterial);
             PaperNoteCanvas paperCanvas = paper.AddComponent<PaperNoteCanvas>();
             paperCanvas.Configure(paper.GetComponent<Renderer>(), paper.GetComponent<Collider>(), new Vector2(0.55f, 0.38f));
+            paperCanvas.ConfigureWritingSizes(0.009f, 0.032f);
             AddGrabbable(paper);
 
-            GameObject pencil = CreatePrimitive("Pencil", PrimitiveType.Cylinder, setObject.transform, new Vector3(0.35f, 0.035f, 0f), new Vector3(0.018f, 0.24f, 0.018f), pencilMaterial);
-            pencil.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            XRGrabInteractable pencilGrab = AddGrabbable(pencil);
-            PaperTool pencilTool = pencil.AddComponent<PaperTool>();
-            pencilTool.Initialize(PaperToolKind.Pencil, pencilGrab);
+            StudyTableToolMenu toolMenu = setObject.AddComponent<StudyTableToolMenu>();
+            toolMenu.Initialize(paperCanvas);
 
-            GameObject eraser = CreatePrimitive("Eraser", PrimitiveType.Cube, setObject.transform, new Vector3(-0.3f, 0.035f, 0f), new Vector3(0.12f, 0.06f, 0.06f), eraserMaterial);
-            XRGrabInteractable eraserGrab = AddGrabbable(eraser);
-            PaperTool eraserTool = eraser.AddComponent<PaperTool>();
-            eraserTool.Initialize(PaperToolKind.Eraser, eraserGrab);
+            StudyTableTeleportPoint teleportPoint = setObject.AddComponent<StudyTableTeleportPoint>();
+            teleportPoint.Initialize(paperCanvas);
         }
 
         private static GameObject CreatePrimitive(string name, PrimitiveType type, Transform parent, Vector3 position, Vector3 scale, Material material)

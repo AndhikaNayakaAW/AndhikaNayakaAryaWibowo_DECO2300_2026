@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -78,6 +79,7 @@ namespace XRStudyWhiteboard
         private bool seatedDesktopView;
         private XRInputDevice leftController;
         private XRInputDevice rightController;
+        private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
 
         private bool IsDesktopMode => desktopMode;
 
@@ -170,6 +172,8 @@ namespace XRStudyWhiteboard
 
             if (desktopMode)
                 HandleDesktopInput();
+
+            RefreshTablePoints();
 
             HandleXRInput();
             snapTurnTimer -= Time.unscaledDeltaTime;
@@ -295,20 +299,67 @@ namespace XRStudyWhiteboard
             }
 
             if (keyboard.digit2Key.wasPressedThisFrame)
-                TeleportDesktop(StudentPoints[0], StudentTargets[0], desktopSeatedHeight, true);
+                TryTeleportToTable(0);
             else if (keyboard.digit3Key.wasPressedThisFrame)
-                TeleportDesktop(StudentPoints[1], StudentTargets[1], desktopSeatedHeight, true);
+                TryTeleportToTable(1);
             else if (keyboard.digit4Key.wasPressedThisFrame)
-                TeleportDesktop(StudentPoints[2], StudentTargets[2], desktopSeatedHeight, true);
+                TryTeleportToTable(2);
             else if (keyboard.digit5Key.wasPressedThisFrame)
-                TeleportDesktop(StudentPoints[3], StudentTargets[3], desktopSeatedHeight, true);
+                TryTeleportToTable(3);
             else if (keyboard.digit6Key.wasPressedThisFrame)
-                TeleportDesktop(StudentPoints[4], StudentTargets[4], desktopSeatedHeight, true);
+                TryTeleportToTable(4);
             else if (keyboard.digit7Key.wasPressedThisFrame)
-                TeleportDesktop(StudentPoints[5], StudentTargets[5], desktopSeatedHeight, true);
+                TryTeleportToTable(5);
+            else if (keyboard.digit8Key.wasPressedThisFrame)
+                TryTeleportToTable(6);
+            else if (keyboard.digit9Key.wasPressedThisFrame)
+                TryTeleportToTable(7);
         }
 
-        private void TeleportDesktop(Vector3 point, Vector3 target, float targetHeight, bool seated)
+        private void RefreshTablePoints()
+        {
+            IReadOnlyList<StudyTableTeleportPoint> activePoints = StudyTableTeleportPoint.Points;
+            if (tablePoints.Count == activePoints.Count)
+                return;
+
+            tablePoints.Clear();
+            for (int i = 0; i < activePoints.Count; i++)
+            {
+                if (activePoints[i] != null)
+                    tablePoints.Add(activePoints[i]);
+            }
+        }
+
+        private void TryTeleportToTable(int index)
+        {
+            RefreshTablePoints();
+            if (index >= 0 && index < tablePoints.Count)
+            {
+                StudyTableTeleportPoint table = tablePoints[index];
+                TeleportDesktop(table.TeleportPosition, table.ViewTarget, desktopSeatedHeight, true, GetTableViewPitch(table));
+                return;
+            }
+
+            // Keep the original fallback points available if a damaged or
+            // older scene has not created runtime table anchors yet.
+            if (index >= 0 && index < StudentPoints.Length)
+                TeleportDesktop(StudentPoints[index], StudentTargets[index], desktopSeatedHeight, true);
+        }
+
+        private float GetTableViewPitch(StudyTableTeleportPoint table)
+        {
+            Vector3 point = table.TeleportPosition;
+            Vector3 target = table.ViewTarget;
+            float horizontalDistance = Vector2.Distance(
+                new Vector2(point.x, point.z),
+                new Vector2(target.x, target.z));
+            float pitch = Mathf.Atan2(desktopSeatedHeight - target.y, Mathf.Max(0.1f, horizontalDistance)) * Mathf.Rad2Deg;
+            // A slight downward look centres the paper while leaving the
+            // board visible above it for orientation and study context.
+            return Mathf.Clamp(pitch, 8f, 18f);
+        }
+
+        private void TeleportDesktop(Vector3 point, Vector3 target, float targetHeight, bool seated, float? seatedPitchOverride = null)
         {
             if (xrOrigin == null || desktopTeleportCooldown > 0f)
                 return;
@@ -327,7 +378,9 @@ namespace XRStudyWhiteboard
             if (direction.sqrMagnitude > 0.001f)
                 xrOrigin.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
 
-            desktopPitch = seated ? desktopSeatedPitch : 0f;
+            desktopPitch = seated
+                ? (seatedPitchOverride.HasValue ? seatedPitchOverride.Value : desktopSeatedPitch)
+                : 0f;
             if (cameraTransform != null)
                 cameraTransform.localRotation = Quaternion.Euler(desktopPitch, 0f, 0f);
         }
@@ -582,27 +635,35 @@ namespace XRStudyWhiteboard
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha2:
-                        TeleportDesktop(StudentPoints[0], StudentTargets[0], desktopSeatedHeight, true);
+                        TryTeleportToTable(0);
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha3:
-                        TeleportDesktop(StudentPoints[1], StudentTargets[1], desktopSeatedHeight, true);
+                        TryTeleportToTable(1);
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha4:
-                        TeleportDesktop(StudentPoints[2], StudentTargets[2], desktopSeatedHeight, true);
+                        TryTeleportToTable(2);
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha5:
-                        TeleportDesktop(StudentPoints[3], StudentTargets[3], desktopSeatedHeight, true);
+                        TryTeleportToTable(3);
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha6:
-                        TeleportDesktop(StudentPoints[4], StudentTargets[4], desktopSeatedHeight, true);
+                        TryTeleportToTable(4);
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha7:
-                        TeleportDesktop(StudentPoints[5], StudentTargets[5], desktopSeatedHeight, true);
+                        TryTeleportToTable(5);
+                        Event.current.Use();
+                        break;
+                    case KeyCode.Alpha8:
+                        TryTeleportToTable(6);
+                        Event.current.Use();
+                        break;
+                    case KeyCode.Alpha9:
+                        TryTeleportToTable(7);
                         Event.current.Use();
                         break;
                     case KeyCode.J:
@@ -614,7 +675,7 @@ namespace XRStudyWhiteboard
 
             GUI.Box(
                 new Rect(16f, 16f, 520f, 172f),
-                "DESKTOP TEST CONTROLS\n\nWASD: move   Q/E or arrows: turn\nJ: stand/jump from a seat   Right-drag: look\nScroll: closer/farther   R: reset\n1: whiteboard   2-7: seated chair views facing board\nL Mouse: draw/trigger   R Mouse: erase in desktop test\nCrosshair: exact writing point   Grip: pick up paper tools\nBuilt-in XR Device Simulator: select Controller; hold Space to pose it\nVR: aim the built-in controller ray at the floor and press the trigger to teleport");
+                "DESKTOP TEST CONTROLS\n\nWASD: move   Q/E or arrows: turn\nJ: stand/jump from a table   Right-drag: look\nScroll: closer/farther   R: reset\n1: whiteboard   2-9: table views facing the paper\nL Mouse: draw/trigger   R Mouse: erase in desktop test\nTable menu: choose pencil, eraser, or clear paper\nBuilt-in XR Device Simulator: select Controller; hold Space to pose it\nVR: aim the built-in controller ray at the floor and press the trigger to teleport");
 
             // Clickable fallbacks are deliberately visible in the Game view.
             // They are especially useful when the simulator panel currently
@@ -636,12 +697,14 @@ namespace XRStudyWhiteboard
                 StandFromSeat();
 
             buttonY += 38f;
-            for (int i = 0; i < StudentPoints.Length; i++)
+            RefreshTablePoints();
+            int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
+            for (int i = 0; i < tableCount; i++)
             {
                 float x = buttonX + (i % 3) * (buttonWidth + gap);
                 float y = buttonY + (i / 3) * 38f;
-                if (GUI.Button(new Rect(x, y, buttonWidth, 32f), "SEAT " + (i + 2).ToString()))
-                    TeleportDesktop(StudentPoints[i], StudentTargets[i], desktopSeatedHeight, true);
+                if (GUI.Button(new Rect(x, y, buttonWidth, 32f), "TABLE " + (i + 1).ToString()))
+                    TryTeleportToTable(i);
             }
 
         }

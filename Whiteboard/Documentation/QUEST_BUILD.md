@@ -20,8 +20,9 @@ These settings were preserved rather than blindly replaced. Confirm the final va
 6. Check the OpenXR interaction profiles and Quest hand-tracking feature if the installed package version exposes them.
 7. Build, or choose Build And Run.
 8. Test controller tracking first. Controllers must work even when hand tracking is unavailable.
-9. Test drawing, all four colours, Marker, Eraser, Clear Board confirmation, teleportation, snap turning, and the grabbable marker.
-10. Test hand tracking separately, including pinch drawing and UI selection.
+9. Test drawing, all four colours, Marker, Eraser, Clear Board confirmation, teleportation, snap turning, and the grabbable whiteboard marker.
+10. Teleport to each student table, confirm the view faces its paper while the board remains visible, then use the table `TOOLS` menu to select Pencil, Eraser, and Clear Paper.
+11. Test hand tracking separately, including pinch drawing and UI selection.
 
 ## Status
 

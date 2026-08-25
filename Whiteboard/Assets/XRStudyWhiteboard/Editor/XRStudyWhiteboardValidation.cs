@@ -62,6 +62,8 @@ namespace XRStudyWhiteboard.Editor
                 ValidateScene(scene, ref checks, ref errors);
             }
 
+            RunDrawingSmokeTests(ref checks, ref errors);
+
             if (errors == 0)
             {
                 Debug.Log("XR Study Whiteboard validation passed (" + checks + " checks). Quest hardware testing is still required for live tracking and haptics.");
@@ -353,6 +355,133 @@ namespace XRStudyWhiteboard.Editor
 
             errors++;
             Debug.LogError("[XR Study Whiteboard] FAILED: " + label);
+        }
+
+        private static void RunDrawingSmokeTests(ref int checks, ref int errors)
+        {
+            GameObject boardObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject paperObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            boardObject.hideFlags = HideFlags.HideAndDontSave;
+            paperObject.hideFlags = HideFlags.HideAndDontSave;
+
+            try
+            {
+                WhiteboardCanvas board = boardObject.AddComponent<WhiteboardCanvas>();
+                board.ConfigureBoardWorldSize(new Vector2(3f, 1.5f));
+                board.InitializeSurface();
+                DrawCircle(board);
+                InvokePrivate(board, "ApplyTexture");
+                Texture2D boardTexture = GetPrivateField<Texture2D>(board, "boardTexture");
+                Check(HasContinuousPath(boardTexture), "Whiteboard circle smoke test is continuous", ref checks, ref errors);
+                board.ClearBoard();
+                Check(IsTextureBlank(boardTexture), "Whiteboard clear smoke test", ref checks, ref errors);
+
+                PaperNoteCanvas paper = paperObject.AddComponent<PaperNoteCanvas>();
+                paper.Configure(paperObject.GetComponent<Renderer>(), paperObject.GetComponent<Collider>(), new Vector2(0.55f, 0.38f));
+                paper.ConfigureWritingSizes(0.009f, 0.032f);
+                PaperTool.Select(PaperToolKind.Pencil);
+                DrawCircle(paper);
+                InvokePrivate(paper, "ApplyTexture");
+                Texture2D paperTexture = GetPrivateField<Texture2D>(paper, "noteTexture");
+                Check(HasContinuousPath(paperTexture), "Paper circle smoke test is continuous", ref checks, ref errors);
+                PaperTool.Select(PaperToolKind.Eraser);
+                paper.DrawAtUV(new Vector2(0.5f, 0.2f), true);
+                paper.DrawAtUV(new Vector2(0.5f, 0.8f), true);
+                paper.ClearNote();
+                Check(IsTextureBlank(paperTexture), "Paper clear smoke test", ref checks, ref errors);
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(boardObject);
+                UnityEngine.Object.DestroyImmediate(paperObject);
+            }
+        }
+
+        private static void DrawCircle(WhiteboardCanvas board)
+        {
+            const int points = 64;
+            Vector2 first = CirclePoint(0, points);
+            board.BeginStroke(first);
+            for (int i = 1; i <= points; i++)
+                board.ContinueStroke(CirclePoint(i, points));
+            board.EndStroke();
+        }
+
+        private static void DrawCircle(PaperNoteCanvas paper)
+        {
+            const int points = 64;
+            Vector2 first = CirclePoint(0, points);
+            paper.DrawAtUV(first, false);
+            for (int i = 1; i <= points; i++)
+                paper.DrawAtUV(CirclePoint(i, points), false);
+            paper.EndStroke();
+        }
+
+        private static Vector2 CirclePoint(int index, int pointCount)
+        {
+            float angle = index / (float)pointCount * Mathf.PI * 2f;
+            return new Vector2(0.5f + Mathf.Cos(angle) * 0.3f, 0.5f + Mathf.Sin(angle) * 0.3f);
+        }
+
+        private static bool HasContinuousPath(Texture2D texture)
+        {
+            if (texture == null)
+                return false;
+
+            const int pointCount = 64;
+            for (int i = 0; i < pointCount; i++)
+            {
+                Vector2 uv = CirclePoint(i, pointCount);
+                int x = Mathf.RoundToInt(uv.x * (texture.width - 1));
+                int y = Mathf.RoundToInt(uv.y * (texture.height - 1));
+                bool foundInk = false;
+                for (int offsetY = -8; offsetY <= 8 && !foundInk; offsetY++)
+                {
+                    for (int offsetX = -8; offsetX <= 8; offsetX++)
+                    {
+                        int sampleX = Mathf.Clamp(x + offsetX, 0, texture.width - 1);
+                        int sampleY = Mathf.Clamp(y + offsetY, 0, texture.height - 1);
+                        Color32 pixel = texture.GetPixel(sampleX, sampleY);
+                        if (pixel.r < 180 && pixel.g < 180 && pixel.b < 180)
+                        {
+                            foundInk = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!foundInk)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsTextureBlank(Texture2D texture)
+        {
+            if (texture == null)
+                return false;
+
+            Color32[] pixels = texture.GetPixels32();
+            for (int i = 0; i < pixels.Length; i++)
+            {
+                if (pixels[i].r < 250 || pixels[i].g < 250 || pixels[i].b < 250)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static T GetPrivateField<T>(object target, string fieldName)
+        {
+            FieldInfo field = target.GetType().GetField(fieldName, BindingFlags.Instance | BindingFlags.NonPublic);
+            return field != null ? (T)field.GetValue(target) : default;
+        }
+
+        private static void InvokePrivate(object target, string methodName)
+        {
+            MethodInfo method = target.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic);
+            method?.Invoke(target, null);
         }
 
         private static T FindComponent<T>(Scene scene) where T : Component

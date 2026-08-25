@@ -3,11 +3,16 @@
 ```text
 Controller ray + trigger ─┐
 Hand pinch ────────────────┼──> WhiteboardDrawer ───> WhiteboardCanvas texture
-World-space UI ───────────┘             │
+Whiteboard world UI ──────┘             │
                                        ▼
                               XRStudyWhiteboardManager
                                 │       │        │
                               tool    colour   clear confirmation
+
+Table `TOOLS` button ──────> StudyTableToolMenu ──> PaperTool selection
+                                                        │
+                                                        ▼
+                                              PaperNoteCanvas texture
 ```
 
 ## Drawing
@@ -23,6 +28,10 @@ Both paths send UV points to `WhiteboardDrawer`. The drawer starts and ends stro
 `XRStudyWhiteboardManager` is the single source of truth for the current tool, current colour, and clear-board flow. UI buttons call the manager; the status display and active outlines refresh from manager state.
 
 The clear overlay is a separate world-space UI object. It is only shown after `Clear Board` is selected, so the destructive action requires a second intentional selection.
+
+Each detected tabletop creates a `PaperNoteCanvas`, a `StudyTableToolMenu`, and a `StudyTableTeleportPoint` at runtime. Desk pencil and eraser meshes are not created. The menu changes the selected paper tool, clears only its associated paper, and is reachable through the existing XR UI ray.
+
+`StudyTableTeleportPoint` gives the editor table shortcuts a paper-facing target. On Quest, the same locations remain reachable through the floor `TeleportationArea`; the point's view pitch aims down at the paper without losing the board from view.
 
 ## XR infrastructure
 

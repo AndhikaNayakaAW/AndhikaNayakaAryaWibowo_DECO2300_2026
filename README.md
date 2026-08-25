@@ -24,6 +24,21 @@ The XR Study Whiteboard gives students a focused virtual study space where they 
 
 - [Week 2 — Paper demo, testing results, and reflection](DesignProcess/Week02_PaperPrototype/README.md)
 
+## Digital Prototype
+
+The Unity prototype is implemented in `Whiteboard` using Unity `6000.3.21f1` with URP, OpenXR, XR Interaction Toolkit, XR Hands, and the Input System.
+
+Current features include:
+
+- Continuous controller and hand pinch drawing on the whiteboard, with interpolated marker strokes and a wider eraser.
+- Black, red, blue, and green marker colours with visible tool/status feedback.
+- Clear-board confirmation.
+- Student tables with paper-only surfaces. Each table has a `TOOLS` button that opens floating `PENCIL`, `ERASER`, and `CLEAR PAPER` actions. The paper pencil line is intentionally finer than the whiteboard marker.
+- Table teleport/view shortcuts that focus the paper while keeping the whiteboard visible, plus floor teleportation and snap turning.
+- Editor testing through the XR Device Simulator and desktop fallback controls.
+
+The original paper-prototyping process is preserved under `DesignProcess/`. Start with the [digital prototype setup guide](Whiteboard/Documentation/SETUP.md).
+
 ## Key outcome
 
 Participants completed the writing, colour selection, erasing, tool switching, and clear-board interactions successfully. They were positive about being able to study in different locations while still feeling like they were in a class environment.

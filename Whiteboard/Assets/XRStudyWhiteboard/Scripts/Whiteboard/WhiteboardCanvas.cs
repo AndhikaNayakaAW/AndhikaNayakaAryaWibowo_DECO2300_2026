@@ -24,7 +24,8 @@ namespace XRStudyWhiteboard
         [SerializeField] private float markerSize = 0.028f;
         [SerializeField] private float eraserSize = 0.06f;
         [SerializeField, Range(0.1f, 1f)] private float markerOpacity = 0.82f;
-        [SerializeField] private float interpolationSpacing = 0.001f;
+        [SerializeField] private float interpolationSpacing = 0.0006f;
+        [SerializeField] private int maximumInterpolationSteps = 2048;
 
         private Texture2D boardTexture;
         private Color32[] pixels;
@@ -97,7 +98,11 @@ namespace XRStudyWhiteboard
             if (surfaceRenderer != null)
             {
                 // A material instance keeps the runtime texture local to this board.
-                surfaceRenderer.material.mainTexture = boardTexture;
+                Material targetMaterial = Application.isPlaying
+                    ? surfaceRenderer.material
+                    : surfaceRenderer.sharedMaterial;
+                if (targetMaterial != null)
+                    targetMaterial.mainTexture = boardTexture;
             }
         }
 
@@ -163,9 +168,15 @@ namespace XRStudyWhiteboard
             float brushRadiusInUv = (brushDiameter * 0.5f)
                 / Mathf.Max(boardWorldSize.x, boardWorldSize.y);
             float spacing = Mathf.Min(
-                Mathf.Max(0.0005f, interpolationSpacing),
-                Mathf.Max(0.0005f, brushRadiusInUv * 0.4f));
-            int steps = Mathf.Max(1, Mathf.CeilToInt(distance / spacing));
+                Mathf.Max(0.00025f, interpolationSpacing),
+                Mathf.Max(0.00025f, brushRadiusInUv * 0.4f));
+            int steps = Mathf.Clamp(
+                Mathf.CeilToInt(distance / spacing),
+                1,
+                Mathf.Max(1, maximumInterpolationSteps));
+            // Stamp every point along the segment, not only the sampled
+            // controller positions. This closes gaps when the ray moves
+            // quickly and makes a full circle read as one continuous stroke.
             for (int i = 1; i <= steps; i++)
             {
                 float t = i / (float)steps;
@@ -330,12 +341,22 @@ namespace XRStudyWhiteboard
                 worldScale.z / Mathf.Max(0.0001f, inheritedScale.z));
             Collider collider = bar.GetComponent<Collider>();
             if (collider != null)
-                Destroy(collider);
+            {
+                if (Application.isPlaying)
+                    Destroy(collider);
+                else
+                    DestroyImmediate(collider);
+            }
             Renderer renderer = bar.GetComponent<Renderer>();
             if (renderer != null)
             {
                 if (material != null)
-                    renderer.material = material;
+                {
+                    if (Application.isPlaying)
+                        renderer.material = material;
+                    else
+                        renderer.sharedMaterial = material;
+                }
                 crosshairRenderers.Add(renderer);
             }
         }

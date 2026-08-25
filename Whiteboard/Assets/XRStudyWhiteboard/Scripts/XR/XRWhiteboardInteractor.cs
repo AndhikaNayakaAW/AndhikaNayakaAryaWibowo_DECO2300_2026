@@ -23,7 +23,11 @@ namespace XRStudyWhiteboard
         [SerializeField] private bool useMouseFallbackInEditor = true;
         [SerializeField] private InputActionAsset controllerInputActions;
         [SerializeField] private GraphicRaycaster desktopUiRaycaster;
-        [SerializeField, Range(0.1f, 1f)] private float desktopPointerSmoothing = 0.45f;
+        // The line renderer already interpolates between UV samples. Keep the
+        // editor pointer responsive instead of adding a visible trailing lag.
+        [SerializeField, Range(0.1f, 1f)] private float desktopPointerSmoothing = 1f;
+        [SerializeField] private float desktopReleaseGraceSeconds = 0.12f;
+        [SerializeField] private float controllerReleaseGraceSeconds = 0.08f;
 
         private XRInputDevice rightController;
         private InputAction controllerTriggerAction;
@@ -40,6 +44,8 @@ namespace XRStudyWhiteboard
         private bool hasDesktopGameMousePosition;
         private bool desktopMouseButtonHeld;
         private bool desktopRightMouseButtonHeld;
+        private float desktopPressGraceTimer;
+        private float controllerPressGraceTimer;
         private bool desktopEraseWasActive;
         private WhiteboardTool toolBeforeDesktopErase;
         private bool usingDesktopCursor;
@@ -122,6 +128,15 @@ namespace XRStudyWhiteboard
             // real headset provides one. L Mouse in the Device Simulator then
             // follows the same trigger path as a physical controller.
             bool hasController = TryGetControllerInput(out pressed, out ray);
+            if (hasController && !usingDesktopCursor)
+            {
+                if (pressed)
+                    controllerPressGraceTimer = controllerReleaseGraceSeconds;
+                else if (controllerPressGraceTimer > 0f)
+                    controllerPressGraceTimer -= Time.unscaledDeltaTime;
+
+                pressed |= controllerPressGraceTimer > 0f;
+            }
             bool editorMouseAvailable = useMouseFallbackInEditor
                 && desktopTesting
                 && Mouse.current != null
@@ -191,8 +206,18 @@ namespace XRStudyWhiteboard
                 // button state while a CGEvent drag is still held. The
                 // Game-view IMGUI latch is the reliable source for editor
                 // drawing, so keep the stroke alive until MouseUp arrives.
-                pressed = desktopMouseButtonHeld
-                    || Mouse.current.leftButton.isPressed
+                bool desktopPointerPressed = desktopMouseButtonHeld || Mouse.current.leftButton.isPressed;
+                if (desktopPointerPressed)
+                    desktopPressGraceTimer = desktopReleaseGraceSeconds;
+                else if (desktopPressGraceTimer > 0f)
+                    desktopPressGraceTimer -= Time.unscaledDeltaTime;
+
+                // A docked Game view can deliver MouseUp one editor frame
+                // before the Input System updates. Hold the same stroke for a
+                // short grace period so that a circle does not become a row
+                // of restarted dots.
+                pressed = desktopPointerPressed
+                    || desktopPressGraceTimer > 0f
                     || desktopErase;
             }
             else
@@ -215,8 +240,8 @@ namespace XRStudyWhiteboard
 
                 bool desktopPaperErase = desktopRightMouseButtonHeld
                     || (Mouse.current != null && Mouse.current.rightButton.isPressed);
-                bool erasingPaper = desktopPaperErase || PaperTool.IsAnyEraserHeld;
-                bool canWriteOnPaper = desktopTesting || PaperTool.IsAnyPencilHeld || PaperTool.IsAnyEraserHeld;
+                bool erasingPaper = desktopPaperErase || PaperTool.IsEraserActive;
+                bool canWriteOnPaper = desktopPaperErase || PaperTool.IsPencilActive || PaperTool.IsEraserActive;
                 if (pressed && canWriteOnPaper)
                     paper.DrawAtUV(paperUv, erasingPaper);
                 else
@@ -271,10 +296,13 @@ namespace XRStudyWhiteboard
                 return point;
             }
 
-            smoothedDesktopUv = Vector2.Lerp(
-                smoothedDesktopUv,
-                point,
-                Mathf.Clamp01(desktopPointerSmoothing));
+            if (desktopPointerSmoothing >= 0.999f)
+            {
+                smoothedDesktopUv = point;
+                return point;
+            }
+
+            smoothedDesktopUv = Vector2.Lerp(smoothedDesktopUv, point, desktopPointerSmoothing);
             return smoothedDesktopUv;
         }
 
@@ -326,7 +354,7 @@ namespace XRStudyWhiteboard
                 if (candidate == null || !candidate.isActiveAndEnabled)
                     continue;
                 Canvas canvas = candidate.transform.GetComponentInParent<Canvas>();
-                if (canvas == null || !canvas.name.Equals("WhiteboardUI", System.StringComparison.OrdinalIgnoreCase))
+                if (!IsProjectWorldCanvas(canvas))
                     continue;
                 RectTransform rect = candidate.transform as RectTransform;
                 if (rect == null || !IsScreenPointInside(rect, gameViewPoint))
@@ -437,7 +465,7 @@ namespace XRStudyWhiteboard
                     if (candidate == null || !candidate.isActiveAndEnabled)
                         continue;
                     Canvas canvas = candidate.transform.GetComponentInParent<Canvas>();
-                    if (canvas == null || !canvas.name.Equals("WhiteboardUI", System.StringComparison.OrdinalIgnoreCase))
+                    if (!IsProjectWorldCanvas(canvas))
                         continue;
                     RectTransform rect = candidate.transform as RectTransform;
                     if (rect == null)
@@ -514,6 +542,15 @@ namespace XRStudyWhiteboard
             if (gameplayCamera == null)
                 gameplayCamera = Camera.main;
             return gameplayCamera;
+        }
+
+        private static bool IsProjectWorldCanvas(Canvas canvas)
+        {
+            if (canvas == null || canvas.renderMode != RenderMode.WorldSpace)
+                return false;
+
+            return canvas.name.Equals("WhiteboardUI", System.StringComparison.OrdinalIgnoreCase)
+                || canvas.name.Equals("TableToolMenu", System.StringComparison.OrdinalIgnoreCase);
         }
 
         private bool TryGetControllerInput(out bool pressed, out Ray ray)

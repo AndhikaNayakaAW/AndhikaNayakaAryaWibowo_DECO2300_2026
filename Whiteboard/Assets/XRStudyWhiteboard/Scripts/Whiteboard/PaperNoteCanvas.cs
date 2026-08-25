@@ -17,9 +17,13 @@ namespace XRStudyWhiteboard
         [SerializeField] private Vector2 paperWorldSize = new Vector2(0.55f, 0.38f);
         [SerializeField] private int textureWidth = 384;
         [SerializeField] private int textureHeight = 256;
-        [SerializeField] private float pencilSize = 0.018f;
-        [SerializeField] private float eraserSize = 0.055f;
-        [SerializeField] private float interpolationSpacing = 0.001f;
+        // Paper uses a fine pencil line, deliberately smaller than the
+        // marker used by WhiteboardCanvas. This keeps a table note readable
+        // instead of making it look like a second whiteboard.
+        [SerializeField] private float pencilSize = 0.009f;
+        [SerializeField] private float eraserSize = 0.032f;
+        [SerializeField] private float interpolationSpacing = 0.00075f;
+        [SerializeField] private int maximumInterpolationSteps = 1024;
 
         private Texture2D noteTexture;
         private Color32[] pixels;
@@ -39,6 +43,12 @@ namespace XRStudyWhiteboard
             paperWorldSize = new Vector2(Mathf.Max(0.05f, worldSize.x), Mathf.Max(0.05f, worldSize.y));
             EnsureCrosshair();
             InitializeSurface();
+        }
+
+        public void ConfigureWritingSizes(float finePencilSize, float wideEraserSize)
+        {
+            pencilSize = Mathf.Clamp(finePencilSize, 0.001f, 0.05f);
+            eraserSize = Mathf.Clamp(wideEraserSize, pencilSize, 0.15f);
         }
 
         private void OnEnable()
@@ -95,7 +105,13 @@ namespace XRStudyWhiteboard
             ApplyTexture();
 
             if (paperRenderer != null)
-                paperRenderer.material.mainTexture = noteTexture;
+            {
+                Material targetMaterial = Application.isPlaying
+                    ? paperRenderer.material
+                    : paperRenderer.sharedMaterial;
+                if (targetMaterial != null)
+                    targetMaterial.mainTexture = noteTexture;
+            }
         }
 
         public bool TryGetUV(Ray ray, float maxDistance, out Vector2 uv)
@@ -145,9 +161,12 @@ namespace XRStudyWhiteboard
             float brushRadiusInUv = (brushDiameter * 0.5f)
                 / Mathf.Max(paperWorldSize.x, paperWorldSize.y);
             float spacing = Mathf.Min(
-                Mathf.Max(0.0005f, interpolationSpacing),
-                Mathf.Max(0.0005f, brushRadiusInUv * 0.4f));
-            int steps = Mathf.Max(1, Mathf.CeilToInt(distance / spacing));
+                Mathf.Max(0.00025f, interpolationSpacing),
+                Mathf.Max(0.00025f, brushRadiusInUv * 0.4f));
+            int steps = Mathf.Clamp(
+                Mathf.CeilToInt(distance / spacing),
+                1,
+                Mathf.Max(1, maximumInterpolationSteps));
             for (int i = 1; i <= steps; i++)
                 Stamp(Vector2.Lerp(previousUv, uv, i / (float)steps), erasing);
 
@@ -175,6 +194,12 @@ namespace XRStudyWhiteboard
             for (int i = 0; i < crosshairRenderers.Count; i++)
                 if (crosshairRenderers[i] != null)
                     crosshairRenderers[i].material.color = colour;
+
+            float diameter = PaperTool.IsEraserActive ? eraserSize : pencilSize;
+            float span = Mathf.Max(0.018f, diameter * 2.2f);
+            float thickness = Mathf.Max(0.0015f, diameter * 0.18f);
+            SetCrosshairBarScale(0, span, thickness, 0.002f);
+            SetCrosshairBarScale(1, thickness, 0.002f, span);
         }
 
         public void EndStroke()
@@ -279,12 +304,22 @@ namespace XRStudyWhiteboard
                 worldScale.z / Mathf.Max(0.0001f, inheritedScale.z));
             Collider collider = bar.GetComponent<Collider>();
             if (collider != null)
-                Destroy(collider);
+            {
+                if (Application.isPlaying)
+                    Destroy(collider);
+                else
+                    DestroyImmediate(collider);
+            }
             Renderer renderer = bar.GetComponent<Renderer>();
             if (renderer != null)
             {
                 if (material != null)
-                    renderer.material = material;
+                {
+                    if (Application.isPlaying)
+                        renderer.material = material;
+                    else
+                        renderer.sharedMaterial = material;
+                }
                 crosshairRenderers.Add(renderer);
             }
         }
@@ -294,6 +329,19 @@ namespace XRStudyWhiteboard
             Color32 fill = colour;
             for (int i = 0; i < pixels.Length; i++)
                 pixels[i] = fill;
+        }
+
+        private void SetCrosshairBarScale(int index, float x, float y, float z)
+        {
+            if (index < 0 || index >= crosshairRenderers.Count || crosshairRenderers[index] == null)
+                return;
+
+            Transform bar = crosshairRenderers[index].transform;
+            Vector3 inheritedScale = paperRenderer.transform.lossyScale;
+            bar.localScale = new Vector3(
+                x / Mathf.Max(0.0001f, inheritedScale.x),
+                y / Mathf.Max(0.0001f, inheritedScale.y),
+                z / Mathf.Max(0.0001f, inheritedScale.z));
         }
 
         private void ApplyTexture()

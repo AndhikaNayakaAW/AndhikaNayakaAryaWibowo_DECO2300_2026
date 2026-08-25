@@ -13,13 +13,15 @@ The exact keyboard mapping can vary with the installed XRI simulator version. Op
 
 1. Confirm that the simulated right controller ray is visible.
 2. Point at the board and hold the right trigger/select input.
-3. Move across the board. The stroke should be continuous rather than disconnected dots.
+3. Draw a complete circle across the board. The stroke should be continuous rather than disconnected dots and should not visibly trail the pointer.
 4. Select Red, Blue, and Green one at a time and draw a short stroke for each.
 5. Select Eraser and erase over a stroke.
 6. Select Marker again and verify that the selected colour remains available.
 7. Select Clear Board, confirm the overlay appears, choose Cancel, then repeat and choose Clear.
 8. Teleport to a different point on the floor and test snap turning.
-9. Grab and release the physical marker.
+9. Teleport to each visible table using the `TABLE` desktop shortcuts or the floor teleport area. Confirm the view is aimed at that table's paper and the whiteboard remains visible.
+10. Point at a table's `TOOLS` button and select `PENCIL`, draw a circle on the paper, select `ERASER`, erase part of it, then use `CLEAR PAPER` and confirm the paper is blank.
+11. Grab and release the whiteboard marker from its tray.
 
 ## What was validated without a headset
 

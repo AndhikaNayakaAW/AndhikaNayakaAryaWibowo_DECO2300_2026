@@ -8,6 +8,7 @@
 - Lightweight classroom with floor, walls, ceiling, desks, chairs, teacher desk, window, door, clock, plant, and lighting.
 - Large blank whiteboard with runtime texture drawing.
 - Smoothed marker strokes with interpolation.
+- Continuous circle interpolation smoke-tested on both the whiteboard and student paper.
 - Black, red, blue, and green colour controls.
 - Marker and larger eraser modes.
 - Visible current-tool/current-colour/input status panel.
@@ -17,7 +18,10 @@
 - World-space UI, hover/pressed button feedback, and subtle right-controller haptics.
 - Reused hands-capable XR Origin, XRI actions, locomotion, controller/hand setup, and hands permission manager.
 - Grabbable physical marker.
+- Student tables now show paper only; each table creates a floating Pencil/Eraser/Clear Paper menu at runtime.
+- Paper pencil strokes use a finer brush than whiteboard marker strokes.
 - Floor teleportation area and existing snap-turn/locomotion infrastructure.
+- Dynamic table teleport/view anchors focus each paper while retaining the whiteboard in view.
 - Editor scene builder at `Tools > XR Study Whiteboard > Build - Repair Classroom`.
 - Student-facing documentation under `Documentation/`.
 
@@ -42,7 +46,7 @@ Pinch drawing is implemented as a secondary path. The experimental two-finger sw
 - The runtime board uses a CPU-updated 1024x512 texture; persistence and saving notes to disk are not implemented.
 - Writing is UV/texture based and does not recognise handwriting or text.
 - The scene has not been performance-profiled on Quest.
-- The physical marker demonstrates XR grabbing but is not required for drawing.
+- The physical marker demonstrates XR grabbing but is not required for drawing. Desk paper tools are menu-selected rather than physical objects.
 
 ## Removed Unrelated Content
 

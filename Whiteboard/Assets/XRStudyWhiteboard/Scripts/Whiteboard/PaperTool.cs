@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
@@ -12,60 +13,67 @@ namespace XRStudyWhiteboard
     }
 
     /// <summary>
-    /// Tracks whether a physical pencil or eraser is currently held. The
-    /// writing interactor uses this so an eraser grabbed from under a desk
-    /// really erases the paper instead of only looking decorative.
+    /// Stores the selected paper tool. Physical tools are still supported for
+    /// old scenes, but the classroom now uses the per-table floating menu so
+    /// no pencil or eraser has to sit on the desk.
     /// </summary>
     public sealed class PaperTool : MonoBehaviour
     {
         private static readonly List<PaperTool> ActiveTools = new List<PaperTool>();
+        private static PaperToolKind selectedKind = PaperToolKind.Pencil;
 
         [SerializeField] private PaperToolKind kind = PaperToolKind.Pencil;
         [SerializeField] private XRGrabInteractable grabInteractable;
 
         public PaperToolKind Kind => kind;
         public bool IsHeld { get; private set; }
+        public static PaperToolKind SelectedKind => selectedKind;
+
+        public static event Action<PaperToolKind> SelectionChanged;
+
+        public static bool IsPencilActive => selectedKind == PaperToolKind.Pencil || HasHeldTool(PaperToolKind.Pencil);
+        public static bool IsEraserActive => selectedKind == PaperToolKind.Eraser || HasHeldTool(PaperToolKind.Eraser);
 
         public static bool IsAnyEraserHeld
         {
-            get
-            {
-                for (int i = ActiveTools.Count - 1; i >= 0; i--)
-                {
-                    PaperTool tool = ActiveTools[i];
-                    if (tool == null)
-                    {
-                        ActiveTools.RemoveAt(i);
-                        continue;
-                    }
-
-                    if (tool.IsHeld && tool.Kind == PaperToolKind.Eraser)
-                        return true;
-                }
-
-                return false;
-            }
+            get => IsEraserActive;
         }
 
         public static bool IsAnyPencilHeld
         {
-            get
-            {
-                for (int i = ActiveTools.Count - 1; i >= 0; i--)
-                {
-                    PaperTool tool = ActiveTools[i];
-                    if (tool == null)
-                    {
-                        ActiveTools.RemoveAt(i);
-                        continue;
-                    }
+            get => IsPencilActive;
+        }
 
-                    if (tool.IsHeld && tool.Kind == PaperToolKind.Pencil)
-                        return true;
+        public static void Select(PaperToolKind tool)
+        {
+            if (selectedKind == tool)
+            {
+                ControllerHaptics.PulseRightController();
+                SelectionChanged?.Invoke(selectedKind);
+                return;
+            }
+
+            selectedKind = tool;
+            SelectionChanged?.Invoke(selectedKind);
+            ControllerHaptics.PulseRightController();
+        }
+
+        private static bool HasHeldTool(PaperToolKind tool)
+        {
+            for (int i = ActiveTools.Count - 1; i >= 0; i--)
+            {
+                PaperTool activeTool = ActiveTools[i];
+                if (activeTool == null)
+                {
+                    ActiveTools.RemoveAt(i);
+                    continue;
                 }
 
-                return false;
+                if (activeTool.IsHeld && activeTool.Kind == tool)
+                    return true;
             }
+
+            return false;
         }
 
         public void Initialize(PaperToolKind toolKind, XRGrabInteractable interactable)

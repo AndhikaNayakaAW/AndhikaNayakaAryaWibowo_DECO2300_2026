@@ -9945,12 +9945,13 @@ MonoBehaviour:
   cursor: {fileID: 1288164049}
   cursorRenderer: {fileID: 1288164047}
   boardWorldSize: {x: 3, y: 1.5}
-  textureWidth: 768
-  textureHeight: 384
+  textureWidth: 1024
+  textureHeight: 512
   markerSize: 0.028
   eraserSize: 0.06
   markerOpacity: 0.82
-  interpolationSpacing: 0.001
+  interpolationSpacing: 0.0006
+  maximumInterpolationSteps: 2048
 --- !u!4 &1827698270
 Transform:
   m_ObjectHideFlags: 0
