@@ -8,16 +8,13 @@ namespace XRStudyWhiteboard
         [SerializeField] private XRStudyWhiteboardManager manager;
         [SerializeField] private Button cancelButton;
         [SerializeField] private Button confirmButton;
+        private bool listenersBound;
 
         public bool IsVisible => gameObject.activeSelf;
 
         private void Awake()
         {
-            if (cancelButton != null)
-                cancelButton.onClick.AddListener(Cancel);
-            if (confirmButton != null)
-                confirmButton.onClick.AddListener(Confirm);
-
+            BindListeners();
             Hide();
         }
 
@@ -26,6 +23,20 @@ namespace XRStudyWhiteboard
             manager = whiteboardManager;
             cancelButton = cancel;
             confirmButton = confirm;
+            BindListeners();
+        }
+
+        private void BindListeners()
+        {
+            if (listenersBound)
+                return;
+
+            if (cancelButton != null)
+                cancelButton.onClick.AddListener(Cancel);
+            if (confirmButton != null)
+                confirmButton.onClick.AddListener(Confirm);
+
+            listenersBound = cancelButton != null || confirmButton != null;
         }
 
         public void Show()

@@ -20,6 +20,11 @@ namespace XRStudyWhiteboard
 
         public void DrawAtUV(Vector2 uv)
         {
+            DrawAtUV(uv, false);
+        }
+
+        public void DrawAtUV(Vector2 uv, bool trustedDesktopInput)
+        {
             if (canvas == null || manager == null || manager.IsClearConfirmationVisible)
                 return;
 
@@ -31,7 +36,7 @@ namespace XRStudyWhiteboard
                 return;
             }
 
-            canvas.ContinueStroke(uv);
+            canvas.ContinueStroke(uv, trustedDesktopInput);
         }
 
         public void EndStroke()

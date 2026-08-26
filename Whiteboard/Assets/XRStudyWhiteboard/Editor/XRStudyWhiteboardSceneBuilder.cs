@@ -222,10 +222,11 @@ namespace XRStudyWhiteboard.Editor
             serializedCanvas.FindProperty("boardWorldSize").vector2Value = new Vector2(3f, 1.5f);
             serializedCanvas.FindProperty("textureWidth").intValue = 1024;
             serializedCanvas.FindProperty("textureHeight").intValue = 512;
-            serializedCanvas.FindProperty("markerSize").floatValue = 0.028f;
+            serializedCanvas.FindProperty("markerSize").floatValue = 0.032f;
             serializedCanvas.FindProperty("eraserSize").floatValue = 0.06f;
-            serializedCanvas.FindProperty("markerOpacity").floatValue = 0.82f;
+            serializedCanvas.FindProperty("markerOpacity").floatValue = 0.95f;
             serializedCanvas.FindProperty("interpolationSpacing").floatValue = 0.0006f;
+            serializedCanvas.FindProperty("maximumInterpolationSteps").intValue = 8192;
             serializedCanvas.ApplyModifiedPropertiesWithoutUndo();
 
             CreateMarkerTray(parent, markerMaterial, accentMaterial);

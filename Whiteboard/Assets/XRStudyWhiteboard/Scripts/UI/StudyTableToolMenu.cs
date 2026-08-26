@@ -110,7 +110,7 @@ namespace XRStudyWhiteboard
             // Put the button just beyond the paper's front-right corner. The
             // menu is presented face-up, so the same front side is visible to
             // Both the seated camera and an XR controller ray use this face.
-            menuObject.transform.localPosition = new Vector3(-0.60f, 0.1f, 0.28f);
+            menuObject.transform.localPosition = new Vector3(-0.30f, 0.1f, -0.45f);
             menuObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             // The tabletop-facing canvas keeps the validation and the
             // controller ray on the same face. The glyphs are rotated in

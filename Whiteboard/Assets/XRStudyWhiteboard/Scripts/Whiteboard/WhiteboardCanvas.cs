@@ -21,13 +21,13 @@ namespace XRStudyWhiteboard
         [Header("Drawing")]
         [SerializeField] private int textureWidth = 768;
         [SerializeField] private int textureHeight = 384;
-        [SerializeField] private float markerSize = 0.028f;
+        [SerializeField] private float markerSize = 0.032f;
         [SerializeField] private float eraserSize = 0.06f;
-        [SerializeField, Range(0.1f, 1f)] private float markerOpacity = 0.82f;
+        [SerializeField, Range(0.1f, 1f)] private float markerOpacity = 0.95f;
         [SerializeField] private float interpolationSpacing = 0.0006f;
-        [SerializeField] private int maximumInterpolationSteps = 2048;
+        [SerializeField] private int maximumInterpolationSteps = 8192;
         [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.08f;
-        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.92f;
+        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.9f;
 
         private Texture2D boardTexture;
         private Color32[] pixels;
@@ -110,7 +110,11 @@ namespace XRStudyWhiteboard
                     ? surfaceRenderer.material
                     : surfaceRenderer.sharedMaterial;
                 if (targetMaterial != null)
+                {
                     targetMaterial.mainTexture = boardTexture;
+                    if (targetMaterial.HasProperty("_BaseMap"))
+                        targetMaterial.SetTexture("_BaseMap", boardTexture);
+                }
             }
         }
 
@@ -180,6 +184,11 @@ namespace XRStudyWhiteboard
 
         public void ContinueStroke(Vector2 uv)
         {
+            ContinueStroke(uv, false);
+        }
+
+        public void ContinueStroke(Vector2 uv, bool trustedDesktopInput)
+        {
             if (!hasPreviousPoint)
             {
                 if (!TryReacquireSurface(uv))
@@ -193,7 +202,7 @@ namespace XRStudyWhiteboard
             // A missed or re-aimed controller ray must not be joined with a
             // long straight segment. That segment is what appears as the
             // unwanted vertical line after a simulator pose jump.
-            if (distance > maximumUvJump)
+            if (!trustedDesktopInput && distance > maximumUvJump)
             {
                 hasPreviousPoint = false;
                 inputSampleCount = 0;
@@ -219,13 +228,15 @@ namespace XRStudyWhiteboard
                 Mathf.CeilToInt(distance / spacing),
                 1,
                 Mathf.Max(1, maximumInterpolationSteps));
-            // Stamp every point along the segment, not only the sampled
-            // controller positions. This closes gaps when the ray moves
-            // quickly and makes a full circle read as one continuous stroke.
+            // Paint each interpolated section as a capsule rather than a
+            // row of circular stamps. This keeps the edge smooth even when
+            // desktop/controller samples are quantised to whole pixels.
+            Vector2 segmentStart = previousUv;
             for (int i = 1; i <= steps; i++)
             {
-                float t = i / (float)steps;
-                Stamp(Vector2.Lerp(previousUv, uv, t));
+                Vector2 segmentEnd = Vector2.Lerp(previousUv, uv, i / (float)steps);
+                StampSegment(segmentStart, segmentEnd);
+                segmentStart = segmentEnd;
             }
 
             previousUv = uv;
@@ -369,6 +380,9 @@ namespace XRStudyWhiteboard
             if (!hasPreviousPoint || inputSampleCount <= 0)
                 return;
 
+            // Finish on the latest raw sample. The filtered point can trail a
+            // fast final drag event by more than the brush radius, leaving a
+            // small but visible gap at a line or circle endpoint.
             Vector2 endpoint = lastInputUv;
             float distance = Vector2.Distance(previousUv, endpoint);
             if (distance > maximumUvJump)
@@ -386,8 +400,13 @@ namespace XRStudyWhiteboard
                 Mathf.CeilToInt(distance / spacing),
                 1,
                 Mathf.Max(1, maximumInterpolationSteps));
+            Vector2 segmentStart = previousUv;
             for (int i = 1; i <= steps; i++)
-                Stamp(Vector2.Lerp(previousUv, endpoint, i / (float)steps));
+            {
+                Vector2 segmentEnd = Vector2.Lerp(previousUv, endpoint, i / (float)steps);
+                StampSegment(segmentStart, segmentEnd);
+                segmentStart = segmentEnd;
+            }
 
             previousUv = endpoint;
             textureDirty = true;
@@ -456,6 +475,74 @@ namespace XRStudyWhiteboard
                         255);
                 }
             }
+        }
+
+        private void StampSegment(Vector2 startUv, Vector2 endUv)
+        {
+            if (pixels == null)
+                InitializeSurface();
+
+            bool erasing = manager != null && manager.CurrentTool == WhiteboardTool.Eraser;
+            Color32 colour = erasing
+                ? new Color32(255, 255, 255, 255)
+                : (Color32)(manager != null ? manager.GetCurrentInkColour() : Color.black);
+            float diameter = erasing ? eraserSize : markerSize;
+            float radiusX = Mathf.Max(1f, (diameter / boardWorldSize.x) * textureWidth * 0.5f);
+            float radiusY = Mathf.Max(1f, (diameter / boardWorldSize.y) * textureHeight * 0.5f);
+            float startX = Mathf.Clamp01(startUv.x) * (textureWidth - 1);
+            float startY = Mathf.Clamp01(startUv.y) * (textureHeight - 1);
+            float endX = Mathf.Clamp01(endUv.x) * (textureWidth - 1);
+            float endY = Mathf.Clamp01(endUv.y) * (textureHeight - 1);
+
+            int minX = Mathf.Max(0, Mathf.FloorToInt(Mathf.Min(startX, endX) - radiusX - 1f));
+            int maxX = Mathf.Min(textureWidth - 1, Mathf.CeilToInt(Mathf.Max(startX, endX) + radiusX + 1f));
+            int minY = Mathf.Max(0, Mathf.FloorToInt(Mathf.Min(startY, endY) - radiusY - 1f));
+            int maxY = Mathf.Min(textureHeight - 1, Mathf.CeilToInt(Mathf.Max(startY, endY) + radiusY + 1f));
+
+            Vector2 start = new Vector2(startX / radiusX, startY / radiusY);
+            Vector2 end = new Vector2(endX / radiusX, endY / radiusY);
+            Vector2 segment = end - start;
+            float segmentLengthSquared = segment.sqrMagnitude;
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Vector2 point = new Vector2(x / radiusX, y / radiusY);
+                    float t = segmentLengthSquared > 0.000001f
+                        ? Mathf.Clamp01(Vector2.Dot(point - start, segment) / segmentLengthSquared)
+                        : 0f;
+                    float normalizedDistance = Vector2.Distance(point, Vector2.Lerp(start, end, t));
+                    if (normalizedDistance > 1.05f)
+                        continue;
+
+                    float coverage = normalizedDistance <= 0.86f
+                        ? 1f
+                        : 1f - Mathf.InverseLerp(0.86f, 1.05f, normalizedDistance);
+                    BlendPixel(x, y, colour, coverage, erasing);
+                }
+            }
+        }
+
+        private void BlendPixel(int x, int y, Color32 colour, float coverage, bool erasing)
+        {
+            int pixelIndex = y * textureWidth + x;
+            Color32 existing = pixels[pixelIndex];
+            if (erasing)
+            {
+                pixels[pixelIndex] = new Color32(
+                    (byte)Mathf.RoundToInt(Mathf.Lerp(existing.r, colour.r, coverage)),
+                    (byte)Mathf.RoundToInt(Mathf.Lerp(existing.g, colour.g, coverage)),
+                    (byte)Mathf.RoundToInt(Mathf.Lerp(existing.b, colour.b, coverage)),
+                    255);
+                return;
+            }
+
+            float opacity = Mathf.Clamp01(markerOpacity) * coverage;
+            pixels[pixelIndex] = new Color32(
+                (byte)Mathf.RoundToInt(Mathf.Lerp(existing.r, colour.r, opacity)),
+                (byte)Mathf.RoundToInt(Mathf.Lerp(existing.g, colour.g, opacity)),
+                (byte)Mathf.RoundToInt(Mathf.Lerp(existing.b, colour.b, opacity)),
+                255);
         }
 
         private void EnsureCrosshair()

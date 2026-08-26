@@ -28,7 +28,7 @@ namespace XRStudyWhiteboard
         // The canvases interpolate between UV samples. A small amount of
         // bounded desktop smoothing removes cursor quantisation without
         // creating a visible trailing line behind the pointer.
-        [SerializeField, Range(0.35f, 1f)] private float desktopPointerSmoothing = 0.92f;
+        [SerializeField, Range(0.1f, 1f)] private float desktopPointerSmoothing = 0.35f;
         [SerializeField, Range(0.02f, 1f)] private float maximumDesktopUvJump = 0.04f;
         [SerializeField] private float desktopReleaseGraceSeconds = 0.32f;
         [SerializeField] private float controllerReleaseGraceSeconds = 0.08f;
@@ -61,6 +61,9 @@ namespace XRStudyWhiteboard
         private bool hasSmoothedDesktopUv;
         private Vector2 desktopGuiScreenPosition;
         private bool hasDesktopGuiScreenPosition;
+        private Vector3 desktopCameraPosition;
+        private Quaternion desktopCameraRotation;
+        private bool hasDesktopCameraSnapshot;
         private void Awake()
         {
             if (rayOrigin == null)
@@ -138,10 +141,19 @@ namespace XRStudyWhiteboard
                 EndDrawing();
                 wasPressed = false;
                 desktopMouseButtonHeld = false;
-                hasDesktopGuiScreenPosition = false;
                 desktopPressGraceTimer = 0f;
                 surfaceMissGraceTimer = 0f;
+                hasDesktopCameraSnapshot = false;
                 return;
+            }
+
+            if ((Mouse.current == null || !Mouse.current.leftButton.isPressed)
+                && !hasDesktopGuiScreenPosition
+                && desktopPressGraceTimer <= 0f)
+            {
+                desktopMouseButtonHeld = false;
+                hasDesktopGuiScreenPosition = false;
+                hasDesktopCameraSnapshot = false;
             }
 
             if (Mouse.current == null || (!Mouse.current.leftButton.isPressed && !desktopMouseButtonHeld))
@@ -174,7 +186,11 @@ namespace XRStudyWhiteboard
                 && Camera.main != null;
             bool virtualControllerAim = Keyboard.current != null && Keyboard.current.spaceKey.isPressed;
             bool desktopPointerActive = Mouse.current != null
-                && (Mouse.current.leftButton.isPressed || desktopMouseButtonHeld);
+                && (Mouse.current.leftButton.isPressed
+                    || (desktopMouseButtonHeld && hasDesktopGuiScreenPosition));
+            bool desktopGestureActive = desktopPointerActive
+                || hasDesktopGuiScreenPosition
+                || desktopPressGraceTimer > 0f;
             // The shared XRI action asset can exist in the editor before the
             // simulator has published a usable virtual controller. In that
             // state TryGetControllerInput reports the action but the ray is
@@ -185,7 +201,7 @@ namespace XRStudyWhiteboard
             bool controllerTriggerPressed = hasController && pressed;
             if (editorMouseAvailable
                 && !virtualControllerAim
-                && (!controllerTriggerPressed || desktopPointerActive))
+                && (!controllerTriggerPressed || desktopGestureActive))
             {
                 usingDesktopCursor = true;
                 // Input System reports the live pointer in the docked
@@ -193,9 +209,15 @@ namespace XRStudyWhiteboard
                 // drag sample follows the actual cursor; caching IMGUI event
                 // coordinates can freeze one axis and create vertical lines.
                 Vector2 mousePosition = Mouse.current.position.ReadValue();
-                if (desktopMouseButtonHeld && hasDesktopGuiScreenPosition)
+                if (hasDesktopGuiScreenPosition)
                     mousePosition = desktopGuiScreenPosition;
 
+                if (desktopPointerActive && !hasDesktopGuiScreenPosition)
+                {
+                    EndDrawing();
+                    wasPressed = false;
+                    return;
+                }
                 // XRUIInputModule's tracked-device raycaster is the correct
                 // path for a real controller and the Device Simulator.  A
                 // normal desktop cursor is a separate pointer, however, so
@@ -215,7 +237,8 @@ namespace XRStudyWhiteboard
                 // otherwise start a board stroke. Consume any UI hit before
                 // converting the pointer into a world ray so closing the
                 // simulator cannot leave a vertical annotation behind.
-                if (IsDesktopPointerOverUi(mousePosition))
+                if (!(Application.isEditor && useMouseFallbackInEditor)
+                    && IsDesktopPointerOverUi(mousePosition))
                 {
                     EndDrawing();
                     wasPressed = false;
@@ -225,7 +248,7 @@ namespace XRStudyWhiteboard
                 Camera camera = GetGameplayCamera();
                 if (camera == null)
                     return;
-                ray = camera.ScreenPointToRay(mousePosition);
+                ray = GetDesktopScreenRay(camera, mousePosition);
                 bool desktopErase = desktopRightMouseButtonHeld
                     || (Mouse.current != null && Mouse.current.rightButton.isPressed);
                 XRStudyWhiteboardManager desktopManager = manager != null
@@ -253,7 +276,8 @@ namespace XRStudyWhiteboard
                 else if (Mouse.current.leftButton.wasReleasedThisFrame)
                     desktopMouseButtonHeld = false;
 
-                bool desktopPointerPressed = desktopMouseButtonHeld || Mouse.current.leftButton.isPressed;
+                bool desktopPointerPressed = Mouse.current.leftButton.isPressed
+                    || (desktopMouseButtonHeld && hasDesktopGuiScreenPosition);
                 if (desktopPointerPressed)
                     desktopPressGraceTimer = desktopReleaseGraceSeconds;
                 else if (desktopPressGraceTimer > 0f)
@@ -272,6 +296,7 @@ namespace XRStudyWhiteboard
                 usingDesktopCursor = false;
                 hasSmoothedDesktopUv = false;
                 desktopEraseWasActive = false;
+                hasDesktopCameraSnapshot = false;
             }
 
             // Use the same ray fallback for the desktop cursor as for a real
@@ -299,7 +324,8 @@ namespace XRStudyWhiteboard
                 return;
             }
 
-            if (PaperNoteCanvas.TryGetNearest(ray, maxRayDistance, out PaperNoteCanvas paper, out Vector2 paperUv))
+            bool paperHit = PaperNoteCanvas.TryGetNearest(ray, maxRayDistance, out PaperNoteCanvas paper, out Vector2 paperUv);
+            if (paperHit)
             {
                 // A table paper and the main board use separate stroke
                 // buffers. End a board stroke before switching surfaces so a
@@ -322,7 +348,7 @@ namespace XRStudyWhiteboard
                 bool erasingPaper = desktopPaperErase || PaperTool.IsEraserActive;
                 bool canWriteOnPaper = desktopPaperErase || PaperTool.IsPencilActive || PaperTool.IsEraserActive;
                 if (pressed && canWriteOnPaper)
-                    paper.DrawAtUV(paperUv, erasingPaper);
+                    paper.DrawAtUV(paperUv, erasingPaper, usingDesktopCursor);
                 else
                     paper.EndStroke();
 
@@ -368,7 +394,7 @@ namespace XRStudyWhiteboard
             uv = SmoothDesktopPoint(uv, pressed && wasPressed);
             canvas.UpdateCursor(uv);
             if (pressed)
-                drawer.DrawAtUV(uv);
+                drawer.DrawAtUV(uv, usingDesktopCursor);
             else
                 drawer.EndStroke();
 
@@ -422,18 +448,24 @@ namespace XRStudyWhiteboard
             if ((current.type == EventType.MouseDown || current.type == EventType.MouseDrag) && current.button == 0)
             {
                 desktopMouseButtonHeld = true;
-                desktopGuiScreenPosition = new Vector2(
-                    current.mousePosition.x,
-                    Screen.height - current.mousePosition.y);
-                hasDesktopGuiScreenPosition = true;
+                // A MouseDown can arrive one editor frame before the Game
+                // view has published its local position. Wait for the first
+                // MouseDrag sample so a stale global coordinate can never
+                // become an isolated dot or a vertical lead-in.
+                if (current.type == EventType.MouseDrag)
+                {
+                    desktopGuiScreenPosition = new Vector2(
+                        current.mousePosition.x,
+                        Screen.height - current.mousePosition.y);
+                    hasDesktopGuiScreenPosition = true;
+                }
             }
             else if (current.type == EventType.MouseUp && current.button == 0)
             {
                 desktopMouseButtonHeld = false;
-                desktopGuiScreenPosition = new Vector2(
-                    current.mousePosition.x,
-                    Screen.height - current.mousePosition.y);
-                hasDesktopGuiScreenPosition = true;
+                hasDesktopGuiScreenPosition = false;
+                desktopPressGraceTimer = 0f;
+                hasDesktopCameraSnapshot = false;
             }
             else if (current.type == EventType.MouseDown && current.button == 1)
                 desktopRightMouseButtonHeld = true;
@@ -504,6 +536,28 @@ namespace XRStudyWhiteboard
 
             if (drawer != null)
                 drawer.EndStroke();
+        }
+
+        private Ray GetDesktopScreenRay(Camera camera, Vector2 screenPosition)
+        {
+            if (!hasDesktopCameraSnapshot)
+            {
+                desktopCameraPosition = camera.transform.position;
+                desktopCameraRotation = camera.transform.rotation;
+                hasDesktopCameraSnapshot = true;
+            }
+
+            // The editor Device Simulator can update the XR camera while a
+            // desktop drag is in progress. Reuse the camera pose captured at
+            // the start of that drag for the ray calculation, then restore
+            // the live pose immediately so controller visuals and locomotion
+            // remain unaffected.
+            Vector3 livePosition = camera.transform.position;
+            Quaternion liveRotation = camera.transform.rotation;
+            camera.transform.SetPositionAndRotation(desktopCameraPosition, desktopCameraRotation);
+            Ray ray = camera.ScreenPointToRay(screenPosition);
+            camera.transform.SetPositionAndRotation(livePosition, liveRotation);
+            return ray;
         }
 
         private void ResolveDesktopUiRaycaster()
@@ -636,7 +690,6 @@ namespace XRStudyWhiteboard
             {
                 desktopUiClickHeld = true;
                 desktopMouseButtonHeld = false;
-                hasDesktopGuiScreenPosition = false;
                 desktopPressGraceTimer = 0f;
                 return true;
             }
@@ -722,7 +775,6 @@ namespace XRStudyWhiteboard
                 // carry its press latch into the next desktop drawing stroke
                 // when the editor fails to deliver the matching MouseUp.
                 desktopMouseButtonHeld = false;
-                hasDesktopGuiScreenPosition = false;
                 desktopPressGraceTimer = 0f;
             }
 

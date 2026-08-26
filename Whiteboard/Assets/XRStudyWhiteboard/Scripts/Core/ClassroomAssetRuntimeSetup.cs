@@ -218,7 +218,7 @@ namespace XRStudyWhiteboard
             if (toolTray != null)
             {
                 toolTray.SetPositionAndRotation(
-                    boardFrontCenter - up * (height * 0.5f + 0.14f) - right * (width * 0.28f),
+                    boardFrontCenter - up * (height * 0.5f + 0.24f) - right * (width * 0.28f),
                     boardRotation);
             }
 
@@ -500,7 +500,7 @@ namespace XRStudyWhiteboard
             GameObject paper = CreatePrimitive("Paper Note", PrimitiveType.Cube, setObject.transform, new Vector3(0f, 0.015f, 0f), new Vector3(0.55f, 0.018f, 0.38f), paperMaterial);
             PaperNoteCanvas paperCanvas = paper.AddComponent<PaperNoteCanvas>();
             paperCanvas.Configure(paper.GetComponent<Renderer>(), paper.GetComponent<Collider>(), new Vector2(0.55f, 0.38f));
-            paperCanvas.ConfigureWritingSizes(0.009f, 0.032f);
+            paperCanvas.ConfigureWritingSizes(0.014f, 0.032f);
             AddGrabbable(paper);
 
             StudyTableToolMenu toolMenu = setObject.AddComponent<StudyTableToolMenu>();

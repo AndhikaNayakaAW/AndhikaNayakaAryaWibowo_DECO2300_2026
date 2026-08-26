@@ -9947,11 +9947,11 @@ MonoBehaviour:
   boardWorldSize: {x: 3, y: 1.5}
   textureWidth: 1024
   textureHeight: 512
-  markerSize: 0.028
+  markerSize: 0.032
   eraserSize: 0.06
-  markerOpacity: 0.82
+  markerOpacity: 0.95
   interpolationSpacing: 0.0006
-  maximumInterpolationSteps: 2048
+  maximumInterpolationSteps: 8192
 --- !u!4 &1827698270
 Transform:
   m_ObjectHideFlags: 0

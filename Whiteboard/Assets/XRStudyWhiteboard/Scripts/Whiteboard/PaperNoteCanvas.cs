@@ -15,17 +15,17 @@ namespace XRStudyWhiteboard
         [SerializeField] private Renderer paperRenderer;
         [SerializeField] private Collider paperCollider;
         [SerializeField] private Vector2 paperWorldSize = new Vector2(0.55f, 0.38f);
-        [SerializeField] private int textureWidth = 384;
-        [SerializeField] private int textureHeight = 256;
+        [SerializeField] private int textureWidth = 768;
+        [SerializeField] private int textureHeight = 512;
         // Paper uses a fine pencil line, deliberately smaller than the
         // marker used by WhiteboardCanvas. This keeps a table note readable
         // instead of making it look like a second whiteboard.
-        [SerializeField] private float pencilSize = 0.009f;
+        [SerializeField] private float pencilSize = 0.01f;
         [SerializeField] private float eraserSize = 0.032f;
-        [SerializeField] private float interpolationSpacing = 0.00075f;
-        [SerializeField] private int maximumInterpolationSteps = 1024;
+        [SerializeField] private float interpolationSpacing = 0.0005f;
+        [SerializeField] private int maximumInterpolationSteps = 4096;
         [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.08f;
-        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.92f;
+        [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.9f;
 
         private Texture2D noteTexture;
         private Color32[] pixels;
@@ -39,6 +39,8 @@ namespace XRStudyWhiteboard
         private int reacquireSampleCount;
         private bool previousStrokeWasErasing;
         private bool textureDirty;
+        private Renderer writingSurfaceRenderer;
+        private Material writingSurfaceMaterial;
         private Transform crosshair;
         private readonly List<Renderer> crosshairRenderers = new List<Renderer>();
 
@@ -84,6 +86,8 @@ namespace XRStudyWhiteboard
 
         private void OnDestroy()
         {
+            if (writingSurfaceMaterial != null)
+                Destroy(writingSurfaceMaterial);
             if (noteTexture != null)
                 Destroy(noteTexture);
         }
@@ -97,7 +101,10 @@ namespace XRStudyWhiteboard
         public void InitializeSurface()
         {
             if (noteTexture != null)
+            {
+                EnsureWritingSurface();
                 return;
+            }
 
             textureWidth = Mathf.Max(128, textureWidth);
             textureHeight = Mathf.Max(128, textureHeight);
@@ -111,15 +118,7 @@ namespace XRStudyWhiteboard
             pixels = new Color32[textureWidth * textureHeight];
             Fill(Color.white);
             ApplyTexture();
-
-            if (paperRenderer != null)
-            {
-                Material targetMaterial = Application.isPlaying
-                    ? paperRenderer.material
-                    : paperRenderer.sharedMaterial;
-                if (targetMaterial != null)
-                    targetMaterial.mainTexture = noteTexture;
-            }
+            EnsureWritingSurface();
         }
 
         public bool TryGetUV(Ray ray, float maxDistance, out Vector2 uv)
@@ -128,6 +127,11 @@ namespace XRStudyWhiteboard
         }
 
         public void DrawAtUV(Vector2 uv, bool erasing)
+        {
+            DrawAtUV(uv, erasing, false);
+        }
+
+        public void DrawAtUV(Vector2 uv, bool erasing, bool trustedDesktopInput)
         {
             InitializeSurface();
             if (!hasPreviousPoint)
@@ -168,7 +172,7 @@ namespace XRStudyWhiteboard
             float distance = Vector2.Distance(previousUv, uv);
             // Do not connect two unrelated controller hits with a long
             // segment when the thin paper collider is briefly missed.
-            if (distance > maximumUvJump)
+            if (!trustedDesktopInput && distance > maximumUvJump)
             {
                 hasPreviousPoint = false;
                 inputSampleCount = 0;
@@ -192,8 +196,13 @@ namespace XRStudyWhiteboard
                 Mathf.CeilToInt(distance / spacing),
                 1,
                 Mathf.Max(1, maximumInterpolationSteps));
+            Vector2 segmentStart = previousUv;
             for (int i = 1; i <= steps; i++)
-                Stamp(Vector2.Lerp(previousUv, uv, i / (float)steps), erasing);
+            {
+                Vector2 segmentEnd = Vector2.Lerp(previousUv, uv, i / (float)steps);
+                StampSegment(segmentStart, segmentEnd, erasing);
+                segmentStart = segmentEnd;
+            }
 
             previousUv = uv;
             textureDirty = true;
@@ -389,6 +398,66 @@ namespace XRStudyWhiteboard
             }
         }
 
+        private void StampSegment(Vector2 startUv, Vector2 endUv, bool erasing)
+        {
+            if (pixels == null)
+                InitializeSurface();
+
+            Color32 colour = erasing ? new Color32(255, 255, 255, 255) : new Color32(20, 25, 35, 255);
+            float diameter = erasing ? eraserSize : pencilSize;
+            float radiusX = Mathf.Max(1f, (diameter / paperWorldSize.x) * textureWidth * 0.5f);
+            float radiusY = Mathf.Max(1f, (diameter / paperWorldSize.y) * textureHeight * 0.5f);
+            float startX = Mathf.Clamp01(startUv.x) * (textureWidth - 1);
+            float startY = Mathf.Clamp01(startUv.y) * (textureHeight - 1);
+            float endX = Mathf.Clamp01(endUv.x) * (textureWidth - 1);
+            float endY = Mathf.Clamp01(endUv.y) * (textureHeight - 1);
+
+            int minX = Mathf.Max(0, Mathf.FloorToInt(Mathf.Min(startX, endX) - radiusX - 1f));
+            int maxX = Mathf.Min(textureWidth - 1, Mathf.CeilToInt(Mathf.Max(startX, endX) + radiusX + 1f));
+            int minY = Mathf.Max(0, Mathf.FloorToInt(Mathf.Min(startY, endY) - radiusY - 1f));
+            int maxY = Mathf.Min(textureHeight - 1, Mathf.CeilToInt(Mathf.Max(startY, endY) + radiusY + 1f));
+
+            Vector2 start = new Vector2(startX / radiusX, startY / radiusY);
+            Vector2 end = new Vector2(endX / radiusX, endY / radiusY);
+            Vector2 segment = end - start;
+            float segmentLengthSquared = segment.sqrMagnitude;
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    Vector2 point = new Vector2(x / radiusX, y / radiusY);
+                    float t = segmentLengthSquared > 0.000001f
+                        ? Mathf.Clamp01(Vector2.Dot(point - start, segment) / segmentLengthSquared)
+                        : 0f;
+                    float normalizedDistance = Vector2.Distance(point, Vector2.Lerp(start, end, t));
+                    if (normalizedDistance > 1.05f)
+                        continue;
+
+                    float coverage = normalizedDistance <= 0.86f
+                        ? 1f
+                        : 1f - Mathf.InverseLerp(0.86f, 1.05f, normalizedDistance);
+                    int pixelIndex = y * textureWidth + x;
+                    Color32 existing = pixels[pixelIndex];
+                    if (erasing)
+                    {
+                        pixels[pixelIndex] = new Color32(
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(existing.r, colour.r, coverage)),
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(existing.g, colour.g, coverage)),
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(existing.b, colour.b, coverage)),
+                            255);
+                    }
+                    else
+                    {
+                        pixels[pixelIndex] = new Color32(
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(existing.r, colour.r, coverage)),
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(existing.g, colour.g, coverage)),
+                            (byte)Mathf.RoundToInt(Mathf.Lerp(existing.b, colour.b, coverage)),
+                            255);
+                    }
+                }
+            }
+        }
+
         private Vector2 FilterInputPoint(Vector2 uv)
         {
             if (inputSampleCount <= 0)
@@ -418,6 +487,9 @@ namespace XRStudyWhiteboard
             if (!hasPreviousPoint || inputSampleCount <= 0)
                 return;
 
+            // Finish on the latest raw sample. The filtered point can trail a
+            // fast final drag event by more than the pencil radius, leaving a
+            // small but visible gap at a line or circle endpoint.
             Vector2 endpoint = lastInputUv;
             float distance = Vector2.Distance(previousUv, endpoint);
             if (distance > maximumUvJump)
@@ -433,8 +505,13 @@ namespace XRStudyWhiteboard
                 Mathf.CeilToInt(distance / spacing),
                 1,
                 Mathf.Max(1, maximumInterpolationSteps));
+            Vector2 segmentStart = previousUv;
             for (int i = 1; i <= steps; i++)
-                Stamp(Vector2.Lerp(previousUv, endpoint, i / (float)steps), previousStrokeWasErasing);
+            {
+                Vector2 segmentEnd = Vector2.Lerp(previousUv, endpoint, i / (float)steps);
+                StampSegment(segmentStart, segmentEnd, previousStrokeWasErasing);
+                segmentStart = segmentEnd;
+            }
 
             previousUv = endpoint;
             textureDirty = true;
@@ -459,6 +536,69 @@ namespace XRStudyWhiteboard
             Material material = shader != null ? new Material(shader) : null;
             CreateCrosshairBar("Horizontal", new Vector3(0.07f, 0.005f, 0.005f), material);
             CreateCrosshairBar("Vertical", new Vector3(0.005f, 0.005f, 0.07f), material);
+        }
+
+        private void EnsureWritingSurface()
+        {
+            if (writingSurfaceRenderer != null || paperRenderer == null || noteTexture == null)
+                return;
+
+            GameObject surface = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            surface.name = "Paper Writing Surface";
+            surface.transform.SetParent(paperRenderer.transform, false);
+            surface.transform.localPosition = new Vector3(
+                0f,
+                0.5f + 0.001f / Mathf.Max(0.0001f, paperRenderer.transform.lossyScale.y),
+                0f);
+            surface.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            Vector3 inheritedScale = paperRenderer.transform.lossyScale;
+            surface.transform.localScale = new Vector3(
+                paperWorldSize.x / Mathf.Max(0.0001f, inheritedScale.x),
+                paperWorldSize.y / Mathf.Max(0.0001f, inheritedScale.z),
+                1f);
+
+            Collider surfaceCollider = surface.GetComponent<Collider>();
+            if (surfaceCollider != null)
+            {
+                if (Application.isPlaying)
+                    Destroy(surfaceCollider);
+                else
+                    DestroyImmediate(surfaceCollider);
+            }
+
+            writingSurfaceRenderer = surface.GetComponent<Renderer>();
+            if (writingSurfaceRenderer == null)
+                return;
+
+            Material sourceMaterial = Application.isPlaying
+                ? paperRenderer.material
+                : paperRenderer.sharedMaterial;
+            if (sourceMaterial != null)
+                writingSurfaceMaterial = new Material(sourceMaterial);
+            else
+            {
+                Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+                if (shader == null)
+                    shader = Shader.Find("Standard");
+                writingSurfaceMaterial = shader != null ? new Material(shader) : null;
+            }
+
+            if (writingSurfaceMaterial == null)
+                return;
+
+            writingSurfaceMaterial.name = "Student Paper Writing Surface";
+            writingSurfaceMaterial.mainTexture = noteTexture;
+            if (writingSurfaceMaterial.HasProperty("_BaseMap"))
+                writingSurfaceMaterial.SetTexture("_BaseMap", noteTexture);
+            if (writingSurfaceMaterial.HasProperty("_Cull"))
+                writingSurfaceMaterial.SetFloat("_Cull", 0f);
+            if (Application.isPlaying)
+                writingSurfaceRenderer.material = writingSurfaceMaterial;
+            else
+                writingSurfaceRenderer.sharedMaterial = writingSurfaceMaterial;
+            if (writingSurfaceMaterial.HasProperty("_BaseColor"))
+                writingSurfaceMaterial.SetColor("_BaseColor", Color.white);
+
         }
 
         private void CreateCrosshairBar(string name, Vector3 worldScale, Material material)
@@ -521,6 +661,13 @@ namespace XRStudyWhiteboard
             noteTexture.SetPixels32(pixels);
             noteTexture.Apply(false, false);
             textureDirty = false;
+            EnsureWritingSurface();
+            if (writingSurfaceMaterial != null)
+            {
+                writingSurfaceMaterial.mainTexture = noteTexture;
+                if (writingSurfaceMaterial.HasProperty("_BaseMap"))
+                    writingSurfaceMaterial.SetTexture("_BaseMap", noteTexture);
+            }
         }
     }
 }
