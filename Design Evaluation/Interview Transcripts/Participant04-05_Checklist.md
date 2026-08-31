@@ -1,6 +1,6 @@
 # P4 and P5 Checklist Notes
 
-These two sessions were recorded as checklist-only evidence. No full interview transcript or participant quote was created.
+These two sessions were checklist-only and were not audio recorded. No full audio transcript was created.
 
 | Check | P4 | P5 |
 | --- | --- | --- |
@@ -16,6 +16,11 @@ These two sessions were recorded as checklist-only evidence. No full interview t
 | Drew on the table paper | completed | completed |
 | Erased paper notes | completed | completed |
 | Cleared the table paper | completed | completed |
+| Confidence score | 5 out of 5 | 5 out of 5 |
 | Overall satisfaction | satisfied | satisfied |
 
-These records support the finding that both participants could complete the core IP1 workflow. They do not provide detailed quotes, confidence scores, or a full explanation of individual problems.
+Shared written feedback from the checklist sessions:
+
+> "very useful for students who are easily distracted in online class and good for homeschooling."
+
+These records support the finding that both participants could complete the core IP1 workflow. They do not provide full audio transcripts or detailed individual quotes.

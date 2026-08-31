@@ -45,15 +45,15 @@ The first five participant sessions show that the core writing workflow can be c
 
 ## Design Evaluation 1 user testing
 
-Five classmates tested the IP1 Unity prototype. Three sessions have full audio transcript PDFs and two sessions have checklist-only evidence. All five participants completed the core workflow and the checklist-only participants were satisfied.
+Five classmates tested the IP1 Unity prototype. Three sessions have full audio transcript PDFs and two sessions were checklist-only with no audio recording. All five participants completed the core workflow. P4 and P5 each scored 5 out of 5 and were satisfied.
 
 The repeated findings were:
 
 - The wall whiteboard was easier to understand than the table paper.
-- The table `PENCIL`, `ERASER`, and `CLEAR PAPER` tools were difficult to notice or read at first.
+- The table `PENCIL`, `ERASER`, and `CLEAR PAPER` tools were difficult to notice or read at first across all five sessions.
 - One participant described paper drawing as slightly glitchy, so paper drawing needs another focused retest even though the task was completed.
 - The teleport control was not immediately visible to one participant, so the navigation affordance should be larger or have a clearer hint.
-- Participants saw the concept as useful for focused online learning and homeschooling. Future ideas included a larger classroom, more tables, more whiteboard features, and possible multiplayer support.
+- Participants saw the concept as useful for focused online learning and homeschooling. P4 and P5 shared written feedback that it was "very useful for students who are easily distracted in online class and good for homeschooling." Future ideas included a larger classroom, more tables, more whiteboard features, and possible multiplayer support.
 
 Read the [interview evidence README](Design%20Evaluation/Interview%20Transcripts/README.md), the [full transcript files](Design%20Evaluation/Interview%20Transcripts/), and the [filled out Design Evaluation 1 guide](Design%20Evaluation/Design%20Evaluation%201%20Filled%20Out.pdf).
 
