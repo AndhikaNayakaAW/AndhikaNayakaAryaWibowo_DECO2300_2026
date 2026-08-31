@@ -55,7 +55,7 @@ The repeated findings were:
 - The teleport control was not immediately visible to one participant, so the navigation affordance should be larger or have a clearer hint.
 - Participants saw the concept as useful for focused online learning and homeschooling. Future ideas included a larger classroom, more tables, more whiteboard features, and possible multiplayer support.
 
-Read the [interview evidence README](Design%20Evaluation/Interview%20Transcripts/README.md), the [full transcript files](Design%20Evaluation/Interview%20Transcripts/), and the [updated Design Evaluation 1 guide](Design%20Evaluation/Design%20Evaluation%201%20XR%20User%20Testing%20Guide.pdf).
+Read the [interview evidence README](Design%20Evaluation/Interview%20Transcripts/README.md), the [full transcript files](Design%20Evaluation/Interview%20Transcripts/), and the [filled out Design Evaluation 1 guide](Design%20Evaluation/Design%20Evaluation%201%20Filled%20Out.pdf).
 
 ## Digital XR Implementation
 
