@@ -12,6 +12,7 @@ namespace XRStudyWhiteboard
     /// </summary>
     public sealed class HandWhiteboardInteractor : MonoBehaviour
     {
+        // pinch tangan kanan adalah jalur tambahan untuk mulai menggambar.
         [SerializeField] private WhiteboardCanvas canvas;
         [SerializeField] private WhiteboardDrawer drawer;
         [SerializeField] private float pinchStartDistance = 0.025f;
@@ -34,6 +35,7 @@ namespace XRStudyWhiteboard
 
         private void Update()
         {
+            // mencegah mouse dan hand simulator menggambar secara bersamaan di editor.
             // The editor Device Simulator can expose a hand subsystem while
             // the desktop mouse is already driving the controller test ray.
             // Running both writers at once produces the characteristic

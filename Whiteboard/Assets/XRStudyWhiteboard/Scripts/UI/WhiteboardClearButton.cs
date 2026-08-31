@@ -5,6 +5,7 @@ namespace XRStudyWhiteboard
 {
     public sealed class WhiteboardClearButton : MonoBehaviour
     {
+        // tombol ini meminta konfirmasi sebelum papan dihapus.
         [SerializeField] private XRStudyWhiteboardManager manager;
         private Button button;
 

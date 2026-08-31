@@ -25,6 +25,7 @@ namespace XRStudyWhiteboard
 
         public void DrawAtUV(Vector2 uv, bool trustedDesktopInput)
         {
+            // mengubah titik uv dari input menjadi satu alur goresan.
             if (canvas == null || manager == null || manager.IsClearConfirmationVisible)
                 return;
 

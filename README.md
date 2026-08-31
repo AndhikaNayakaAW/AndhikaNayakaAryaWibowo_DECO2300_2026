@@ -15,8 +15,8 @@
 | **Course** | DECO2300 – Digital Prototyping and Extended Reality |
 | **Student** | Andhika Nayaka Arya Wibowo |
 | **Concept** | XR Study Whiteboard |
-| **Demo outcome** | Successful completion with no observed mistakes |
-| **Testing methods** | Wizard-of-Oz + Think-Aloud Protocol |
+| **Demo outcome** | Week 2 paper demo completed; IP1 core workflow completed by five participants |
+| **Testing methods** | Wizard-of-Oz, think aloud, and task-based user testing |
 
 The XR Study Whiteboard gives students a focused virtual study space where they can write notes with simple hand gestures while keeping the atmosphere of a classroom.
 
@@ -41,7 +41,21 @@ The original paper-prototyping process is preserved under `DesignProcess/`. Star
 
 ## Key outcome
 
-Participants completed the writing, colour selection, erasing, tool switching, and clear-board interactions successfully. They were positive about being able to study in different locations while still feeling like they were in a class environment.
+The first five participant sessions show that the core writing workflow can be completed on both the wall whiteboard and table paper. The whiteboard was the easiest surface to use, while the table tools were the main discoverability issue. Participants also saw the classroom concept as useful for students who are easily distracted during online classes and for homeschooling because it can recreate some of the focus and structure of a classroom.
+
+## Design Evaluation 1 user testing
+
+Five classmates tested the IP1 Unity prototype. Three sessions have full audio transcript PDFs and two sessions have checklist-only evidence. All five participants completed the core workflow and the checklist-only participants were satisfied.
+
+The repeated findings were:
+
+- The wall whiteboard was easier to understand than the table paper.
+- The table `PENCIL`, `ERASER`, and `CLEAR PAPER` tools were difficult to notice or read at first.
+- One participant described paper drawing as slightly glitchy, so paper drawing needs another focused retest even though the task was completed.
+- The teleport control was not immediately visible to one participant, so the navigation affordance should be larger or have a clearer hint.
+- Participants saw the concept as useful for focused online learning and homeschooling. Future ideas included a larger classroom, more tables, more whiteboard features, and possible multiplayer support.
+
+Read the [interview evidence README](Design%20Evaluation/Interview%20Transcripts/README.md), the [full transcript files](Design%20Evaluation/Interview%20Transcripts/), and the [updated Design Evaluation 1 guide](Design%20Evaluation/Design%20Evaluation%201%20XR%20User%20Testing%20Guide.pdf).
 
 ## Digital XR Implementation
 

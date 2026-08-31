@@ -17,6 +17,7 @@ namespace XRStudyWhiteboard
 
         private void Awake()
         {
+            // menghubungkan action xri ke ui world space.
             if (inputModule == null)
                 inputModule = GetComponent<XRUIInputModule>();
             if (actions == null || inputModule == null)

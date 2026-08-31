@@ -20,6 +20,7 @@ namespace XRStudyWhiteboard
     public sealed class PaperTool : MonoBehaviour
     {
         private static readonly List<PaperTool> ActiveTools = new List<PaperTool>();
+        // menyimpan pilihan pencil atau eraser untuk semua kertas.
         private static PaperToolKind selectedKind = PaperToolKind.Pencil;
 
         [SerializeField] private PaperToolKind kind = PaperToolKind.Pencil;

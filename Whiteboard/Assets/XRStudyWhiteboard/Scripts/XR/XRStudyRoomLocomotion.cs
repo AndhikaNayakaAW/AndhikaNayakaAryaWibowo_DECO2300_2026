@@ -24,6 +24,7 @@ namespace XRStudyWhiteboard
     [DefaultExecutionOrder(10000)]
     public sealed class XRStudyRoomLocomotion : MonoBehaviour
     {
+        // mengatur gerak xr, teleportasi, snap turn, dan mode desktop.
         [SerializeField] private Transform xrOrigin;
         [SerializeField] private Transform cameraTransform;
         [SerializeField] private float moveSpeed = 2.2f;

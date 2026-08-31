@@ -101,6 +101,7 @@ namespace XRStudyWhiteboard
 
         private void BuildMenu()
         {
+            // membuat menu tools di samping setiap kertas.
             if (menuObject != null)
                 return;
 

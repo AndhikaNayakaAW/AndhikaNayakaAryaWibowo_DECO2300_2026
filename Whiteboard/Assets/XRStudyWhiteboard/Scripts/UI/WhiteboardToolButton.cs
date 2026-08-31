@@ -5,6 +5,7 @@ namespace XRStudyWhiteboard
 {
     public sealed class WhiteboardToolButton : MonoBehaviour
     {
+        // tombol ini memilih marker atau eraser untuk papan.
         [SerializeField] private WhiteboardTool tool;
         [SerializeField] private XRStudyWhiteboardManager manager;
         [SerializeField] private Outline selectionOutline;

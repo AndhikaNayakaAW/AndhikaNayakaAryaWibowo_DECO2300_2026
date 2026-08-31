@@ -29,6 +29,7 @@ namespace XRStudyWhiteboard
         [SerializeField, Range(0.02f, 1f)] private float maximumUvJump = 0.08f;
         [SerializeField, Range(0.35f, 1f)] private float strokePointSmoothing = 0.9f;
 
+        // tekstur runtime ini menjadi media gambar pada papan.
         private Texture2D boardTexture;
         private Color32[] pixels;
         private XRStudyWhiteboardManager manager;
@@ -189,6 +190,7 @@ namespace XRStudyWhiteboard
 
         public void ContinueStroke(Vector2 uv, bool trustedDesktopInput)
         {
+            // mengisi jarak antar titik agar garis tidak menjadi titik terpisah.
             if (!hasPreviousPoint)
             {
                 if (!TryReacquireSurface(uv))

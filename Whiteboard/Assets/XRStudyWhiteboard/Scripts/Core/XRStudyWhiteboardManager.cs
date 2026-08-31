@@ -29,6 +29,7 @@ namespace XRStudyWhiteboard
         [SerializeField] private WhiteboardTool startingTool = WhiteboardTool.Marker;
         [SerializeField] private WhiteboardColour startingColour = WhiteboardColour.Black;
 
+        // menyimpan tool dan warna yang sedang dipakai oleh semua input.
         public WhiteboardTool CurrentTool { get; private set; }
         public WhiteboardColour CurrentColour { get; private set; }
         public bool IsClearConfirmationVisible => clearConfirmation != null && clearConfirmation.IsVisible;
@@ -87,6 +88,7 @@ namespace XRStudyWhiteboard
 
         public void RequestClear()
         {
+            // meminta konfirmasi sebelum seluruh papan dihapus.
             if (clearConfirmation != null)
             {
                 clearConfirmation.Show();

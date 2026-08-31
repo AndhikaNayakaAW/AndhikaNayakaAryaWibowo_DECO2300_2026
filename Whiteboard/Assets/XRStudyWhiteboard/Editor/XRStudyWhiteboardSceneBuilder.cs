@@ -44,6 +44,7 @@ namespace XRStudyWhiteboard.Editor
         [MenuItem("Tools/XR Study Whiteboard/Build - Repair Classroom", priority = 1)]
         public static void BuildClassroom()
         {
+            // membangun scene kelas dan memasang komponen xr yang diperlukan.
             EnsureFolders();
             Scene scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
             GameObject root = NewObject(RootName, null);

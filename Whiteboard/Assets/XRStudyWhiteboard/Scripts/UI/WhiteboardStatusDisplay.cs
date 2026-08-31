@@ -5,6 +5,7 @@ namespace XRStudyWhiteboard
 {
     public sealed class WhiteboardStatusDisplay : MonoBehaviour
     {
+        // panel ini menampilkan tool, warna, input, dan status gambar.
         [SerializeField] private TMP_Text toolText;
         [SerializeField] private TMP_Text colourText;
         [SerializeField] private TMP_Text inputText;

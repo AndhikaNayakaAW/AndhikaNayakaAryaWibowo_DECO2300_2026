@@ -128,6 +128,7 @@ namespace XRStudyWhiteboard
 
         private void Update()
         {
+            // membaca trigger kanan lalu memilih ui, kertas, atau papan.
             if (canvas == null || drawer == null)
                 return;
 

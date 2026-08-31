@@ -39,6 +39,7 @@ namespace XRStudyWhiteboard.Editor
         [MenuItem("Tools/XR Study Whiteboard/Validate Classroom Setup", priority = 10)]
         public static void ValidateClassroom()
         {
+            // memeriksa scene dan menguji garis, lingkaran, serta kanvas kertas.
             int errors = 0;
             int checks = 0;
 

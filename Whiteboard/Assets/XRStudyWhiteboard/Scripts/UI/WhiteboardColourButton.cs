@@ -5,6 +5,7 @@ namespace XRStudyWhiteboard
 {
     public sealed class WhiteboardColourButton : MonoBehaviour
     {
+        // tombol ini mengubah warna marker dan tanda pilihan aktif.
         [SerializeField] private WhiteboardColour colour;
         [SerializeField] private XRStudyWhiteboardManager manager;
         [SerializeField] private Image swatch;

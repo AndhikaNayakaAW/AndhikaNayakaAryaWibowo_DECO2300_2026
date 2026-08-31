@@ -8,6 +8,7 @@ namespace XRStudyWhiteboard
     /// It intentionally shares the same ray/trigger workflow as the main
     /// whiteboard, but keeps each student's notes on a separate texture.
     /// </summary>
+    // setiap meja mempunyai kanvas catatan yang terpisah.
     public sealed class PaperNoteCanvas : MonoBehaviour
     {
         private static readonly List<PaperNoteCanvas> ActiveNotes = new List<PaperNoteCanvas>();
@@ -133,6 +134,7 @@ namespace XRStudyWhiteboard
 
         public void DrawAtUV(Vector2 uv, bool erasing, bool trustedDesktopInput)
         {
+            // menulis pada sisi atas kertas dengan ukuran pencil atau eraser.
             InitializeSurface();
             if (!hasPreviousPoint)
             {

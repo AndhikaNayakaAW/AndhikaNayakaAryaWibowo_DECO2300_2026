@@ -28,6 +28,7 @@ namespace XRStudyWhiteboard
         {
             get
             {
+                // memberi posisi pendekatan agar kamera menghadap kertas.
                 Vector3 forward = transform.forward;
                 forward.y = 0f;
                 if (forward.sqrMagnitude < 0.001f)
