@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.XR;
 using Unity.XR.CoreUtils;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
+using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
 using XRCommonUsages = UnityEngine.XR.CommonUsages;
 using XRInputDevice = UnityEngine.XR.InputDevice;
 
@@ -27,6 +28,8 @@ namespace XRStudyWhiteboard
         // mengatur gerak xr, teleportasi, snap turn, dan mode desktop.
         [SerializeField] private Transform xrOrigin;
         [SerializeField] private Transform cameraTransform;
+        [SerializeField] private SeatAnchor whiteboardAnchor;
+        [SerializeField] private SeatAnchor centerAnchor;
         [SerializeField] private float moveSpeed = 2.2f;
         [SerializeField] private float fastMoveSpeed = 4.5f;
         [SerializeField] private float snapTurnDegrees = 30f;
@@ -46,10 +49,8 @@ namespace XRStudyWhiteboard
         [SerializeField] private float minimumZ = -5.85f;
         [SerializeField] private float maximumZ = 5.85f;
 
-        // Desktop shortcuts are standing viewpoints, not seated camera
-        // poses.  They make it possible to test the full room quickly when
-        // a headset is not connected.  The physical headset uses the floor
-        // TeleportationArea with the controller ray instead.
+        // Fallback room destinations for older scenes without desk bounds.
+        // Imported desks use explicit camera-height SeatAnchors instead.
         private static readonly Vector3 WhiteboardPoint = new Vector3(0f, 0f, -2.4f);
         private static readonly Vector3 WhiteboardTarget = new Vector3(0f, 1.45f, -5.35f);
         private static readonly Vector3[] StudentPoints =
@@ -80,12 +81,16 @@ namespace XRStudyWhiteboard
         private bool desktopMode;
         private bool seatedDesktopView;
         private bool desktopNavigationPointerHeld;
+        private bool desktopHelpExpanded;
         private XRInputDevice leftController;
         private XRInputDevice rightController;
         private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
         private readonly List<MonoBehaviour> simulatorResetTargets = new List<MonoBehaviour>();
         private readonly List<FieldInfo> simulatorResetFields = new List<FieldInfo>();
 
+        private DesktopSimulatorInputOwnership simulatorInputOwnership;
+        public int DesktopControllerHand { get; private set; } = -1;
+        public bool IsDesktopControllerMode => desktopMode && DesktopControllerHand >= 0;
         private bool IsDesktopMode => desktopMode;
         public bool IsDesktopNavigationPointerHeld => desktopNavigationPointerHeld;
 
@@ -158,14 +163,11 @@ namespace XRStudyWhiteboard
                 deviceSimulator.gameObject.SetActive(desktopMode);
                 if (desktopMode)
                 {
+                    XRDeviceSimulator simulator = deviceSimulator.GetComponent<XRDeviceSimulator>();
+                    if (simulator != null) simulatorInputOwnership = (DesktopSimulatorInputOwnership)ConfigureDesktopSimulatorInput(simulator);
+                    Camera camera = cameraTransform != null ? cameraTransform.GetComponent<Camera>() : null;
+                    if (camera != null) camera.fieldOfView = 75f;
                     Invoke(nameof(SelectBothControllersSimulator), 0.35f);
-                    Invoke(nameof(SelectBothControllersSimulator), 1f);
-                    Invoke(nameof(SelectBothControllersSimulator), 2f);
-                    // The official simulator changes to HMD input when the
-                    // Game view receives focus. Keep both virtual controllers
-                    // selected so cursor testing cannot lose the controller
-                    // ray after a normal focus click.
-                    InvokeRepeating(nameof(SelectBothControllersSimulator), 0.5f, 0.5f);
                     Invoke(nameof(ForceDesktopStartView), 2.25f);
                 }
             }
@@ -181,9 +183,31 @@ namespace XRStudyWhiteboard
 
             RefreshTablePoints();
 
-            HandleXRInput();
+            if (!desktopMode) HandleXRInput();
             snapTurnTimer -= Time.unscaledDeltaTime;
             desktopTeleportCooldown -= Time.unscaledDeltaTime;
+        }
+
+        private void Start()
+        {
+            EnsureNavigationAnchors();
+        }
+
+        private void EnsureNavigationAnchors()
+        {
+            if (centerAnchor == null)
+            {
+                Vector3 forward = xrOrigin != null ? xrOrigin.forward : Vector3.back;
+                centerAnchor = SeatAnchor.FindOrCreate(transform.root, "CenterAnchor",
+                    new Vector3(0f, desktopSpawnHeight, desktopSpawnDepth), forward);
+            }
+
+            if (whiteboardAnchor == null)
+            {
+                Vector3 headPosition = WhiteboardPoint + Vector3.up * desktopSpawnHeight;
+                whiteboardAnchor = SeatAnchor.FindOrCreate(transform.root, "WhiteboardAnchor",
+                    headPosition, WhiteboardTarget - headPosition);
+            }
         }
 
         private void LateUpdate()
@@ -192,16 +216,17 @@ namespace XRStudyWhiteboard
                 return;
 
             SetDesktopCameraOffset();
-            Vector3 position = xrOrigin.localPosition;
-            if (Mathf.Abs(position.y - desktopHeight) > 0.01f)
+            Vector3 position = xrOrigin.position;
+            float cameraHeight = cameraTransform != null ? cameraTransform.position.y : position.y;
+            if (Mathf.Abs(cameraHeight - desktopHeight) > 0.01f)
             {
                 // The editor simulator may apply a tracked floor pose when
                 // the Game view receives focus. Keep the desktop test at a
                 // standing height without blocking normal X/Z movement.
-                position.y = desktopHeight;
-                xrOrigin.localPosition = position;
+                position.y += desktopHeight - cameraHeight;
+                xrOrigin.position = position;
             }
-            if (position.y >= desktopMinimumHeight)
+            if (desktopHeight >= desktopMinimumHeight)
                 return;
 
             // XR Origin and the editor simulator can apply their own tracking
@@ -210,7 +235,7 @@ namespace XRStudyWhiteboard
             position.x = 0f;
             position.y = desktopSpawnHeight;
             position.z = desktopSpawnDepth;
-            xrOrigin.localPosition = position;
+            xrOrigin.position = position;
             xrOrigin.localRotation = resetRotation;
 
             if (cameraTransform != null)
@@ -223,6 +248,13 @@ namespace XRStudyWhiteboard
             if (keyboard == null)
                 return;
 
+            if (keyboard.tKey.wasPressedThisFrame) SelectDesktopController(0);
+            if (keyboard.yKey.wasPressedThisFrame) SelectDesktopController(1);
+            if (keyboard.escapeKey.wasPressedThisFrame) SelectDesktopController(-1);
+
+            // Controller posing and navigation have distinct input owners.
+            if (keyboard.spaceKey.isPressed || keyboard.leftShiftKey.isPressed)
+                return;
             Vector2 input = Vector2.zero;
             if (keyboard.wKey.isPressed) input.y += 1f;
             if (keyboard.sKey.isPressed) input.y -= 1f;
@@ -232,7 +264,7 @@ namespace XRStudyWhiteboard
             if (input.sqrMagnitude > 1f)
                 input.Normalize();
 
-            float speed = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed
+            float speed = keyboard.rightShiftKey.isPressed
                 ? fastMoveSpeed
                 : moveSpeed;
             MoveInViewDirection(input, speed * Time.unscaledDeltaTime);
@@ -248,13 +280,14 @@ namespace XRStudyWhiteboard
                 vertical -= 1f;
             if (Mathf.Abs(vertical) > 0f)
             {
-                Vector3 position = xrOrigin.localPosition;
+                Vector3 position = xrOrigin.position;
+                float previousHeight = desktopHeight;
                 desktopHeight = Mathf.Clamp(
                     desktopHeight + vertical * desktopVerticalMoveSpeed * Time.unscaledDeltaTime,
                     desktopMinimumHeight,
                     desktopMaximumHeight);
-                position.y = desktopHeight;
-                xrOrigin.localPosition = position;
+                position.y += desktopHeight - previousHeight;
+                xrOrigin.position = position;
             }
 
             float turn = 0f;
@@ -264,7 +297,7 @@ namespace XRStudyWhiteboard
                 Turn(turn * 90f * Time.unscaledDeltaTime);
 
             Mouse mouse = Mouse.current;
-            if (mouse != null)
+            if (mouse != null && !IsDesktopControllerMode)
             {
                 if (mouse.rightButton.isPressed)
                 {
@@ -279,12 +312,6 @@ namespace XRStudyWhiteboard
                 if (Mathf.Abs(wheel) > 0.01f)
                     MoveInViewDirection(Vector2.up * Mathf.Sign(wheel), Mathf.Abs(wheel) * desktopWheelMoveScale);
 
-                // Focusing the Game view can make the official simulator
-                // switch back to HMD input. Re-select both virtual
-                // controllers after that focus click so cursor/controller
-                // testing continues without an extra recovery step.
-                if (mouse.leftButton.wasPressedThisFrame)
-                    Invoke(nameof(SelectBothControllersSimulator), 0.1f);
             }
 
             if (keyboard.rKey.wasPressedThisFrame)
@@ -300,7 +327,7 @@ namespace XRStudyWhiteboard
         {
             if (keyboard.digit1Key.wasPressedThisFrame)
             {
-                TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
+                NavigateToWhiteboard();
                 return;
             }
 
@@ -325,7 +352,10 @@ namespace XRStudyWhiteboard
         private void RefreshTablePoints()
         {
             IReadOnlyList<StudyTableTeleportPoint> activePoints = StudyTableTeleportPoint.Points;
-            if (tablePoints.Count == activePoints.Count)
+            bool unchanged = tablePoints.Count == activePoints.Count;
+            for (int i = 0; unchanged && i < tablePoints.Count; i++)
+                unchanged = tablePoints[i] != null && tablePoints[i].isActiveAndEnabled;
+            if (unchanged)
                 return;
 
             tablePoints.Clear();
@@ -334,6 +364,7 @@ namespace XRStudyWhiteboard
                 if (activePoints[i] != null)
                     tablePoints.Add(activePoints[i]);
             }
+            tablePoints.Sort((left, right) => left.TableIndex.CompareTo(right.TableIndex));
         }
 
         private void TryTeleportToTable(int index)
@@ -342,7 +373,7 @@ namespace XRStudyWhiteboard
             if (index >= 0 && index < tablePoints.Count)
             {
                 StudyTableTeleportPoint table = tablePoints[index];
-                TeleportDesktop(table.TeleportPosition, table.ViewTarget, desktopSeatedHeight, true, GetTableViewPitch(table));
+                NavigateToAnchor(table.SeatAnchor, true, GetTableViewPitch(table));
                 return;
             }
 
@@ -354,55 +385,88 @@ namespace XRStudyWhiteboard
 
         private float GetTableViewPitch(StudyTableTeleportPoint table)
         {
-            Vector3 point = table.TeleportPosition;
-            Vector3 target = table.ViewTarget;
-            float horizontalDistance = Vector2.Distance(
-                new Vector2(point.x, point.z),
-                new Vector2(target.x, target.z));
-            float pitch = Mathf.Atan2(desktopSeatedHeight - target.y, Mathf.Max(0.1f, horizontalDistance)) * Mathf.Rad2Deg;
-            // The paper is below the eye line. A deeper downward pitch keeps
-            // the paper, its tool button, and the chair in one table view,
-            // while the board remains visible in the upper part of the view.
-            return Mathf.Clamp(pitch, 10f, 18f);
+            // The desktop overview includes both the page and teacher's board.
+            // Real HMD pitch remains under the user's control.
+            return 25f;
         }
 
         private void TeleportDesktop(Vector3 point, Vector3 target, float targetHeight, bool seated, float? seatedPitchOverride = null)
         {
-            if (xrOrigin == null || desktopTeleportCooldown > 0f)
+            Vector3 position = point;
+            position.y = targetHeight;
+            NavigateToCameraPose(position, target - position, seated, seatedPitchOverride ?? desktopSeatedPitch);
+        }
+
+        public void NavigateToTable(int tableNumber)
+        {
+            TryTeleportToTable(tableNumber - 1);
+        }
+
+        public void NavigateToWhiteboard()
+        {
+            EnsureNavigationAnchors();
+            NavigateToAnchor(whiteboardAnchor, false);
+        }
+
+        public void NavigateToAnchor(SeatAnchor anchor, bool seated = false, float desktopViewPitch = 0f)
+        {
+            if (anchor != null)
+                NavigateToCameraPose(anchor.CameraPosition, anchor.FacingDirection, seated, desktopViewPitch);
+        }
+
+        private void NavigateToCameraPose(Vector3 cameraPosition, Vector3 facingDirection, bool seated, float desktopViewPitch)
+        {
+            if (xrOrigin == null || cameraTransform == null || desktopTeleportCooldown > 0f)
                 return;
 
             desktopTeleportCooldown = 0.18f;
-            desktopHeight = targetHeight;
             seatedDesktopView = seated;
-            Vector3 position = point;
-            position.y = desktopHeight;
-            position.x = Mathf.Clamp(position.x, minimumX, maximumX);
-            position.z = Mathf.Clamp(position.z, minimumZ, maximumZ);
-            xrOrigin.position = position;
+            if (desktopMode)
+            {
+                Camera desktopCamera = cameraTransform.GetComponent<Camera>();
+                if (desktopCamera != null) desktopCamera.fieldOfView = seated ? 100f : 75f;
+                desktopPitch = seated ? desktopViewPitch : 0f;
+                SetDesktopCameraOffset();
+                desktopHeight = cameraPosition.y;
+            }
 
-            Vector3 direction = target - position;
-            direction.y = 0f;
-            if (direction.sqrMagnitude > 0.001f)
-                xrOrigin.rotation = Quaternion.LookRotation(direction.normalized, Vector3.up);
+            AlignCameraToPose(xrOrigin, cameraTransform, cameraPosition, facingDirection);
+        }
 
-            desktopPitch = seated
-                ? (seatedPitchOverride.HasValue ? seatedPitchOverride.Value : desktopSeatedPitch)
-                : 0f;
-            if (cameraTransform != null)
-                cameraTransform.localRotation = Quaternion.Euler(desktopPitch, 0f, 0f);
+        /// <summary>Aligns the actual camera, including any tracked room-scale offset.</summary>
+        public static void AlignCameraToPose(Transform origin, Transform camera, Vector3 cameraPosition, Vector3 facingDirection)
+        {
+            if (origin == null || camera == null)
+                return;
+
+            Vector3 currentForward = Vector3.ProjectOnPlane(camera.forward, Vector3.up);
+            Vector3 targetForward = Vector3.ProjectOnPlane(facingDirection, Vector3.up);
+            if (currentForward.sqrMagnitude < 0.001f)
+                currentForward = Vector3.ProjectOnPlane(origin.forward, Vector3.up);
+            if (currentForward.sqrMagnitude > 0.001f && targetForward.sqrMagnitude > 0.001f)
+            {
+                float yawDelta = Vector3.SignedAngle(currentForward, targetForward, Vector3.up);
+                origin.RotateAround(camera.position, Vector3.up, yawDelta);
+            }
+
+            // Translate after yaw so camera X/Y/Z exactly match the anchor.
+            // Do not overwrite tracked camera pitch, roll, local pose or rig scale.
+            origin.position += cameraPosition - camera.position;
         }
 
         private void StandFromSeat()
         {
-            if (!desktopMode || xrOrigin == null)
+            if (xrOrigin == null || cameraTransform == null)
                 return;
 
             seatedDesktopView = false;
             desktopHeight = desktopSpawnHeight;
-            desktopPitch = 0f;
-            Vector3 position = xrOrigin.position;
-            position.y = desktopHeight;
-            xrOrigin.position = position;
+            if (desktopMode)
+            {
+                desktopPitch = 0f;
+                SetDesktopCameraOffset();
+            }
+            xrOrigin.position += Vector3.up * (desktopSpawnHeight - cameraTransform.position.y);
         }
 
         private void HandleXRInput()
@@ -455,23 +519,16 @@ namespace XRStudyWhiteboard
 
         private void Turn(float degrees)
         {
-            xrOrigin.Rotate(Vector3.up, degrees, Space.World);
+            if (cameraTransform != null)
+                xrOrigin.RotateAround(cameraTransform.position, Vector3.up, degrees);
+            else
+                xrOrigin.Rotate(Vector3.up, degrees, UnityEngine.Space.World);
         }
 
         private void ResetView()
         {
-            if (desktopMode)
-            {
-                desktopHeight = desktopSpawnHeight;
-                seatedDesktopView = false;
-            }
-            xrOrigin.localPosition = resetPosition;
-            xrOrigin.localRotation = resetRotation;
-            if (desktopMode)
-                SetDesktopCameraOffset();
-            desktopPitch = 0f;
-            if (cameraTransform != null)
-                cameraTransform.localRotation = Quaternion.identity;
+            EnsureNavigationAnchors();
+            NavigateToAnchor(centerAnchor, false);
         }
 
         private void ForceDesktopStartView()
@@ -519,6 +576,44 @@ namespace XRStudyWhiteboard
             XROrigin origin = xrOrigin != null ? xrOrigin.GetComponent<XROrigin>() : null;
             if (origin != null)
                 origin.CameraYOffset = 0f;
+        }
+
+        public static System.IDisposable ConfigureDesktopSimulatorInput(XRDeviceSimulator simulator)
+        {
+            return new DesktopSimulatorInputOwnership(simulator);
+        }
+
+        private void OnDestroy()
+        {
+            simulatorInputOwnership?.Dispose();
+        }
+
+        /// <summary>T selects left, Y selects right; Escape restores the desktop cursor.</summary>
+        public void SelectDesktopController(int hand)
+        {
+            if (!desktopMode || hand < -1 || hand > 1)
+                return;
+            DesktopControllerHand = hand;
+            simulatorInputOwnership?.SetExplicitControllerMode(hand >= 0);
+            if (hand < 0) return;
+            XRDeviceSimulator simulator = FindFirstObjectByType<XRDeviceSimulator>();
+            if (simulator != null)
+            {
+                // XRI 3.4 exposes read-only selection state. Its UI methods
+                // update presentation only, so set the simulator's desktop
+                // target as well. This does not change headset tracking.
+                PropertyInfo target = typeof(XRDeviceSimulator).GetProperty("targetedDeviceInput", BindingFlags.Instance | BindingFlags.NonPublic);
+                if (target != null)
+                    target.SetValue(simulator, System.Enum.Parse(target.PropertyType, hand == 0 ? "LeftDevice" : "RightDevice"));
+            }
+            string methodName = hand == 0 ? "OnActivateLeftController" : "OnActivateRightController";
+            foreach (MonoBehaviour behaviour in Resources.FindObjectsOfTypeAll<MonoBehaviour>())
+            {
+                if (behaviour == null || behaviour.GetType().Name != "XRDeviceSimulatorUI"
+                    || !behaviour.gameObject.scene.IsValid()) continue;
+                behaviour.GetType().GetMethod(methodName, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.Invoke(behaviour, null);
+                break;
+            }
         }
 
         private void SelectBothControllersSimulator()
@@ -620,6 +715,11 @@ namespace XRStudyWhiteboard
             if (!IsDesktopMode)
                 return;
 
+            // Release before GUI.Button can consume the event, including
+            // clicks on the collapsible help control.
+            if (Event.current.rawType == EventType.MouseUp && Event.current.button == 0)
+                desktopNavigationPointerHeld = false;
+
             // IMGUI receives keyboard events even when the new Input System
             // has not yet re-established Game-view focus. Keep the same
             // shortcuts available through this path so chair/board changes
@@ -629,7 +729,7 @@ namespace XRStudyWhiteboard
                 switch (Event.current.keyCode)
                 {
                     case KeyCode.Alpha1:
-                        TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
+                        NavigateToWhiteboard();
                         Event.current.Use();
                         break;
                     case KeyCode.Alpha2:
@@ -675,30 +775,43 @@ namespace XRStudyWhiteboard
                 }
             }
 
-            GUI.Box(
-                new Rect(16f, 16f, 520f, 172f),
-                "DESKTOP TEST CONTROLS\n\nWASD: move   Q/E or arrows: turn\nJ: stand/jump from a table   C: center view\nRight-drag: look   Scroll: closer/farther   R: reset\n1: whiteboard   2-9: table views facing the paper\nL Mouse: draw/trigger   R Mouse: erase in desktop test\nTable menu: choose pencil, eraser, or clear paper\nBuilt-in XR Device Simulator: select Controller; hold Space to pose it\nVR: aim the built-in controller ray at the floor and press the trigger to teleport");
+            Rect helpButton = new Rect(16f, 16f, 130f, 28f);
+            Rect helpPanel = new Rect(16f, 50f, 510f, 165f);
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0
+                && (helpButton.Contains(Event.current.mousePosition)
+                    || (desktopHelpExpanded && helpPanel.Contains(Event.current.mousePosition))))
+                desktopNavigationPointerHeld = true;
+            if (GUI.Button(helpButton, desktopHelpExpanded ? "CLOSE HELP" : "CONTROLS  ?"))
+                desktopHelpExpanded = !desktopHelpExpanded;
+            if (desktopHelpExpanded)
+            {
+                GUI.Box(helpPanel,
+                    "DESKTOP CONTROLS\n\nWASD: move   Q / E: turn   Right-drag: look\nScroll: closer / farther   Page Up / Down: height\nLeft mouse: draw / select   Right mouse: erase\n1: whiteboard   2-9: tables   J: stand   C: center\nT: left controller   Y: right controller   Esc: cursor\nHeadset: use controller rays to select tools and draw");
+            }
+
+            if (IsDesktopControllerMode)
+                GUI.Label(new Rect(160f, 16f, 580f, 28f),
+                    (DesktopControllerHand == 0 ? "LEFT" : "RIGHT") + " CONTROLLER  |  Mouse: aim  Click: trigger  G: grab  Esc: cursor");
 
             // Clickable fallbacks are deliberately visible in the Game view.
             // They are especially useful when the simulator panel currently
             // owns keyboard focus, and they make the intended test route
             // obvious: sit, stand, walk to the board, and return to a desk.
-            // Keep the navigation pad in the upper-right corner, away from
-            // the whiteboard and its world-space tool panel. The official
-            // simulator and help text occupy the left side of the Game view.
+            // Keep navigation below the classroom view and above the
+            // collapsed simulator footer, away from the paper and board.
             RefreshTablePoints();
             int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
             int columns = tableCount > 9 ? 4 : 3;
             float buttonWidth = tableCount > 9 ? 84f : 108f;
             float gap = tableCount > 9 ? 5f : 6f;
             float navigationWidth = columns * buttonWidth + (columns - 1) * gap;
-            float buttonX = Mathf.Max(16f, Screen.width - navigationWidth - 16f);
+            float buttonX = 16f;
             int tableRows = Mathf.CeilToInt(tableCount / (float)columns);
             float navigationHeight = 32f + gap + tableRows * 32f + Mathf.Max(0, tableRows - 1) * gap;
             // Anchor the complete navigation pad to the bottom edge. The old
             // fixed y-position placed the last table row below short Game
             // views, so TABLE 7-9 were visibly cut off.
-            float buttonY = Mathf.Max(16f, Screen.height - navigationHeight - 16f);
+            float buttonY = Mathf.Max(16f, Screen.height - navigationHeight - 64f);
             // The table grid becomes four columns in the imported room. Give
             // the three action buttons their own wider row so WHITEBOARD,
             // STAND / JUMP, and CENTER VIEW remain readable instead of being
@@ -731,46 +844,11 @@ namespace XRStudyWhiteboard
                 desktopNavigationPointerHeld = false;
             }
 
-            if (Event.current.type == EventType.MouseUp
-                && (Event.current.button == 0 || Event.current.button < 0))
-            {
-                Vector2 pointer = Event.current.mousePosition;
-                Rect whiteboardRect = new Rect(buttonX, buttonY, actionWidth, 32f);
-                Rect standRect = new Rect(buttonX + actionWidth + actionGap, buttonY, actionWidth, 32f);
-                Rect centerRect = new Rect(buttonX + 2f * (actionWidth + actionGap), buttonY, actionWidth, 32f);
-                if (whiteboardRect.Contains(pointer))
-                {
-                    TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
-                    Event.current.Use();
-                }
-                else if (standRect.Contains(pointer))
-                {
-                    StandFromSeat();
-                    Event.current.Use();
-                }
-                else if (centerRect.Contains(pointer))
-                {
-                    CenterView();
-                    Event.current.Use();
-                }
-                else
-                {
-                    for (int i = 0; i < tableCount; i++)
-                    {
-                        float x = buttonX + (i % columns) * (buttonWidth + gap);
-                        float y = buttonY + 32f + gap + (i / columns) * (32f + gap);
-                        if (!new Rect(x, y, buttonWidth, 32f).Contains(pointer))
-                            continue;
-
-                        TryTeleportToTable(i);
-                        Event.current.Use();
-                        break;
-                    }
-                }
-            }
-
+            // Let GUI.Button process MouseUp itself so it releases hotControl.
+            // Consuming that event in a second click handler swallowed the
+            // first drawing drag after every navigation button press.
             if (GUI.Button(new Rect(buttonX, buttonY, actionWidth, 32f), "WHITEBOARD"))
-                TeleportDesktop(WhiteboardPoint, WhiteboardTarget, desktopSpawnHeight, false);
+                NavigateToWhiteboard();
             if (GUI.Button(new Rect(buttonX + actionWidth + actionGap, buttonY, actionWidth, 32f), "STAND / JUMP"))
                 StandFromSeat();
             if (GUI.Button(new Rect(buttonX + 2f * (actionWidth + actionGap), buttonY, actionWidth, 32f), "CENTER VIEW"))
@@ -816,23 +894,9 @@ namespace XRStudyWhiteboard
 
         private void CenterView()
         {
+            ResetView();
             if (desktopMode)
-            {
-                ResetView();
                 ResetSimulatorControllers();
-                return;
-            }
-
-            // A real headset owns the controller poses; recentering should
-            // realign the player's view without trying to move tracked hands
-            // away from their physical positions.
-            List<XRInputSubsystem> subsystems = new List<XRInputSubsystem>();
-            SubsystemManager.GetSubsystems(subsystems);
-            for (int i = 0; i < subsystems.Count; i++)
-            {
-                if (subsystems[i] != null && subsystems[i].running)
-                    subsystems[i].TryRecenter();
-            }
         }
 
         private void ResetSimulatorControllers()
