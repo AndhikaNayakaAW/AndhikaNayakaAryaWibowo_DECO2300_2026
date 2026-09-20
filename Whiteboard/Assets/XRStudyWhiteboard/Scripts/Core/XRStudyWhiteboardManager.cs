@@ -34,6 +34,9 @@ namespace XRStudyWhiteboard
         public WhiteboardColour CurrentColour { get; private set; }
         public bool IsClearConfirmationVisible => clearConfirmation != null && clearConfirmation.IsVisible;
 
+        public WhiteboardSessionRecorder Recorder { get; private set; }
+        public bool IsPlaybackActive => Recorder != null && Recorder.IsPlaying;
+
         public event Action StateChanged;
 
         private void Awake()
@@ -44,23 +47,26 @@ namespace XRStudyWhiteboard
             if (canvas != null)
                 canvas.SetManager(this);
 
+            EnsureRecorder();
             RefreshState();
         }
 
         public void SetTool(WhiteboardTool tool)
         {
-            if (CurrentTool == tool)
+            if (IsPlaybackActive || CurrentTool == tool)
                 return;
 
+            canvas?.EndStroke();
             CurrentTool = tool;
             RefreshState();
         }
 
         public void SetColour(WhiteboardColour colour)
         {
-            if (CurrentColour == colour)
+            if (IsPlaybackActive || CurrentColour == colour)
                 return;
 
+            canvas?.EndStroke();
             CurrentColour = colour;
             RefreshState();
             ControllerHaptics.PulseRightController();
@@ -88,6 +94,9 @@ namespace XRStudyWhiteboard
 
         public void RequestClear()
         {
+            if (IsPlaybackActive)
+                return;
+            canvas?.EndStroke();
             // meminta konfirmasi sebelum seluruh papan dihapus.
             if (clearConfirmation != null)
             {
@@ -98,6 +107,8 @@ namespace XRStudyWhiteboard
 
         public void ConfirmClear()
         {
+            if (IsPlaybackActive)
+                return;
             if (canvas != null)
                 canvas.ClearBoard();
 
@@ -123,6 +134,25 @@ namespace XRStudyWhiteboard
             if (canvas != null)
                 canvas.SetManager(this);
 
+            EnsureRecorder();
+            RefreshState();
+        }
+
+        private void EnsureRecorder()
+        {
+            if (!Application.isPlaying)
+                return;
+            if (Recorder == null)
+                Recorder = GetComponent<WhiteboardSessionRecorder>();
+            if (Recorder == null)
+                Recorder = gameObject.AddComponent<WhiteboardSessionRecorder>();
+            Recorder.Configure(this, canvas);
+        }
+
+        internal void ApplyPlaybackSelection(WhiteboardTool tool, WhiteboardColour colour)
+        {
+            CurrentTool = tool;
+            CurrentColour = colour;
             RefreshState();
         }
 

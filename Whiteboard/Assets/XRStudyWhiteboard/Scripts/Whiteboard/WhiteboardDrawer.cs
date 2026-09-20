@@ -26,11 +26,16 @@ namespace XRStudyWhiteboard
         public void DrawAtUV(Vector2 uv, bool trustedDesktopInput)
         {
             // mengubah titik uv dari input menjadi satu alur goresan.
-            if (canvas == null || manager == null || manager.IsClearConfirmationVisible)
+            if (canvas == null || manager == null)
                 return;
+            if (manager.IsClearConfirmationVisible || manager.IsPlaybackActive)
+            {
+                drawing = false;
+                return;
+            }
 
             canvas.UpdateCursor(uv);
-            if (!drawing)
+            if (!drawing || !canvas.IsStrokeOpen)
             {
                 drawing = true;
                 canvas.BeginStroke(uv);
@@ -38,6 +43,11 @@ namespace XRStudyWhiteboard
             }
 
             canvas.ContinueStroke(uv, trustedDesktopInput);
+        }
+
+        private void OnDisable()
+        {
+            EndStroke();
         }
 
         public void EndStroke()

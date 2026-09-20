@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,6 +43,13 @@ namespace XRStudyWhiteboard
         private Vector2 reacquireAnchorUv;
         private int reacquireSampleCount;
         private bool textureDirty;
+        private bool latestInputIsDesktop;
+        private bool strokeOpen;
+        private bool applyingPlayback;
+        private Material boardMaterial;
+        public bool IsStrokeOpen => strokeOpen;
+        public event Action<WhiteboardRecordingEventType, Vector2, bool> DrawingEvent;
+        private bool LiveInputBlocked => manager != null && manager.IsPlaybackActive && !applyingPlayback;
         private Transform crosshair;
         private readonly List<Renderer> crosshairRenderers = new List<Renderer>();
 
@@ -56,8 +64,17 @@ namespace XRStudyWhiteboard
 
         private void OnDestroy()
         {
-            if (boardTexture != null)
-                Destroy(boardTexture);
+            DestroyOwned(boardTexture);
+            DestroyOwned(boardMaterial);
+            foreach (Renderer renderer in crosshairRenderers)
+                if (renderer != null) DestroyOwned(renderer.sharedMaterial);
+        }
+
+        private static void DestroyOwned(UnityEngine.Object owned)
+        {
+            if (owned == null) return;
+            if (Application.isPlaying) Destroy(owned);
+            else DestroyImmediate(owned);
         }
 
         private void LateUpdate()
@@ -107,11 +124,15 @@ namespace XRStudyWhiteboard
             if (surfaceRenderer != null)
             {
                 // A material instance keeps the runtime texture local to this board.
-                Material targetMaterial = Application.isPlaying
-                    ? surfaceRenderer.material
-                    : surfaceRenderer.sharedMaterial;
+                Material sourceMaterial = surfaceRenderer.sharedMaterial;
+                Material targetMaterial = sourceMaterial != null ? new Material(sourceMaterial) : null;
+                boardMaterial = targetMaterial;
+                surfaceRenderer.sharedMaterial = targetMaterial;
                 if (targetMaterial != null)
                 {
+                    Shader unlit = Shader.Find("Universal Render Pipeline/Unlit");
+                    if (unlit != null) targetMaterial.shader = unlit;
+                    targetMaterial.color = Color.white;
                     targetMaterial.mainTexture = boardTexture;
                     if (targetMaterial.HasProperty("_BaseMap"))
                         targetMaterial.SetTexture("_BaseMap", boardTexture);
@@ -138,7 +159,8 @@ namespace XRStudyWhiteboard
                 Plane boardPlane = new Plane(
                     box.transform.TransformDirection(Vector3.forward),
                     box.transform.TransformPoint(frontLocalPoint));
-                if (!boardPlane.Raycast(ray, out float planeDistance)
+                if (Vector3.Dot(ray.direction, boardPlane.normal) >= 0f
+                    || !boardPlane.Raycast(ray, out float planeDistance)
                     || planeDistance < 0f
                     || planeDistance > maxDistance)
                     return false;
@@ -177,6 +199,11 @@ namespace XRStudyWhiteboard
 
         public void BeginStroke(Vector2 uv)
         {
+            if (LiveInputBlocked)
+                return;
+            EndStroke();
+            strokeOpen = true;
+            DrawingEvent?.Invoke(WhiteboardRecordingEventType.StrokeBegin, uv, false);
             hasPreviousPoint = false;
             inputSampleCount = 0;
             reacquireSampleCount = 0;
@@ -190,6 +217,15 @@ namespace XRStudyWhiteboard
 
         public void ContinueStroke(Vector2 uv, bool trustedDesktopInput)
         {
+            if (LiveInputBlocked)
+                return;
+            if (!strokeOpen)
+            {
+                BeginStroke(uv);
+                return;
+            }
+            latestInputIsDesktop = trustedDesktopInput;
+            DrawingEvent?.Invoke(WhiteboardRecordingEventType.StrokePoint, uv, trustedDesktopInput);
             // mengisi jarak antar titik agar garis tidak menjadi titik terpisah.
             if (!hasPreviousPoint)
             {
@@ -247,7 +283,12 @@ namespace XRStudyWhiteboard
 
         public void EndStroke()
         {
+            if (LiveInputBlocked)
+                return;
+            if (strokeOpen)
+                DrawingEvent?.Invoke(WhiteboardRecordingEventType.StrokeEnd, default, false);
             CloseStrokeToLatestInput();
+            strokeOpen = false;
             hasPreviousPoint = false;
             inputSampleCount = 0;
             reacquireSampleCount = 0;
@@ -255,15 +296,69 @@ namespace XRStudyWhiteboard
 
         public void ClearBoard()
         {
+            if (LiveInputBlocked)
+                return;
             InitializeSurface();
             EndStroke();
+            DrawingEvent?.Invoke(WhiteboardRecordingEventType.Clear, default, false);
             Fill(Color.white);
             textureDirty = false;
             ApplyTexture();
         }
 
+        public Color32[] CapturePixels()
+        {
+            InitializeSurface();
+            return (Color32[])pixels.Clone();
+        }
+
+        internal void RestorePixels(Color32[] snapshot)
+        {
+            InitializeSurface();
+            strokeOpen = false;
+            hasPreviousPoint = false;
+            inputSampleCount = 0;
+            reacquireSampleCount = 0;
+            if (snapshot != null && snapshot.Length == pixels.Length)
+                Array.Copy(snapshot, pixels, pixels.Length);
+            else
+                Fill(Color.white);
+            ApplyTexture();
+        }
+
+        internal void ApplyPlaybackEvent(WhiteboardRecordingEvent recordedEvent)
+        {
+            applyingPlayback = true;
+            try
+            {
+                switch (recordedEvent.type)
+                {
+                    case WhiteboardRecordingEventType.StrokeBegin:
+                        BeginStroke(recordedEvent.position);
+                        UpdateCursor(recordedEvent.position);
+                        break;
+                    case WhiteboardRecordingEventType.StrokePoint:
+                        ContinueStroke(recordedEvent.position, recordedEvent.trustedDesktopInput);
+                        UpdateCursor(recordedEvent.position);
+                        break;
+                    case WhiteboardRecordingEventType.StrokeEnd:
+                        EndStroke();
+                        break;
+                    case WhiteboardRecordingEventType.Clear:
+                        ClearBoard();
+                        break;
+                }
+            }
+            finally
+            {
+                applyingPlayback = false;
+            }
+        }
+
         public void UpdateCursor(Vector2 uv)
         {
+            if (LiveInputBlocked)
+                return;
             EnsureCrosshair();
             if (crosshair == null)
                 return;
@@ -387,7 +482,7 @@ namespace XRStudyWhiteboard
             // small but visible gap at a line or circle endpoint.
             Vector2 endpoint = lastInputUv;
             float distance = Vector2.Distance(previousUv, endpoint);
-            if (distance > maximumUvJump)
+            if (!latestInputIsDesktop && distance > maximumUvJump)
                 return;
 
             float brushDiameter = manager != null && manager.CurrentTool == WhiteboardTool.Eraser

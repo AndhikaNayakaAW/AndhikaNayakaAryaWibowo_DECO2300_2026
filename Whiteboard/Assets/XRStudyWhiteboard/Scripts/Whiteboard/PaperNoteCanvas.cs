@@ -40,6 +40,7 @@ namespace XRStudyWhiteboard
         private int reacquireSampleCount;
         private bool previousStrokeWasErasing;
         private bool textureDirty;
+        private bool latestInputIsDesktop;
         private Renderer writingSurfaceRenderer;
         private Material writingSurfaceMaterial;
         private Transform crosshair;
@@ -66,11 +67,18 @@ namespace XRStudyWhiteboard
         {
             if (!ActiveNotes.Contains(this))
                 ActiveNotes.Add(this);
+            PaperTool.SelectionChanged += OnToolSelectionChanged;
         }
 
         private void OnDisable()
         {
+            PaperTool.SelectionChanged -= OnToolSelectionChanged;
             ActiveNotes.Remove(this);
+            EndStroke();
+        }
+
+        private void OnToolSelectionChanged(PaperToolKind tool)
+        {
             EndStroke();
         }
 
@@ -87,10 +95,17 @@ namespace XRStudyWhiteboard
 
         private void OnDestroy()
         {
-            if (writingSurfaceMaterial != null)
-                Destroy(writingSurfaceMaterial);
-            if (noteTexture != null)
-                Destroy(noteTexture);
+            DestroyOwned(writingSurfaceMaterial);
+            DestroyOwned(noteTexture);
+            foreach (Renderer renderer in crosshairRenderers)
+                if (renderer != null) DestroyOwned(renderer.sharedMaterial);
+        }
+
+        private static void DestroyOwned(Object owned)
+        {
+            if (owned == null) return;
+            if (Application.isPlaying) Destroy(owned);
+            else DestroyImmediate(owned);
         }
 
         private void LateUpdate()
@@ -135,6 +150,7 @@ namespace XRStudyWhiteboard
         public void DrawAtUV(Vector2 uv, bool erasing, bool trustedDesktopInput)
         {
             // menulis pada sisi atas kertas dengan ukuran pencil atau eraser.
+            latestInputIsDesktop = trustedDesktopInput;
             InitializeSurface();
             if (!hasPreviousPoint)
             {
@@ -241,15 +257,14 @@ namespace XRStudyWhiteboard
             if (crosshair == null)
                 return;
 
-            Vector3 inheritedScale = paperRenderer != null
-                ? paperRenderer.transform.lossyScale
-                : Vector3.one;
-            float localPaperWidth = paperWorldSize.x / Mathf.Max(0.0001f, inheritedScale.x);
-            float localPaperDepth = paperWorldSize.y / Mathf.Max(0.0001f, inheritedScale.z);
+            BoxCollider box = paperCollider as BoxCollider;
+            Vector3 center = box != null ? box.center : Vector3.zero;
+            Vector3 size = box != null ? box.size : Vector3.one;
+            float lift = 0.003f / Mathf.Max(0.0001f, Mathf.Abs(paperRenderer.transform.lossyScale.y));
             crosshair.localPosition = new Vector3(
-                (uv.x - 0.5f) * localPaperWidth,
-                0.65f,
-                (uv.y - 0.5f) * localPaperDepth);
+                center.x + (uv.x - 0.5f) * size.x,
+                center.y + size.y * 0.5f + lift,
+                center.z + (uv.y - 0.5f) * size.z);
 
             Color colour = new Color(0.05f, 0.9f, 1f, 1f);
             for (int i = 0; i < crosshairRenderers.Count; i++)
@@ -329,7 +344,8 @@ namespace XRStudyWhiteboard
                 Plane paperPlane = new Plane(
                     box.transform.TransformDirection(Vector3.up),
                     box.transform.TransformPoint(topLocalPoint));
-                if (!paperPlane.Raycast(ray, out distance)
+                if (Vector3.Dot(ray.direction, paperPlane.normal) >= 0f
+                    || !paperPlane.Raycast(ray, out distance)
                     || distance < 0f
                     || distance > maxDistance)
                     return false;
@@ -494,7 +510,7 @@ namespace XRStudyWhiteboard
             // small but visible gap at a line or circle endpoint.
             Vector2 endpoint = lastInputUv;
             float distance = Vector2.Distance(previousUv, endpoint);
-            if (distance > maximumUvJump)
+            if (!latestInputIsDesktop && distance > maximumUvJump)
                 return;
 
             float brushDiameter = previousStrokeWasErasing ? eraserSize : pencilSize;
@@ -552,7 +568,11 @@ namespace XRStudyWhiteboard
                 0f,
                 0.5f + 0.001f / Mathf.Max(0.0001f, paperRenderer.transform.lossyScale.y),
                 0f);
-            surface.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+            // Quad U follows local +X; rotating +90 degrees sends Quad V
+            // along paper +Z, exactly matching TryGetPaperIntersection.
+            // The former -90 degree rotation sent V along -Z and displayed
+            // every contact at the opposite depth on the sheet.
+            surface.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             Vector3 inheritedScale = paperRenderer.transform.lossyScale;
             surface.transform.localScale = new Vector3(
                 paperWorldSize.x / Mathf.Max(0.0001f, inheritedScale.x),
@@ -572,18 +592,12 @@ namespace XRStudyWhiteboard
             if (writingSurfaceRenderer == null)
                 return;
 
-            Material sourceMaterial = Application.isPlaying
-                ? paperRenderer.material
-                : paperRenderer.sharedMaterial;
-            if (sourceMaterial != null)
-                writingSurfaceMaterial = new Material(sourceMaterial);
-            else
-            {
-                Shader shader = Shader.Find("Universal Render Pipeline/Lit");
-                if (shader == null)
-                    shader = Shader.Find("Standard");
-                writingSurfaceMaterial = shader != null ? new Material(shader) : null;
-            }
+            // A writing sheet must stay white and its pencil readable even
+            // under the classroom's dim baked lighting.
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (shader == null)
+                shader = Shader.Find("Unlit/Texture");
+            writingSurfaceMaterial = shader != null ? new Material(shader) : null;
 
             if (writingSurfaceMaterial == null)
                 return;
