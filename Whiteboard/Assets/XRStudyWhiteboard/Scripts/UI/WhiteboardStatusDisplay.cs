@@ -10,6 +10,7 @@ namespace XRStudyWhiteboard
         [SerializeField] private TMP_Text colourText;
         [SerializeField] private TMP_Text inputText;
         [SerializeField] private TMP_Text drawingText;
+        private bool compactLayout;
 
         public void Initialize(TMP_Text toolLabel, TMP_Text colourLabel, TMP_Text inputLabel, TMP_Text drawingLabel)
         {
@@ -19,10 +20,24 @@ namespace XRStudyWhiteboard
             drawingText = drawingLabel;
         }
 
+        public void InitializeCompact(TMP_Text currentLabel)
+        {
+            compactLayout = true;
+            toolText = currentLabel;
+            colourText = inputText = drawingText = null;
+        }
+
         public void Refresh(XRStudyWhiteboardManager manager)
         {
             if (manager == null)
                 return;
+
+            if (compactLayout)
+            {
+                if (toolText != null)
+                    toolText.text = "CURRENT  " + manager.CurrentTool + " / " + manager.CurrentColour;
+                return;
+            }
 
             if (toolText != null)
                 toolText.text = "CURRENT TOOL\n<color=#9BE7FF>" + manager.CurrentTool.ToString().ToUpperInvariant() + "</color>";

@@ -66,6 +66,8 @@ namespace XRStudyWhiteboard.Editor
 
             RunDrawingSmokeTests(ref checks, ref errors);
             RunTableToolMenuSmokeTests(ref checks, ref errors);
+            XRStudyWhiteboardSessionValidation.Run(ref checks, ref errors);
+            XRStudyNavigationValidation.ValidateCameraAnchorAlignment();
 
             if (errors == 0)
             {
@@ -204,6 +206,8 @@ namespace XRStudyWhiteboard.Editor
         private static void ValidateScene(Scene scene, ref int checks, ref int errors)
         {
             CheckMissingScripts(scene, ref checks, ref errors);
+            Check(FindSceneObject("GrabMarker", scene) == null, "Obsolete black marker removed", ref checks, ref errors);
+            Check(FindSceneObject("ToolTray", scene) == null, "Obsolete marker holder removed", ref checks, ref errors);
 
             WhiteboardCanvas canvas = FindComponent<WhiteboardCanvas>(scene);
             WhiteboardDrawer drawer = FindComponent<WhiteboardDrawer>(scene);
@@ -282,7 +286,6 @@ namespace XRStudyWhiteboard.Editor
             }
             Check(hasWorldSpaceCanvas, "World-space whiteboard UI canvas exists", ref checks, ref errors);
 
-            Check(FindComponent<XRGrabInteractable>(scene) != null, "Grab marker interactable exists", ref checks, ref errors);
             Check(FindComponent<TeleportationArea>(scene) != null, "Teleportation floor exists", ref checks, ref errors);
             Check(FindComponents<Camera>(scene).Length >= 1, "XR camera exists", ref checks, ref errors);
 
@@ -448,7 +451,7 @@ namespace XRStudyWhiteboard.Editor
                 Check(menuCanvas != null, "Table tool menu has a world canvas", ref checks, ref errors);
                 if (menuTransform != null)
                 {
-                    Check(Vector3.Dot(menuTransform.forward, Vector3.down) > 0.9f, "Table tool menu faces the tabletop", ref checks, ref errors);
+                    Check(Vector3.Dot(menuTransform.forward, (menuTransform.position - new Vector3(0f, 0.62f, 0.62f)).normalized) > 0.8f, "Table tool menu faces the seated user", ref checks, ref errors);
                     Check(menuTransform.GetComponent<GraphicRaycaster>() != null, "Table tool menu has a desktop raycaster", ref checks, ref errors);
                     Check(menuTransform.GetComponent<TrackedDeviceGraphicRaycaster>() != null, "Table tool menu has a tracked-device raycaster", ref checks, ref errors);
                 }
@@ -456,32 +459,23 @@ namespace XRStudyWhiteboard.Editor
                 Button[] buttons = menuTransform != null
                     ? menuTransform.GetComponentsInChildren<Button>(true)
                     : Array.Empty<Button>();
-                Check(buttons.Length == 4, "Table tool menu exposes tools, pencil, eraser, and clear buttons", ref checks, ref errors);
-
-                Transform openTransform = menuTransform != null ? menuTransform.Find("OpenToolsButton") : null;
+                Check(buttons.Length == 3, "Drawing dock exposes pencil, eraser, and clear actions", ref checks, ref errors);
                 Transform panelTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel") : null;
-                Button openButton = openTransform != null ? openTransform.GetComponent<Button>() : null;
-                Check(openButton != null && panelTransform != null && !panelTransform.gameObject.activeSelf, "Table tool panel starts closed", ref checks, ref errors);
-                TMP_Text openLabel = openTransform != null ? openTransform.Find("Label")?.GetComponent<TMP_Text>() : null;
-                Check(openLabel != null
-                    && openLabel.transform.localScale == Vector3.one
-                    && Quaternion.Angle(openLabel.transform.localRotation, Quaternion.Euler(0f, 0f, 180f)) < 0.1f,
-                    "Table tools label is not mirrored", ref checks, ref errors);
-
-                if (openButton != null && menuTransform != null)
-                {
-                    RectTransform openRect = openButton.transform as RectTransform;
-                    Vector3 openPoint = openRect.TransformPoint(openRect.rect.center);
-                    Ray menuRay = new Ray(openPoint - menuTransform.forward * 0.5f, menuTransform.forward);
-                    Check(StudyTableToolMenu.TryHandleAnyRay(menuRay, true), "Controller ray reaches the table tools button", ref checks, ref errors);
-                    StudyTableToolMenu.TryHandleAnyRay(menuRay, false);
-                    Check(panelTransform.gameObject.activeSelf, "Controller ray opens the table tool panel", ref checks, ref errors);
-                }
+                Check(panelTransform != null && panelTransform.gameObject.activeSelf, "Drawing controls are immediately visible", ref checks, ref errors);
+                Transform titleTransform = panelTransform != null ? panelTransform.Find("MenuTitle") : null;
+                TMP_Text title = titleTransform != null ? titleTransform.GetComponent<TMP_Text>() : null;
+                Check(title != null && title.text == "DRAWING TOOLS", "Drawing dock states its purpose", ref checks, ref errors);
 
                 Transform eraserTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel/Eraser") : null;
                 Button eraserButton = eraserTransform != null ? eraserTransform.GetComponent<Button>() : null;
                 if (eraserButton != null)
-                    eraserButton.onClick.Invoke();
+                {
+                    Vector3 buttonPoint = eraserButton.transform.position;
+                    Ray menuRay = new Ray(buttonPoint - menuTransform.forward * 0.5f, menuTransform.forward);
+                    MethodInfo handler = typeof(StudyTableToolMenu).GetMethod("TryHandleRay", BindingFlags.Instance | BindingFlags.NonPublic);
+                    Check((bool)handler.Invoke(menu, new object[] { menuRay, true, false }), "Controller ray reaches desk eraser", ref checks, ref errors);
+                    StudyTableToolMenu.TryHandleAnyRay(menuRay, false);
+                }
                 Check(PaperTool.SelectedKind == PaperToolKind.Eraser, "Table eraser action selects the eraser", ref checks, ref errors);
                 Transform pencilTransform = menuTransform != null ? menuTransform.Find("FloatingToolPanel/Pencil") : null;
                 Button pencilButton = pencilTransform != null ? pencilTransform.GetComponent<Button>() : null;

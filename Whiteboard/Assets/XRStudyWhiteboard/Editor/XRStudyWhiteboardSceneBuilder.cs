@@ -230,20 +230,7 @@ namespace XRStudyWhiteboard.Editor
             serializedCanvas.FindProperty("maximumInterpolationSteps").intValue = 8192;
             serializedCanvas.ApplyModifiedPropertiesWithoutUndo();
 
-            CreateMarkerTray(parent, markerMaterial, accentMaterial);
             return canvas;
-        }
-
-        private static void CreateMarkerTray(Transform parent, Material markerMaterial, Material accentMaterial)
-        {
-            CreatePrimitive("ToolTray", PrimitiveType.Cube, parent, new Vector3(-1.25f, 1.18f, -5.15f), new Vector3(0.75f, 0.08f, 0.38f), accentMaterial, Layer("Environment"));
-            GameObject marker = CreatePrimitive("GrabMarker", PrimitiveType.Cylinder, parent, new Vector3(-1.25f, 1.35f, -5.14f), new Vector3(0.045f, 0.18f, 0.045f), markerMaterial, Layer("Grabbable"));
-            marker.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            Rigidbody rigidbody = marker.AddComponent<Rigidbody>();
-            rigidbody.isKinematic = true;
-            rigidbody.useGravity = false;
-            XRGrabInteractable grab = marker.AddComponent<XRGrabInteractable>();
-            grab.throwOnDetach = false;
         }
 
         private static void CreateStudentDesk(Transform parent, Material woodMaterial, Vector3 position, string name)

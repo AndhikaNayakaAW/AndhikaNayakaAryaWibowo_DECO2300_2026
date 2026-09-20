@@ -156,8 +156,6 @@ namespace XRStudyWhiteboard
 
             Transform surface = FindChild(sceneRoot, "DrawingSurface");
             Transform frame = FindChild(sceneRoot, "BoardFrame");
-            Transform toolTray = FindChild(sceneRoot, "ToolTray");
-            Transform marker = FindChild(sceneRoot, "GrabMarker");
             Transform whiteboardUi = FindChild(sceneRoot, "WhiteboardUI");
             if (surface == null || whiteboardCanvas == null)
                 return;
@@ -215,20 +213,6 @@ namespace XRStudyWhiteboard
                 frame.localScale = new Vector3(width + 0.2f, height + 0.2f, 0.12f);
             }
 
-            if (toolTray != null)
-            {
-                toolTray.SetPositionAndRotation(
-                    boardFrontCenter - up * (height * 0.5f + 0.24f) - right * (width * 0.28f),
-                    boardRotation);
-            }
-
-            if (marker != null && toolTray != null)
-            {
-                marker.SetPositionAndRotation(
-                    toolTray.position + up * 0.18f,
-                    boardRotation * Quaternion.Euler(90f, 0f, 0f));
-            }
-
             if (whiteboardUi != null)
             {
                 // World-space Unity canvases present their graphic front on
@@ -244,37 +228,26 @@ namespace XRStudyWhiteboard
                     : normal;
                 whiteboardUi.SetPositionAndRotation(
                     boardFrontCenter
-                    // The panel is roughly 0.67m wide at the runtime scale.
+                    // The panel is roughly 1.04m wide at the runtime scale.
                     // Leave enough clearance for its left edge to stay off
                     // the board instead of covering the writing surface.
-                    + right * (width * 0.5f + 0.48f)
+                    + right * (width * 0.5f + 0.70f)
                     + frontDirection * 0.14f
                     + up * 0.02f,
                     uiRotation);
                 // Keep the complete colour/tool/status panel inside the
-                // seated desktop view while leaving the writing surface
-                // unobstructed. The original 640px canvas at 0.00135 world
-                // scale was clipped at the right edge of the Game view.
-                whiteboardUi.localScale = Vector3.one * 0.00105f;
+                // whiteboard view while leaving the writing surface unobstructed.
+                whiteboardUi.localScale = Vector3.one * 0.0018f;
                 ApplyWhiteboardUiLayout(whiteboardUi);
             }
         }
 
         private static void ApplyWhiteboardUiLayout(Transform whiteboardUi)
         {
-            // Scenes built before the compact panel layout still contain the
-            // old heading anchors. Apply the same safe in-panel positions at
-            // runtime so an existing classroom scene is fixed without
-            // requiring the user to rebuild the imported room.
-            SetUiAnchoredPosition(whiteboardUi.Find("ToolPanel/ColourHeading"), new Vector2(-180f, 180f));
-            SetUiAnchoredPosition(whiteboardUi.Find("ToolPanel/ToolHeading"), new Vector2(-180f, 45f));
-        }
-
-        private static void SetUiAnchoredPosition(Transform target, Vector2 position)
-        {
-            RectTransform rect = target as RectTransform;
-            if (rect != null)
-                rect.anchoredPosition = position;
+            WhiteboardControlPanel panel = whiteboardUi.GetComponent<WhiteboardControlPanel>();
+            if (panel == null)
+                panel = whiteboardUi.gameObject.AddComponent<WhiteboardControlPanel>();
+            panel.Initialize(whiteboardUi.root.GetComponentInChildren<XRStudyWhiteboardManager>(true));
         }
 
         private void DisableOriginalBoard(Transform model)
@@ -504,10 +477,10 @@ namespace XRStudyWhiteboard
             AddGrabbable(paper);
 
             StudyTableToolMenu toolMenu = setObject.AddComponent<StudyTableToolMenu>();
-            toolMenu.Initialize(paperCanvas);
+            toolMenu.Initialize(paperCanvas, deskBounds);
 
             StudyTableTeleportPoint teleportPoint = setObject.AddComponent<StudyTableTeleportPoint>();
-            teleportPoint.Initialize(paperCanvas);
+            teleportPoint.Initialize(paperCanvas, deskBounds, index);
         }
 
         private static GameObject CreatePrimitive(string name, PrimitiveType type, Transform parent, Vector3 position, Vector3 scale, Material material)
@@ -535,9 +508,9 @@ namespace XRStudyWhiteboard
 
         private static Material CreateRuntimeMaterial(string name, Color colour)
         {
-            Shader shader = Shader.Find("Universal Render Pipeline/Lit");
+            Shader shader = Shader.Find("Universal Render Pipeline/Unlit");
             if (shader == null)
-                shader = Shader.Find("Standard");
+                shader = Shader.Find("Unlit/Texture");
             Material material = new Material(shader)
             {
                 name = name,

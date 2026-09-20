@@ -1,61 +1,72 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
 namespace XRStudyWhiteboard
 {
-    /// <summary>
-    /// Creates the small tool button that lives beside one paper and the
-    /// floating pencil, eraser, and clear-paper menu opened by that button.
-    /// The menu is generated at runtime because the number and positions of
-    /// tabletops are detected from the imported classroom model.
-    /// </summary>
+    /// <summary>Always-open drawing controls beside the currently occupied desk.</summary>
     public sealed class StudyTableToolMenu : MonoBehaviour
     {
         private static readonly List<StudyTableToolMenu> ActiveMenus = new List<StudyTableToolMenu>();
-        private static readonly Color PanelColour = new Color(0.035f, 0.075f, 0.12f, 0.97f);
-        private static readonly Color ButtonColour = new Color(0.09f, 0.14f, 0.19f, 1f);
-        private static readonly Color AccentColour = new Color(0.25f, 0.75f, 0.92f, 1f);
-
         [SerializeField] private PaperNoteCanvas paper;
-
         private GameObject menuObject;
         private GameObject menuPanel;
         private TMP_Text selectedToolText;
+        private Button pencilButton;
+        private Button eraserButton;
+        private Button hoveredButton;
         private bool directControllerClickHeld;
         private bool desktopClickHeld;
+        private Bounds deskBounds;
+        private bool hasDeskBounds;
+        private Canvas menuCanvas;
 
         public static bool TryHandleDesktopScreenPoint(Vector2 screenPoint, Camera eventCamera, bool pressed)
         {
-            for (int i = ActiveMenus.Count - 1; i >= 0; i--)
-            {
-                StudyTableToolMenu menu = ActiveMenus[i];
-                if (menu == null)
-                {
-                    ActiveMenus.RemoveAt(i);
-                    continue;
-                }
-
-                if (menu.TryHandleDesktopScreenPointInternal(screenPoint, eventCamera, pressed))
-                    return true;
-            }
-
-            return false;
+            if (eventCamera == null)
+                return false;
+            return TryHandleAnyRayInternal(eventCamera.ScreenPointToRay(screenPoint), pressed, true);
         }
 
         public static void EndDesktopPointer()
         {
-            for (int i = 0; i < ActiveMenus.Count; i++)
+            foreach (StudyTableToolMenu menu in ActiveMenus)
             {
-                if (ActiveMenus[i] != null)
-                    ActiveMenus[i].desktopClickHeld = false;
+                if (menu == null)
+                    continue;
+                menu.desktopClickHeld = false;
+                menu.SetPointerFeedback(null, false);
             }
         }
 
         public static bool TryHandleAnyRay(Ray ray, bool pressed)
         {
+            return TryHandleAnyRayInternal(ray, pressed, false);
+        }
+
+        /// <summary>Consumes a native XR UI hit without dispatching its click or pointer state again.</summary>
+        public static bool ContainsAnyRay(Ray ray)
+        {
+            foreach (StudyTableToolMenu menu in ActiveMenus)
+            {
+                if (menu == null || menu.menuObject == null || !menu.menuObject.activeInHierarchy)
+                    continue;
+                Plane plane = new Plane(menu.menuObject.transform.forward, menu.menuObject.transform.position);
+                if (!plane.Raycast(ray, out float distance) || distance < 0f || distance > 2.2f)
+                    continue;
+                RectTransform panel = (RectTransform)menu.menuPanel.transform;
+                if (panel.rect.Contains(panel.InverseTransformPoint(ray.GetPoint(distance))))
+                    return true;
+            }
+            return false;
+        }
+
+        private static bool TryHandleAnyRayInternal(Ray ray, bool pressed, bool desktop)
+        {
+            bool consumed = false;
             for (int i = ActiveMenus.Count - 1; i >= 0; i--)
             {
                 StudyTableToolMenu menu = ActiveMenus[i];
@@ -64,20 +75,30 @@ namespace XRStudyWhiteboard
                     ActiveMenus.RemoveAt(i);
                     continue;
                 }
-
-                if (menu.TryHandleRay(ray, pressed))
-                    return true;
+                if (!consumed && menu.TryHandleRay(ray, pressed, desktop))
+                    consumed = true;
             }
-
-            return false;
+            return consumed;
         }
 
         public void Initialize(PaperNoteCanvas paperNote)
         {
             paper = paperNote;
-            if (!ActiveMenus.Contains(this))
-                ActiveMenus.Add(this);
-            BuildMenu();
+            BuildMenu(true);
+        }
+
+        public void Initialize(PaperNoteCanvas paperNote, Bounds tabletop)
+        {
+            Initialize(paperNote, tabletop, true);
+        }
+
+        /// <summary>Test seam for pointer checks that do not need an XR physics raycaster.</summary>
+        public void Initialize(PaperNoteCanvas paperNote, Bounds tabletop, bool includeTrackedRaycaster)
+        {
+            deskBounds = tabletop;
+            hasDeskBounds = true;
+            paper = paperNote;
+            BuildMenu(includeTrackedRaycaster);
         }
 
         private void OnEnable()
@@ -91,275 +112,167 @@ namespace XRStudyWhiteboard
         {
             ActiveMenus.Remove(this);
             PaperTool.SelectionChanged -= RefreshSelection;
+            SetPointerFeedback(null, false);
         }
 
-        private void OnDestroy()
+        private void BuildMenu(bool includeTrackedRaycaster)
         {
-            ActiveMenus.Remove(this);
-            PaperTool.SelectionChanged -= RefreshSelection;
-        }
-
-        private void BuildMenu()
-        {
-            // membuat menu tools di samping setiap kertas.
             if (menuObject != null)
                 return;
-
-            TMP_FontAsset font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
-            menuObject = new GameObject("TableToolMenu");
+            menuObject = new GameObject("TableToolMenu", typeof(RectTransform));
             menuObject.transform.SetParent(transform, false);
-            // Put the button just beyond the paper's front-right corner. The
-            // menu is presented face-up, so the same front side is visible to
-            // Both the seated camera and an XR controller ray use this face.
-            menuObject.transform.localPosition = new Vector3(-0.30f, 0.1f, -0.45f);
-            menuObject.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-            // The tabletop-facing canvas keeps the validation and the
-            // controller ray on the same face. The glyphs are rotated in
-            // their own plane below so they remain upright to the seated user.
-            menuObject.transform.localScale = Vector3.one * 0.00115f;
-
-            Canvas canvas = menuObject.AddComponent<Canvas>();
-            canvas.renderMode = RenderMode.WorldSpace;
-            canvas.sortingOrder = 20;
-            canvas.worldCamera = Camera.main;
+            // Students face world -Z; their right is world -X. The panel's
+            // nearest edge stays outside the paper's 0.55m footprint, and its
+            // bottom edge stays above the tabletop. Aim the complete canvas
+            // toward the intended seated head, so labels and hitboxes agree.
+            Vector3 panelPosition = transform.position + new Vector3(-0.45f, 0.20f, 0.04f);
+            Vector3 seatedHead = hasDeskBounds
+                ? new Vector3(deskBounds.center.x, deskBounds.max.y + 0.62f, deskBounds.max.z + 0.22f)
+                : transform.position + new Vector3(0f, 0.62f, 0.62f);
+            menuObject.transform.SetPositionAndRotation(panelPosition, Quaternion.LookRotation(panelPosition - seatedHead, Vector3.up));
+            menuObject.transform.localScale = Vector3.one * 0.00075f;
+            menuCanvas = menuObject.AddComponent<Canvas>();
+            menuCanvas.renderMode = RenderMode.WorldSpace;
+            menuCanvas.sortingOrder = 20;
+            menuCanvas.worldCamera = Camera.main;
             menuObject.AddComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
-            GraphicRaycaster graphicRaycaster = menuObject.AddComponent<GraphicRaycaster>();
-            graphicRaycaster.ignoreReversedGraphics = false;
-            TrackedDeviceGraphicRaycaster trackedRaycaster = menuObject.AddComponent<TrackedDeviceGraphicRaycaster>();
-            trackedRaycaster.ignoreReversedGraphics = false;
+            menuObject.AddComponent<GraphicRaycaster>();
+            if (includeTrackedRaycaster)
+                menuObject.AddComponent<TrackedDeviceGraphicRaycaster>();
+            menuObject.GetComponent<RectTransform>().sizeDelta = new Vector2(380f, 400f);
 
-            RectTransform canvasRect = menuObject.GetComponent<RectTransform>();
-            canvasRect.sizeDelta = new Vector2(420f, 330f);
-
-            menuPanel = CreatePanel(menuObject.transform, "FloatingToolPanel", new Vector2(0f, 84f), new Vector2(470f, 224f), PanelColour);
-            CreateText(menuPanel.transform, "MenuTitle", "PAPER TOOLS", font, new Vector2(0f, 78f), new Vector2(410f, 40f), 23f, TextAlignmentOptions.Center, AccentColour);
-            CreateButton(menuPanel.transform, "Pencil", "PENCIL", font, new Vector2(-145f, 8f), new Vector2(130f, 66f), () => SelectTool(PaperToolKind.Pencil));
-            CreateButton(menuPanel.transform, "Eraser", "ERASER", font, new Vector2(0f, 8f), new Vector2(130f, 66f), () => SelectTool(PaperToolKind.Eraser));
-            CreateButton(menuPanel.transform, "ClearPaper", "CLEAR PAPER", font, new Vector2(145f, 8f), new Vector2(130f, 66f), ClearPaper);
-            selectedToolText = CreateText(menuPanel.transform, "SelectedTool", "PENCIL READY", font, new Vector2(0f, -76f), new Vector2(410f, 34f), 17f, TextAlignmentOptions.Center, Color.white);
-
-            GameObject openButton = CreatePanel(menuObject.transform, "OpenToolsButton", new Vector2(0f, -104f), new Vector2(250f, 72f), ButtonColour);
-            Button open = openButton.AddComponent<Button>();
-            Image openImage = openButton.GetComponent<Image>();
-            open.targetGraphic = openImage;
-            SetButtonColours(open, ButtonColour);
-            CreateText(openButton.transform, "Label", "TOOLS", font, Vector2.zero, new Vector2(230f, 60f), 20f, TextAlignmentOptions.Center, Color.white);
-            open.onClick.AddListener(ToggleMenu);
-
-            menuPanel.SetActive(false);
+            menuPanel = StudyUiStyle.CreatePanel(menuObject.transform, "FloatingToolPanel", Vector2.zero, new Vector2(380f, 400f), StudyUiStyle.Panel, true);
+            StudyUiStyle.CreateText(menuPanel.transform, "MenuTitle", "DRAWING TOOLS", new Vector2(0f, 152f), new Vector2(330f, 38f), 27f, TextAlignmentOptions.Left, StudyUiStyle.Text).fontStyle = FontStyles.Bold;
+            StudyUiStyle.CreateText(menuPanel.transform, "Instruction", "Choose a tool, then draw\non the paper.", new Vector2(0f, 101f), new Vector2(330f, 62f), 20f, TextAlignmentOptions.Left, StudyUiStyle.Muted);
+            StudyUiStyle.CreateText(menuPanel.transform, "ToolHeading", "TOOL", new Vector2(0f, 49f), new Vector2(330f, 26f), 16f, TextAlignmentOptions.Left, StudyUiStyle.Muted);
+            pencilButton = StudyUiStyle.CreateButton(menuPanel.transform, "Pencil", "PENCIL", new Vector2(-85f, 0f), new Vector2(158f, 62f), () => SelectTool(PaperToolKind.Pencil));
+            eraserButton = StudyUiStyle.CreateButton(menuPanel.transform, "Eraser", "ERASER", new Vector2(85f, 0f), new Vector2(158f, 62f), () => SelectTool(PaperToolKind.Eraser));
+            selectedToolText = StudyUiStyle.CreateText(menuPanel.transform, "SelectedTool", "Pencil selected", new Vector2(0f, -59f), new Vector2(330f, 36f), 21f, TextAlignmentOptions.Left, StudyUiStyle.Accent);
+            StudyUiStyle.CreateText(menuPanel.transform, "ActionHeading", "ACTIONS", new Vector2(0f, -105f), new Vector2(330f, 26f), 16f, TextAlignmentOptions.Left, StudyUiStyle.Muted);
+            StudyUiStyle.CreateButton(menuPanel.transform, "ClearPaper", "CLEAR PAPER", new Vector2(0f, -152f), new Vector2(330f, 58f), ClearPaper);
             RefreshSelection(PaperTool.SelectedKind);
-        }
-
-        private void ToggleMenu()
-        {
-            if (menuPanel == null)
-                return;
-
-            menuPanel.SetActive(!menuPanel.activeSelf);
-            ControllerHaptics.PulseRightController();
         }
 
         private void LateUpdate()
         {
             if (menuObject == null)
                 return;
+            Camera camera = Camera.main;
+            if (camera == null)
+                return;
+            if (menuCanvas.worldCamera == null)
+                menuCanvas.worldCamera = camera;
 
-            // Camera.main can be assigned after runtime XR startup. Keeping
-            // it on the world canvas makes both the standard XRUI module and
-            // the editor GraphicRaycaster use the same event camera.
-            Canvas canvas = menuObject.GetComponent<Canvas>();
-            if (canvas != null && canvas.worldCamera == null)
-                canvas.worldCamera = Camera.main;
+            // Only the closest occupied desk presents controls. Sixteen full
+            // panels otherwise obscure furniture and compete with the board.
+            StudyTableToolMenu nearest = null;
+            float nearestDistance = 1.1f * 1.1f;
+            foreach (StudyTableToolMenu candidate in ActiveMenus)
+            {
+                if (candidate == null || candidate.paper == null)
+                    continue;
+                Vector3 delta = camera.transform.position - candidate.transform.position;
+                if (delta.z < 0.08f || Mathf.Abs(delta.y) > 1.3f)
+                    continue;
+                delta.y = 0f;
+                if (delta.sqrMagnitude < nearestDistance)
+                {
+                    nearestDistance = delta.sqrMagnitude;
+                    nearest = candidate;
+                }
+            }
+            bool visible = nearest == this;
+            if (menuObject.activeSelf != visible)
+            {
+                menuObject.SetActive(visible);
+                SetPointerFeedback(null, false);
+                directControllerClickHeld = desktopClickHeld = false;
+            }
         }
 
-        private bool TryHandleRay(Ray ray, bool pressed)
+        private bool TryHandleRay(Ray ray, bool pressed, bool desktop)
         {
-            if (menuObject == null)
+            if (menuObject == null || !menuObject.activeInHierarchy)
                 return false;
-
-            Canvas canvas = menuObject.GetComponent<Canvas>();
-            RectTransform canvasRect = menuObject.GetComponent<RectTransform>();
-            if (canvas == null || canvasRect == null)
-                return false;
-
-            Plane menuPlane = new Plane(menuObject.transform.forward, menuObject.transform.position);
-            if (!menuPlane.Raycast(ray, out float distance) || distance < 0f)
+            Plane plane = new Plane(menuObject.transform.forward, menuObject.transform.position);
+            if (!plane.Raycast(ray, out float distance) || distance < 0f || distance > 2.2f)
             {
-                directControllerClickHeld = false;
+                SetPointerFeedback(null, false);
+                if (desktop) desktopClickHeld = false; else directControllerClickHeld = false;
                 return false;
             }
-
             Vector3 worldPoint = ray.GetPoint(distance);
-
-            Button[] buttons = menuObject.GetComponentsInChildren<Button>(false);
-            Button hitButton = null;
-            for (int i = 0; i < buttons.Length; i++)
+            Button hit = null;
+            foreach (Button button in menuObject.GetComponentsInChildren<Button>(false))
             {
-                Button button = buttons[i];
-                if (button == null || !button.isActiveAndEnabled)
+                if (!button.isActiveAndEnabled || !button.interactable)
                     continue;
-
-                RectTransform buttonRect = button.transform as RectTransform;
-                if (buttonRect == null)
-                    continue;
-
-                Vector2 buttonPoint = buttonRect.InverseTransformPoint(worldPoint);
-                // Require the ray-plane hit to be inside the actual button.
-                // The old broad “near button” tolerance also matched rays
-                // aimed at the paper, so the menu consumed every paper
-                // stroke before PaperNoteCanvas could receive it.
-                if (buttonRect.rect.Contains(buttonPoint))
+                RectTransform rect = (RectTransform)button.transform;
+                if (rect.rect.Contains(rect.InverseTransformPoint(worldPoint)))
                 {
-                    hitButton = button;
+                    hit = button;
                     break;
                 }
             }
-
-            if (hitButton != null && pressed && !directControllerClickHeld)
-                hitButton.onClick.Invoke();
-
-            directControllerClickHeld = pressed;
-            if (hitButton != null)
-                return true;
-
-            // A hidden menu must not block the paper. Only an open panel
-            // consumes the empty space between its buttons.
-            if (menuPanel != null && menuPanel.activeSelf)
-            {
-                RectTransform panelRect = menuPanel.transform as RectTransform;
-                if (panelRect != null && panelRect.rect.Contains(panelRect.InverseTransformPoint(worldPoint)))
-                    return true;
-            }
-
-            directControllerClickHeld = false;
-            return false;
+            bool held = desktop ? desktopClickHeld : directControllerClickHeld;
+            SetPointerFeedback(hit, pressed);
+            if (hit != null && pressed && !held)
+                hit.onClick.Invoke();
+            if (desktop) desktopClickHeld = pressed; else directControllerClickHeld = pressed;
+            RectTransform panel = (RectTransform)menuPanel.transform;
+            return panel.rect.Contains(panel.InverseTransformPoint(worldPoint));
         }
 
-        private bool TryHandleDesktopScreenPointInternal(Vector2 screenPoint, Camera eventCamera, bool pressed)
+        private void SetPointerFeedback(Button target, bool pressed)
         {
-            if (menuObject == null)
-                return false;
-
-            Button[] buttons = menuObject.GetComponentsInChildren<Button>(false);
-            Button hitButton = null;
-            for (int i = 0; i < buttons.Length; i++)
+            if (EventSystem.current == null)
+                return;
+            PointerEventData pointer = new PointerEventData(EventSystem.current);
+            if (hoveredButton != target && hoveredButton != null)
             {
-                Button button = buttons[i];
-                RectTransform buttonRect = button != null ? button.transform as RectTransform : null;
-                if (button == null
-                    || !button.isActiveAndEnabled
-                    || buttonRect == null
-                    || !RectTransformUtility.RectangleContainsScreenPoint(buttonRect, screenPoint, eventCamera))
-                    continue;
-
-                hitButton = button;
-                break;
+                hoveredButton.OnPointerUp(pointer);
+                hoveredButton.OnPointerExit(pointer);
             }
-
-            if (hitButton != null)
+            if (target != null)
             {
-                if (pressed && !desktopClickHeld)
-                    hitButton.onClick.Invoke();
-
-                desktopClickHeld = pressed;
-                return true;
+                if (hoveredButton != target)
+                    target.OnPointerEnter(pointer);
+                if (pressed)
+                    target.OnPointerDown(pointer);
+                else
+                    target.OnPointerUp(pointer);
             }
-
-            if (menuPanel != null && menuPanel.activeSelf)
-            {
-                RectTransform panelRect = menuPanel.transform as RectTransform;
-                if (panelRect != null
-                    && RectTransformUtility.RectangleContainsScreenPoint(panelRect, screenPoint, eventCamera))
-                {
-                    desktopClickHeld = pressed;
-                    return true;
-                }
-            }
-
-            desktopClickHeld = false;
-            return false;
+            hoveredButton = target;
         }
 
         private void SelectTool(PaperToolKind tool)
         {
             PaperTool.Select(tool);
-            if (menuPanel != null)
-                menuPanel.SetActive(false);
+            RefreshSelection(tool);
         }
 
         private void ClearPaper()
         {
             if (paper != null)
                 paper.ClearNote();
-
-            if (menuPanel != null)
-                menuPanel.SetActive(false);
             ControllerHaptics.PulseRightController();
         }
 
         private void RefreshSelection(PaperToolKind tool)
         {
             if (selectedToolText != null)
-                selectedToolText.text = tool == PaperToolKind.Pencil ? "PENCIL READY" : "ERASER READY";
+                selectedToolText.text = tool == PaperToolKind.Pencil ? "Pencil selected" : "Eraser selected";
+            RefreshToolButton(pencilButton, tool == PaperToolKind.Pencil, "PENCIL");
+            RefreshToolButton(eraserButton, tool == PaperToolKind.Eraser, "ERASER");
         }
 
-        private static GameObject CreatePanel(Transform parent, string name, Vector2 position, Vector2 size, Color colour)
+        private static void RefreshToolButton(Button button, bool selected, string label)
         {
-            GameObject panel = new GameObject(name);
-            panel.transform.SetParent(parent, false);
-            RectTransform rect = panel.AddComponent<RectTransform>();
-            rect.sizeDelta = size;
-            rect.anchoredPosition = position;
-            Image image = panel.AddComponent<Image>();
-            image.color = colour;
-            image.raycastTarget = name != "FloatingToolPanel";
-            return panel;
-        }
-
-        private static void CreateButton(Transform parent, string name, string label, TMP_FontAsset font, Vector2 position, Vector2 size, UnityEngine.Events.UnityAction action)
-        {
-            GameObject buttonObject = CreatePanel(parent, name, position, size, ButtonColour);
-            Button button = buttonObject.AddComponent<Button>();
-            Image image = buttonObject.GetComponent<Image>();
-            button.targetGraphic = image;
-            SetButtonColours(button, ButtonColour);
-            TMP_Text text = CreateText(buttonObject.transform, "Label", label, font, Vector2.zero, size - new Vector2(10f, 8f), 17f, TextAlignmentOptions.Center, Color.white);
-            text.raycastTarget = false;
-            button.onClick.AddListener(action);
-        }
-
-        private static void SetButtonColours(Button button, Color normal)
-        {
-            ColorBlock colours = button.colors;
-            colours.normalColor = normal;
-            colours.highlightedColor = Color.Lerp(normal, Color.white, 0.3f);
-            colours.pressedColor = Color.Lerp(normal, Color.black, 0.2f);
-            colours.selectedColor = colours.highlightedColor;
-            colours.fadeDuration = 0.08f;
-            button.colors = colours;
-        }
-
-        private static TMP_Text CreateText(Transform parent, string name, string text, TMP_FontAsset font, Vector2 position, Vector2 size, float fontSize, TextAlignmentOptions alignment, Color colour)
-        {
-            GameObject textObject = new GameObject(name);
-            textObject.transform.SetParent(parent, false);
-            RectTransform rect = textObject.AddComponent<RectTransform>();
-            rect.sizeDelta = size;
-            rect.anchoredPosition = position;
-            TextMeshProUGUI textComponent = textObject.AddComponent<TextMeshProUGUI>();
-            textComponent.text = text;
-            textComponent.font = font;
-            textComponent.fontSize = fontSize;
-            textComponent.color = colour;
-            textComponent.alignment = alignment;
-            textComponent.transform.localScale = Vector3.one;
-            // The seated camera approaches the desk from the opposite side
-            // of the face-up canvas' local Y axis. Rotate only the glyphs in
-            // the plane so the button rectangles keep their hitboxes while
-            // labels read upright from the intended table view.
-            textComponent.transform.localRotation = Quaternion.Euler(0f, 0f, 180f);
-            textComponent.raycastTarget = false;
-            return textComponent;
+            if (button == null)
+                return;
+            StudyUiStyle.StyleButton(button, selected);
+            TMP_Text text = button.GetComponentInChildren<TMP_Text>();
+            text.text = selected ? label + "\n<size=13>ACTIVE</size>" : label;
         }
     }
 }

@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.XR;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
 namespace XRStudyWhiteboard
@@ -23,10 +22,10 @@ namespace XRStudyWhiteboard
             if (actions == null || inputModule == null)
                 return;
 
-            bool desktopTesting = Application.isEditor
-                || (Application.platform != RuntimePlatform.Android && !XRSettings.isDeviceActive);
             inputModule.enableXRInput = true;
-            inputModule.enableMouseInput = desktopTesting;
+            // EditorDesktopInteractor dispatches the mouse to world UI once.
+            // Keep XR rays on the official input module without a second click.
+            inputModule.enableMouseInput = false;
             inputModule.enableBuiltinActionsAsFallback = true;
             inputModule.pointAction = Reference("XRI UI/Point");
             inputModule.leftClickAction = Reference("XRI UI/Click");
