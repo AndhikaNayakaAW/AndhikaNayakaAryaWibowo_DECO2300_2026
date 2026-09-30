@@ -82,6 +82,11 @@ namespace XRStudyWhiteboard
         private bool seatedDesktopView;
         private bool desktopNavigationPointerHeld;
         private bool desktopHelpExpanded;
+        private bool leftPrimaryWasPressed;
+        private bool leftSecondaryWasPressed;
+        private bool rightPrimaryWasPressed;
+        private bool rightSecondaryWasPressed;
+        private int nextQuestTableIndex;
         private XRInputDevice leftController;
         private XRInputDevice rightController;
         private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
@@ -493,6 +498,46 @@ namespace XRStudyWhiteboard
                 Turn(Mathf.Sign(turnAxis.x) * snapTurnDegrees);
                 snapTurnTimer = snapTurnCooldown;
             }
+
+            HandleQuestNavigationButtons();
+        }
+
+        private void HandleQuestNavigationButtons()
+        {
+            bool leftPrimary = ReadButton(leftController, XRCommonUsages.primaryButton);
+            bool leftSecondary = ReadButton(leftController, XRCommonUsages.secondaryButton);
+            bool rightPrimary = ReadButton(rightController, XRCommonUsages.primaryButton);
+            bool rightSecondary = ReadButton(rightController, XRCommonUsages.secondaryButton);
+
+            // Give the headset a dependable navigation fallback even if the
+            // floor teleport arc is hidden by controller modality. These are
+            // edge-triggered so holding a face button cannot jump repeatedly.
+            if (leftPrimary && !leftPrimaryWasPressed)
+                NavigateToWhiteboard();
+            if (leftSecondary && !leftSecondaryWasPressed)
+            {
+                RefreshTablePoints();
+                int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
+                if (tableCount > 0)
+                {
+                    TryTeleportToTable(nextQuestTableIndex % tableCount);
+                    nextQuestTableIndex = (nextQuestTableIndex + 1) % tableCount;
+                }
+            }
+            if (rightPrimary && !rightPrimaryWasPressed)
+                ResetView();
+            if (rightSecondary && !rightSecondaryWasPressed)
+                StandFromSeat();
+
+            leftPrimaryWasPressed = leftPrimary;
+            leftSecondaryWasPressed = leftSecondary;
+            rightPrimaryWasPressed = rightPrimary;
+            rightSecondaryWasPressed = rightSecondary;
+        }
+
+        private static bool ReadButton(XRInputDevice device, InputFeatureUsage<bool> usage)
+        {
+            return device.isValid && device.TryGetFeatureValue(usage, out bool pressed) && pressed;
         }
 
         private void MoveInViewDirection(Vector2 input, float distance)

@@ -4,17 +4,20 @@
 
 | Input | Action |
 | --- | --- |
-| Right trigger (hold) | Draw on the whiteboard; select a world-space UI control when pointing at it |
-| Right grip | Grab the whiteboard marker from its tray |
-| Left thumbstick | Move when the existing locomotion configuration enables continuous movement |
-| Configured teleport action | Teleport to the classroom floor and move to any table |
-| Right thumbstick | Snap turn using the reused XRI locomotion setup |
+| Right trigger (hold) | Draw on the whiteboard or paper; select a world-space UI control when pointing at it |
+| Left thumbstick | Move through the classroom |
+| Right thumbstick | Snap turn |
+| X | Go directly to the whiteboard |
+| Y | Go to the next student table |
+| A | Return to the centre view |
+| B | Stand up from a seated table view |
+| Teleport ray | Aim at the classroom floor and use the configured XRI teleport action |
 
 Marker mode starts with black selected. The four available colours are black, red, blue, and green. The eraser is selected from the UI and uses a larger brush.
 
 ## Student table paper
 
-The table contains the paper only. Point at the `TOOLS` button beside the paper and press the right trigger to open its floating menu:
+The nearest table presents its drawing controls beside the paper. Point with the right controller and press the right trigger:
 
 - `PENCIL` selects the fine paper-writing line.
 - `ERASER` selects a wider paper eraser.

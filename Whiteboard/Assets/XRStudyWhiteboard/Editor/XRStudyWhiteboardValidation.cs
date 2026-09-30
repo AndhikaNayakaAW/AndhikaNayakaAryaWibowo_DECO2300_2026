@@ -33,6 +33,7 @@ namespace XRStudyWhiteboard.Editor
         private const string SimulatorControlsPath = "Assets/Samples/XR Interaction Toolkit/3.4.1/XR Device Simulator/XR Device Simulator Controls.inputactions";
         private const string ControllerControlsPath = "Assets/Samples/XR Interaction Toolkit/3.4.1/XR Device Simulator/XR Device Controller Controls.inputactions";
         private const string HandControlsPath = "Assets/Samples/XR Interaction Toolkit/3.4.1/XR Device Simulator/XR Device Hand Controls.inputactions";
+        private const string XrGeneralSettingsPath = "Assets/XR/XRGeneralSettingsPerBuildTarget.asset";
         private const string OpenXRSettingsPath = "Assets/XR/Settings/OpenXR Package Settings.asset";
         private const string SimulatorObjectName = "XR Device Simulator (Editor Test)";
 
@@ -50,7 +51,9 @@ namespace XRStudyWhiteboard.Editor
             CheckFile(SimulatorControlsPath, ref checks, ref errors);
             CheckFile(ControllerControlsPath, ref checks, ref errors);
             CheckFile(HandControlsPath, ref checks, ref errors);
+            CheckFile(XrGeneralSettingsPath, ref checks, ref errors);
             CheckFile(OpenXRSettingsPath, ref checks, ref errors);
+            CheckAndroidXrStartup(ref checks, ref errors);
             CheckOpenXRFeature("OculusTouchControllerProfile Android", ref checks, ref errors);
             CheckOpenXRFeature("MetaQuestTouchPlusControllerProfile Android", ref checks, ref errors);
             CheckOpenXRFeature("MetaQuestFeature Android", ref checks, ref errors);
@@ -339,6 +342,24 @@ namespace XRStudyWhiteboard.Editor
             int nextBlock = featureIndex < 0 ? -1 : text.IndexOf("--- !u!114", featureIndex + 1, StringComparison.Ordinal);
             bool enabled = featureIndex >= 0 && text.Substring(featureIndex, (nextBlock < 0 ? text.Length : nextBlock) - featureIndex).Contains("m_enabled: 1");
             Check(enabled, "OpenXR feature enabled: " + featureName, ref checks, ref errors);
+        }
+
+        private static void CheckAndroidXrStartup(ref int checks, ref int errors)
+        {
+            string xrSettings = File.Exists(XrGeneralSettingsPath)
+                ? File.ReadAllText(XrGeneralSettingsPath)
+                : string.Empty;
+            int androidIndex = xrSettings.IndexOf("m_Name: Android Providers", StringComparison.Ordinal);
+            int nextBlock = androidIndex < 0
+                ? -1
+                : xrSettings.IndexOf("--- !u!114", androidIndex + 1, StringComparison.Ordinal);
+            string androidBlock = androidIndex < 0
+                ? string.Empty
+                : xrSettings.Substring(androidIndex, (nextBlock < 0 ? xrSettings.Length : nextBlock) - androidIndex);
+            Check(androidBlock.Contains("m_AutomaticLoading: 1"),
+                "Android XR loader starts automatically", ref checks, ref errors);
+            Check(androidBlock.Contains("m_AutomaticRunning: 1"),
+                "Android XR subsystems run automatically", ref checks, ref errors);
         }
 
         private static void CheckFile(string path, ref int checks, ref int errors)

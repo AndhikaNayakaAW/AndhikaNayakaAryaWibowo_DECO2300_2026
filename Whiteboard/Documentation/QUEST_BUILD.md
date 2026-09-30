@@ -17,13 +17,14 @@ These settings were preserved rather than blindly replaced. Confirm the final va
 3. Open `File > Build Profiles` or `File > Build Settings`.
 4. Select Android and confirm `XRStudyClassroom` is included and enabled.
 5. Check `Project Settings > XR Plug-in Management` and confirm OpenXR is enabled for Android.
-6. Check the OpenXR interaction profiles and Quest hand-tracking feature if the installed package version exposes them.
-7. Build, or choose Build And Run.
-8. Test controller tracking first. Controllers must work even when hand tracking is unavailable.
-9. Test drawing, all four colours, Marker, Eraser, Clear Board confirmation, teleportation, snap turning, and the grabbable whiteboard marker.
-10. Teleport to each student table, confirm the view faces its paper while the board remains visible, then use the table `TOOLS` menu to select Pencil, Eraser, and Clear Paper.
-11. Test hand tracking separately, including pinch drawing and UI selection.
+6. Confirm `Initialize XR on Startup` is enabled for Android. Without it, the APK opens without controller tracking or XR input.
+7. Check the OpenXR interaction profiles and Quest hand-tracking feature if the installed package version exposes them.
+8. Build, or choose Build And Run.
+9. Test controller tracking first. Controllers must work even when hand tracking is unavailable.
+10. Test drawing, all four colours, Marker, Eraser, Clear Board confirmation, teleportation, and snap turning.
+11. Visit each student table, confirm the view faces its paper while the board remains visible, then select Pencil, Eraser, and Clear Paper.
+12. Test hand tracking separately, including pinch drawing and UI selection.
 
-## Status
+## Controller navigation fallback
 
-The project is prepared for Quest testing, but this environment did not run an Android build or connect to Quest hardware. Do not treat editor compilation as hardware validation.
+If the floor teleport arc is difficult to see, use `X` for the whiteboard, `Y` to cycle through the student tables, `A` for the centre view, and `B` to stand. These shortcuts use native Quest controller input and remain available alongside continuous movement and the XRI teleport ray.

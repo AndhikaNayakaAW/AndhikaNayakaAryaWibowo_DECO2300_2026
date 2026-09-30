@@ -94,7 +94,12 @@ namespace XRStudyWhiteboard
                 return;
             resolvedTriggerHand = hand;
             controllerTriggerAction = null;
-            string actionName = hand == 0 ? "XRI Left Interaction/Activate" : "XRI Right Interaction/Activate";
+            // XRI maps the controller index trigger to Select. Activate is
+            // normally the grip control, so using it made Quest users squeeze
+            // the grip before a trigger stroke could begin. Keep desktop hand
+            // selection and physical Quest controllers on the same trigger
+            // action.
+            string actionName = hand == 0 ? "XRI Left Interaction/Select" : "XRI Right Interaction/Select";
 
             if (controllerInputActions != null)
             {
@@ -844,7 +849,7 @@ namespace XRStudyWhiteboard
 
             // The XR Device Simulator and the controller rig publish input
             // through the official XRI Input System action asset. Reading the
-            // same Activate action keeps cursor-driven editor testing and a
+            // same Select action keeps cursor-driven editor testing and a
             // physical Quest trigger on one path.
             ResolveControllerTriggerAction();
             if (controllerTriggerAction != null)
