@@ -7,11 +7,12 @@
 | Right trigger (hold) | Draw on the whiteboard or paper; select a world-space UI control when pointing at it |
 | Left thumbstick | Move through the classroom |
 | Right thumbstick | Snap turn |
-| Left X | Go to the previous destination |
-| Left Y | Go to the next destination |
+| Left X | Stand at writing height directly in front of the whiteboard |
+| Left Y | Go to the next student table |
+| Right A | Close or reopen the controller guide |
 | Teleport ray | Aim at the classroom floor and use the configured XRI teleport action |
 
-The X/Y destination cycle includes the whiteboard and every student table, then wraps around. The right controller alone selects Marker, Eraser, Pencil, colours, and other drawing controls. Marker mode starts with black selected. The four available colours are black, red, blue, and green.
+The right controller alone selects Marker, Eraser, Pencil, colours, and other drawing controls. Table paper is fixed in place so the right trigger writes instead of grabbing it. Marker mode starts with black selected. The four available colours are black, red, blue, and green.
 
 ## Student table paper
 

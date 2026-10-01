@@ -27,4 +27,4 @@ These settings were preserved rather than blindly replaced. Confirm the final va
 
 ## Controller navigation fallback
 
-If the floor teleport arc is difficult to see, use left-controller `Y` for the next destination and left-controller `X` for the previous destination. The cycle includes the whiteboard and every student table. Use the right controller trigger to select drawing tools and write on the board or paper. These shortcuts remain available alongside continuous movement and the XRI teleport ray.
+If the floor teleport arc is difficult to see, use left-controller `X` to stand directly in front of the whiteboard and left-controller `Y` to cycle through the student tables. Use the right controller trigger to select drawing tools and write on the board or fixed paper. The in-headset controller guide opens at startup; right-controller `A` closes or reopens it.

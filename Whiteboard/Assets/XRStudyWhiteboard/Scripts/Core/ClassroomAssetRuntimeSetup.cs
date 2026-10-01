@@ -474,13 +474,35 @@ namespace XRStudyWhiteboard
             PaperNoteCanvas paperCanvas = paper.AddComponent<PaperNoteCanvas>();
             paperCanvas.Configure(paper.GetComponent<Renderer>(), paper.GetComponent<Collider>(), new Vector2(0.55f, 0.38f));
             paperCanvas.ConfigureWritingSizes(0.014f, 0.032f);
-            AddGrabbable(paper);
+            ConfigurePaperForWriting(paper);
 
             StudyTableToolMenu toolMenu = setObject.AddComponent<StudyTableToolMenu>();
             toolMenu.Initialize(paperCanvas, deskBounds);
 
             StudyTableTeleportPoint teleportPoint = setObject.AddComponent<StudyTableTeleportPoint>();
             teleportPoint.Initialize(paperCanvas, deskBounds, index);
+        }
+
+        public static void ConfigurePaperForWriting(GameObject paper)
+        {
+            if (paper == null)
+                return;
+
+            // A note is a fixed writing surface. XRGrabInteractable consumes
+            // the same right trigger used by PaperNoteCanvas, so remove grab
+            // behaviour and its rigidbody from generated and upgraded desks.
+            XRGrabInteractable grab = paper.GetComponent<XRGrabInteractable>();
+            Rigidbody body = paper.GetComponent<Rigidbody>();
+            if (Application.isPlaying)
+            {
+                if (grab != null) Destroy(grab);
+                if (body != null) Destroy(body);
+            }
+            else
+            {
+                if (grab != null) DestroyImmediate(grab);
+                if (body != null) DestroyImmediate(body);
+            }
         }
 
         private static GameObject CreatePrimitive(string name, PrimitiveType type, Transform parent, Vector3 position, Vector3 scale, Material material)

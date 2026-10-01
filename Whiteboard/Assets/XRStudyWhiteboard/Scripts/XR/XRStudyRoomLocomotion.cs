@@ -84,7 +84,7 @@ namespace XRStudyWhiteboard
         private bool desktopHelpExpanded;
         private bool leftPrimaryWasPressed;
         private bool leftSecondaryWasPressed;
-        private int questDestinationIndex = -1;
+        private int nextQuestTableIndex;
         private XRInputDevice leftController;
         private XRInputDevice rightController;
         private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
@@ -118,6 +118,14 @@ namespace XRStudyWhiteboard
             leftController = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
             rightController = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
             desktopMode = DetermineDesktopMode();
+
+            if (!desktopMode && cameraTransform != null)
+            {
+                VRControllerGuide guide = GetComponent<VRControllerGuide>();
+                if (guide == null)
+                    guide = gameObject.AddComponent<VRControllerGuide>();
+                guide.Initialize(cameraTransform);
+            }
 
             // The editor simulator can drive the HMD pose independently of
             // this desktop controller. Keep its controller input available,
@@ -407,8 +415,40 @@ namespace XRStudyWhiteboard
 
         public void NavigateToWhiteboard()
         {
+            WhiteboardCanvas board = FindFirstObjectByType<WhiteboardCanvas>();
+            Renderer boardRenderer = board != null ? board.GetComponent<Renderer>() : null;
+            if (boardRenderer != null)
+            {
+                Vector3 classroomSide = Vector3.ProjectOnPlane(board.transform.forward, Vector3.up);
+                Vector3 towardRoomCenter = Vector3.ProjectOnPlane(-boardRenderer.bounds.center, Vector3.up);
+                if (classroomSide.sqrMagnitude < 0.001f)
+                    classroomSide = towardRoomCenter;
+                if (towardRoomCenter.sqrMagnitude > 0.001f
+                    && Vector3.Dot(classroomSide, towardRoomCenter) < 0f)
+                    classroomSide = -classroomSide;
+
+                Vector3 cameraPosition = CalculateWhiteboardCameraPosition(boardRenderer.bounds, classroomSide);
+                NavigateToCameraPose(cameraPosition, boardRenderer.bounds.center - cameraPosition, false, 0f);
+                return;
+            }
+
             EnsureNavigationAnchors();
             NavigateToAnchor(whiteboardAnchor, false);
+        }
+
+        public static Vector3 CalculateWhiteboardCameraPosition(Bounds boardBounds, Vector3 classroomSide)
+        {
+            Vector3 normal = Vector3.ProjectOnPlane(classroomSide, Vector3.up);
+            if (normal.sqrMagnitude < 0.001f)
+                normal = Vector3.forward;
+            normal.Normalize();
+
+            Vector3 position = boardBounds.center + normal * 1.75f;
+            // Align the tracked eyes to a stable adult standing height. This
+            // avoids inheriting a low guardian/floor offset and keeps the full
+            // board and its tool panel visible and reachable.
+            position.y = Mathf.Clamp(boardBounds.center.y, 1.55f, 1.75f);
+            return position;
         }
 
         public void NavigateToAnchor(SeatAnchor anchor, bool seated = false, float desktopViewPitch = 0f)
@@ -505,38 +545,26 @@ namespace XRStudyWhiteboard
             bool leftPrimary = ReadButton(leftController, XRCommonUsages.primaryButton);
             bool leftSecondary = ReadButton(leftController, XRCommonUsages.secondaryButton);
 
-            // X and Y provide a dependable two-way destination cycle even if
-            // the floor teleport arc is hidden by controller modality. Keep
-            // the right controller free for tools, UI and drawing.
+            // X is a reliable whiteboard shortcut. Y advances through every
+            // table. Keep the right controller free for tools and drawing.
             if (leftPrimary && !leftPrimaryWasPressed)
-                NavigateQuestDestination(-1);
+                NavigateToWhiteboard();
             if (leftSecondary && !leftSecondaryWasPressed)
-                NavigateQuestDestination(1);
+                NavigateToNextTable();
 
             leftPrimaryWasPressed = leftPrimary;
             leftSecondaryWasPressed = leftSecondary;
         }
 
-        private void NavigateQuestDestination(int direction)
+        private void NavigateToNextTable()
         {
             RefreshTablePoints();
             int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
-            int destinationCount = tableCount + 1; // Whiteboard plus every table.
-            if (destinationCount <= 1)
-            {
-                NavigateToWhiteboard();
+            if (tableCount <= 0)
                 return;
-            }
 
-            if (questDestinationIndex < 0)
-                questDestinationIndex = direction >= 0 ? 0 : destinationCount - 1;
-            else
-                questDestinationIndex = (questDestinationIndex + direction + destinationCount) % destinationCount;
-
-            if (questDestinationIndex == 0)
-                NavigateToWhiteboard();
-            else
-                TryTeleportToTable(questDestinationIndex - 1);
+            TryTeleportToTable(nextQuestTableIndex % tableCount);
+            nextQuestTableIndex = (nextQuestTableIndex + 1) % tableCount;
         }
 
         private static bool ReadButton(XRInputDevice device, InputFeatureUsage<bool> usage)
