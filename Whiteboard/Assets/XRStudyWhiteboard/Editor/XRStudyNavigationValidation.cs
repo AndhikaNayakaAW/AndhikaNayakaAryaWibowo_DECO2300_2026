@@ -4,6 +4,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Inputs.Simulation;
 
 namespace XRStudyWhiteboard.Editor
@@ -11,6 +12,48 @@ namespace XRStudyWhiteboard.Editor
     /// <summary>Regression checks for camera-pose navigation with tracked HMD offsets.</summary>
     public static class XRStudyNavigationValidation
     {
+        public static void ValidateQuestInteractionContract()
+        {
+            MethodInfo calculatePosition = typeof(XRStudyRoomLocomotion).GetMethod(
+                "CalculateWhiteboardCameraPosition", BindingFlags.Public | BindingFlags.Static);
+            Require(calculatePosition != null, "Whiteboard navigation exposes a board-relative camera pose");
+            if (calculatePosition != null)
+            {
+                Bounds board = new Bounds(new Vector3(1.2f, 2.25f, -5.1f), new Vector3(3.2f, 1.7f, 0.05f));
+                Vector3 position = (Vector3)calculatePosition.Invoke(null, new object[] { board, Vector3.forward });
+                Require(position.y >= 1.55f && position.y <= 1.75f,
+                    "Whiteboard shortcut uses a comfortable standing eye height");
+                Require(Vector3.Dot(position - board.center, Vector3.forward) > 1.4f,
+                    "Whiteboard shortcut places the user on the board's classroom side");
+            }
+
+            MethodInfo configurePaper = typeof(ClassroomAssetRuntimeSetup).GetMethod(
+                "ConfigurePaperForWriting", BindingFlags.Public | BindingFlags.Static);
+            Require(configurePaper != null, "Paper setup exposes its writing-only interaction rule");
+            if (configurePaper != null)
+            {
+                GameObject paper = new GameObject("Paper interaction validation");
+                try
+                {
+                    paper.AddComponent<Rigidbody>();
+                    paper.AddComponent<XRGrabInteractable>();
+                    configurePaper.Invoke(null, new object[] { paper });
+                    Require(paper.GetComponent<XRGrabInteractable>() == null,
+                        "Table paper cannot be grabbed by an XR controller");
+                    Require(paper.GetComponent<Rigidbody>() == null,
+                        "Table paper stays fixed while writing");
+                }
+                finally
+                {
+                    UnityEngine.Object.DestroyImmediate(paper);
+                }
+            }
+
+            Type guideType = Type.GetType("XRStudyWhiteboard.VRControllerGuide, Assembly-CSharp");
+            Require(guideType != null && typeof(MonoBehaviour).IsAssignableFrom(guideType),
+                "A runtime VR controller guide is available");
+        }
+
         [MenuItem("Tools/XR Study Whiteboard/Validate Desktop Simulator Input Ownership", priority = 13)]
         public static void ValidateDesktopSimulatorInputOwnership()
         {

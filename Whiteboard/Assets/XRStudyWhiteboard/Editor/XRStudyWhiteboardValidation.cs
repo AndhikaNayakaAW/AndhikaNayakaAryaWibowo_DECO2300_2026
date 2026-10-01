@@ -71,6 +71,7 @@ namespace XRStudyWhiteboard.Editor
             RunTableToolMenuSmokeTests(ref checks, ref errors);
             XRStudyWhiteboardSessionValidation.Run(ref checks, ref errors);
             XRStudyNavigationValidation.ValidateCameraAnchorAlignment();
+            XRStudyNavigationValidation.ValidateQuestInteractionContract();
 
             if (errors == 0)
             {
