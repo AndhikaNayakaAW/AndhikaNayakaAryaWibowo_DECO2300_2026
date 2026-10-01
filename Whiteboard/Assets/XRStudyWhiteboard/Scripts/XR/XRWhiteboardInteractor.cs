@@ -68,9 +68,32 @@ namespace XRStudyWhiteboard
 
             manager = FindFirstObjectByType<XRStudyWhiteboardManager>();
             desktopLocomotion = FindFirstObjectByType<XRStudyRoomLocomotion>();
+            RestrictToolUiToRightController();
             ResolveXrRayOrigin();
             ResolveDesktopUiRaycaster();
             ResolveControllerTriggerAction();
+        }
+
+        private static void RestrictToolUiToRightController()
+        {
+            // Navigation belongs to the left controller. Disable only its UI
+            // participation so it cannot select marker, eraser, colour or
+            // paper tools; its movement and teleport interactors still work.
+            foreach (XRRayInteractor interactor in FindObjectsByType<XRRayInteractor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (interactor.handedness == InteractorHandedness.Left)
+                    interactor.enableUIInteraction = false;
+            }
+            foreach (NearFarInteractor interactor in FindObjectsByType<NearFarInteractor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (interactor.handedness == InteractorHandedness.Left)
+                    interactor.enableUIInteraction = false;
+            }
+            foreach (XRPokeInteractor interactor in FindObjectsByType<XRPokeInteractor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            {
+                if (interactor.handedness == InteractorHandedness.Left)
+                    interactor.enableUIInteraction = false;
+            }
         }
 
         public void SetReferences(WhiteboardCanvas whiteboardCanvas, WhiteboardDrawer whiteboardDrawer, Transform origin)

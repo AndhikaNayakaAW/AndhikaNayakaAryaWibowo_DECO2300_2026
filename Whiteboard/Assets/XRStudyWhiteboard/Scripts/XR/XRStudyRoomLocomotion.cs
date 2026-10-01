@@ -84,9 +84,7 @@ namespace XRStudyWhiteboard
         private bool desktopHelpExpanded;
         private bool leftPrimaryWasPressed;
         private bool leftSecondaryWasPressed;
-        private bool rightPrimaryWasPressed;
-        private bool rightSecondaryWasPressed;
-        private int nextQuestTableIndex;
+        private int questDestinationIndex = -1;
         private XRInputDevice leftController;
         private XRInputDevice rightController;
         private readonly List<StudyTableTeleportPoint> tablePoints = new List<StudyTableTeleportPoint>();
@@ -506,33 +504,39 @@ namespace XRStudyWhiteboard
         {
             bool leftPrimary = ReadButton(leftController, XRCommonUsages.primaryButton);
             bool leftSecondary = ReadButton(leftController, XRCommonUsages.secondaryButton);
-            bool rightPrimary = ReadButton(rightController, XRCommonUsages.primaryButton);
-            bool rightSecondary = ReadButton(rightController, XRCommonUsages.secondaryButton);
 
-            // Give the headset a dependable navigation fallback even if the
-            // floor teleport arc is hidden by controller modality. These are
-            // edge-triggered so holding a face button cannot jump repeatedly.
+            // X and Y provide a dependable two-way destination cycle even if
+            // the floor teleport arc is hidden by controller modality. Keep
+            // the right controller free for tools, UI and drawing.
             if (leftPrimary && !leftPrimaryWasPressed)
-                NavigateToWhiteboard();
+                NavigateQuestDestination(-1);
             if (leftSecondary && !leftSecondaryWasPressed)
-            {
-                RefreshTablePoints();
-                int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
-                if (tableCount > 0)
-                {
-                    TryTeleportToTable(nextQuestTableIndex % tableCount);
-                    nextQuestTableIndex = (nextQuestTableIndex + 1) % tableCount;
-                }
-            }
-            if (rightPrimary && !rightPrimaryWasPressed)
-                ResetView();
-            if (rightSecondary && !rightSecondaryWasPressed)
-                StandFromSeat();
+                NavigateQuestDestination(1);
 
             leftPrimaryWasPressed = leftPrimary;
             leftSecondaryWasPressed = leftSecondary;
-            rightPrimaryWasPressed = rightPrimary;
-            rightSecondaryWasPressed = rightSecondary;
+        }
+
+        private void NavigateQuestDestination(int direction)
+        {
+            RefreshTablePoints();
+            int tableCount = tablePoints.Count > 0 ? tablePoints.Count : StudentPoints.Length;
+            int destinationCount = tableCount + 1; // Whiteboard plus every table.
+            if (destinationCount <= 1)
+            {
+                NavigateToWhiteboard();
+                return;
+            }
+
+            if (questDestinationIndex < 0)
+                questDestinationIndex = direction >= 0 ? 0 : destinationCount - 1;
+            else
+                questDestinationIndex = (questDestinationIndex + direction + destinationCount) % destinationCount;
+
+            if (questDestinationIndex == 0)
+                NavigateToWhiteboard();
+            else
+                TryTeleportToTable(questDestinationIndex - 1);
         }
 
         private static bool ReadButton(XRInputDevice device, InputFeatureUsage<bool> usage)

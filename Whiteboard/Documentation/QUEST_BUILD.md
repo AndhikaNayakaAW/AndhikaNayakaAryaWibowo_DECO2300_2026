@@ -27,4 +27,4 @@ These settings were preserved rather than blindly replaced. Confirm the final va
 
 ## Controller navigation fallback
 
-If the floor teleport arc is difficult to see, use `X` for the whiteboard, `Y` to cycle through the student tables, `A` for the centre view, and `B` to stand. These shortcuts use native Quest controller input and remain available alongside continuous movement and the XRI teleport ray.
+If the floor teleport arc is difficult to see, use left-controller `Y` for the next destination and left-controller `X` for the previous destination. The cycle includes the whiteboard and every student table. Use the right controller trigger to select drawing tools and write on the board or paper. These shortcuts remain available alongside continuous movement and the XRI teleport ray.
