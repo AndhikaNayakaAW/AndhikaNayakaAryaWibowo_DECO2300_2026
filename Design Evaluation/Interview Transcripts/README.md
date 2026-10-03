@@ -2,6 +2,12 @@
 
 > Design Evaluation 1 user testing evidence for the XR Study Whiteboard prototype.
 
+## Iteration 2 evidence
+
+The combined Iteration 2 evidence is stored in [Iteration2_XRStudyWhiteboard_Transcript_and_Results.md](Iteration2_XRStudyWhiteboard_Transcript_and_Results.md). It contains the two recording-backed transcripts (P01 Kai voice recording and P02 Syifa camera recording), the three clearly labelled notes-only in-class sessions (P03 Amy, P04 Serafina, and P05 Safira), participant task matrices, ratings, recording links, and evidence limitations.
+
+The completed [Design Evaluation 2 PDF](../Design%20Evaluation%202%20Testing%20Plan.pdf) and editable [DOCX](../Design%20Evaluation%202%20Testing%20Plan.docx) use a three-page assessed response followed by raw-evidence appendices.
+
 ## At a glance
 
 | Item | Record |
