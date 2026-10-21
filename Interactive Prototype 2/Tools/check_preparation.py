@@ -1,6 +1,8 @@
 """Verify the IP2 preparation bundle without claiming studio or headset completion."""
 from pathlib import Path
 import csv
+import hashlib
+import json
 import unittest
 from zipfile import ZipFile
 
@@ -45,9 +47,33 @@ class IP2PreparationChecks(unittest.TestCase):
     def test_unfinished_requirements_are_explicit(self):
         text = (PACK / 'README.md').read_text()
         for phrase in ('PENDING', 'working-prototype video', 'mandatory studio',
-                       'actual results', 'pre-session'):
+                       'course uploads', 'pre-session'):
             self.assertIn(phrase, text)
         self.assertTrue((PACK / 'Media/Recording Guide.md').is_file())
+
+    def test_provided_video_inventory(self):
+        manifest = json.loads((PACK / 'Media/Video Manifest.json').read_text())
+        self.assertEqual(len(manifest['files']), 2)
+        for record in manifest['files']:
+            video = PACK / 'Media' / record['filename']
+            self.assertEqual(video.stat().st_size, record['bytes'])
+            self.assertGreater(record['duration_seconds'], 330)
+            self.assertEqual(record['video_track_count'], 1)
+            self.assertEqual(record['audio_track_count'], 1)
+
+    def test_code_guide_matches_all_custom_source_files(self):
+        index = json.loads((PACK / 'Code Study/Code Index.json').read_text())
+        guide = (PACK / 'Code Study/Code Study Guide.md').read_text()
+        source = ROOT / 'Whiteboard/Assets/XRStudyWhiteboard'
+        actual = set((source / 'Scripts').rglob('*.cs')) | set((source / 'Editor').glob('*.cs'))
+        self.assertEqual(len(index['scripts']), len(actual))
+        for record in index['scripts']:
+            path = ROOT / record['file']
+            self.assertIn(path, actual)
+            self.assertIn(path.name, guide)
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), record['sha256'])
+        for extension in ('.md', '.docx', '.pdf'):
+            self.assertTrue((PACK / 'Code Study' / ('Code Study Guide' + extension)).is_file())
 
 
 if __name__ == '__main__':

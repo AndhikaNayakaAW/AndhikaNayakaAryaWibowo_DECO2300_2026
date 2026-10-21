@@ -49,6 +49,7 @@ def style_run(run, bold=False, italic=False, size=12):
 
 def clean(text):
     text = text.replace('—', ',').replace('–', '-').replace(';', '.').replace('--','-')
+    text = text.replace('`', '')
     return re.sub(r'_{60,}', '_' * 54, text)
 
 

@@ -1,0 +1,1741 @@
+{
+  "source_commit": "0a57822af2d2708ea2eae36df198a9f8ef67a2e2",
+  "prepared_on": "2026-10-21",
+  "custom_script_count": 34,
+  "scripts": [
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyNavigationValidation.cs",
+      "category": "Editor only",
+      "sha256": "52c66f11c9dd83969802fb7c738098345e24b58b34ada0bf3c74b489c86ff0f8",
+      "methods": [
+        {
+          "name": "ValidateQuestInteractionContract",
+          "line": 15
+        },
+        {
+          "name": "ValidateDesktopSimulatorInputOwnership",
+          "line": 58
+        },
+        {
+          "name": "ValidateControllerSelection",
+          "line": 175
+        },
+        {
+          "name": "ReadAxis",
+          "line": 203
+        },
+        {
+          "name": "ReadVector",
+          "line": 204
+        },
+        {
+          "name": "ValidateCameraAnchorAlignment",
+          "line": 207
+        },
+        {
+          "name": "CreateChild",
+          "line": 281
+        },
+        {
+          "name": "Require",
+          "line": 289
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyNavigationValidation.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyUiValidation.cs",
+      "category": "Editor only",
+      "sha256": "5c60c4093fbca377a9fc1f552fe9cbfb05a97ab917587c0c2d015bf473da3e37",
+      "methods": [
+        {
+          "name": "ValidateStudyControls",
+          "line": 13
+        },
+        {
+          "name": "ValidateSessionIcons",
+          "line": 31
+        },
+        {
+          "name": "ValidateTablePointer",
+          "line": 58
+        },
+        {
+          "name": "HandleTablePointer",
+          "line": 88
+        },
+        {
+          "name": "Require",
+          "line": 93
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyUiValidation.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardEditorStartup.cs",
+      "category": "Editor only",
+      "sha256": "a91654da014431041485456dec18e7167fdca84f737fd6440ca766f9a022f12a",
+      "methods": [
+        {
+          "name": "OpenMainSceneWhenUntitled",
+          "line": 18
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardEditorStartup.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardPlayFocus.cs",
+      "category": "Editor only",
+      "sha256": "88e9459af7b15670abd07356127fc67210bb6e631bba42048b3d29a867a39f27",
+      "methods": [
+        {
+          "name": "OnPlayModeStateChanged",
+          "line": 17
+        },
+        {
+          "name": "FocusGameView",
+          "line": 25
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardPlayFocus.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardSceneBuilder.cs",
+      "category": "Editor only",
+      "sha256": "97f64df0cb698d6221c1bdb7ba0c40fb2beb9bc120e024818e15e97523885f04",
+      "methods": [
+        {
+          "name": "BuildClassroom",
+          "line": 45
+        },
+        {
+          "name": "OpenMainScene",
+          "line": 132
+        },
+        {
+          "name": "EnsureFolders",
+          "line": 143
+        },
+        {
+          "name": "NewObject",
+          "line": 171
+        },
+        {
+          "name": "CreatePrimitive",
+          "line": 180
+        },
+        {
+          "name": "CreateWhiteboard",
+          "line": 196
+        },
+        {
+          "name": "CreateStudentDesk",
+          "line": 236
+        },
+        {
+          "name": "CreateDeskLeg",
+          "line": 248
+        },
+        {
+          "name": "CreateChair",
+          "line": 253
+        },
+        {
+          "name": "CreateTeacherDesk",
+          "line": 261
+        },
+        {
+          "name": "CreateWindow",
+          "line": 271
+        },
+        {
+          "name": "CreateDoor",
+          "line": 278
+        },
+        {
+          "name": "CreateDecorations",
+          "line": 284
+        },
+        {
+          "name": "DisableImportedVisualEffects",
+          "line": 289
+        },
+        {
+          "name": "CreateLighting",
+          "line": 317
+        },
+        {
+          "name": "CreatePointLight",
+          "line": 337
+        },
+        {
+          "name": "CreateXROrigin",
+          "line": 349
+        },
+        {
+          "name": "CreateEditorDeviceSimulator",
+          "line": 400
+        },
+        {
+          "name": "DisableTemplateCallouts",
+          "line": 424
+        },
+        {
+          "name": "CreateHandsPermissions",
+          "line": 432
+        },
+        {
+          "name": "CreateEventSystem",
+          "line": 444
+        },
+        {
+          "name": "CreateWhiteboardUI",
+          "line": 461
+        },
+        {
+          "name": "CreateColourButton",
+          "line": 541
+        },
+        {
+          "name": "CreateToolButton",
+          "line": 565
+        },
+        {
+          "name": "CreateButton",
+          "line": 574
+        },
+        {
+          "name": "CreateButton",
+          "line": 580
+        },
+        {
+          "name": "CreateButton",
+          "line": 586
+        },
+        {
+          "name": "CreateButton",
+          "line": 593
+        },
+        {
+          "name": "CreateButtonInternal",
+          "line": 599
+        },
+        {
+          "name": "CreateText",
+          "line": 625
+        },
+        {
+          "name": "CreateTeleportArea",
+          "line": 646
+        },
+        {
+          "name": "FindDeepChild",
+          "line": 662
+        },
+        {
+          "name": "CreateMaterial",
+          "line": 682
+        },
+        {
+          "name": "Layer",
+          "line": 708
+        },
+        {
+          "name": "EnsureBuildScene",
+          "line": 714
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardSceneBuilder.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardSessionValidation.cs",
+      "category": "Editor only",
+      "sha256": "4ac6a64e410cfee21bdd14b8bf402302a48d18b5bc0e7d45527bac6ea2c7f39b",
+      "methods": [
+        {
+          "name": "ValidateDrawingAndRecording",
+          "line": 12
+        },
+        {
+          "name": "Run",
+          "line": 22
+        },
+        {
+          "name": "ValidateSurfaceCoordinates",
+          "line": 29
+        },
+        {
+          "name": "ValidateStrokeBoundaries",
+          "line": 89
+        },
+        {
+          "name": "ValidateSession",
+          "line": 146
+        },
+        {
+          "name": "Line",
+          "line": 261
+        },
+        {
+          "name": "SetElapsed",
+          "line": 269
+        },
+        {
+          "name": "AdvancePlayback",
+          "line": 274
+        },
+        {
+          "name": "SetField",
+          "line": 280
+        },
+        {
+          "name": "GetField",
+          "line": 285
+        },
+        {
+          "name": "IsWhiteAt",
+          "line": 290
+        },
+        {
+          "name": "PixelsEqual",
+          "line": 297
+        },
+        {
+          "name": "IsBlank",
+          "line": 307
+        },
+        {
+          "name": "Check",
+          "line": 315
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardSessionValidation.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardValidation.cs",
+      "category": "Editor only",
+      "sha256": "80b496b0f031c358a11be32e3aa2610082cd517ee5eb3a624a0a8d34e3a1360f",
+      "methods": [
+        {
+          "name": "ValidateClassroom",
+          "line": 41
+        },
+        {
+          "name": "BuildAndroidPlayerValidation",
+          "line": 88
+        },
+        {
+          "name": "AddDeviceSimulatorForEditorTest",
+          "line": 113
+        },
+        {
+          "name": "LogImportedClassroomGeometry",
+          "line": 154
+        },
+        {
+          "name": "RemoveDeviceSimulatorForEditorTest",
+          "line": 194
+        },
+        {
+          "name": "ValidateScene",
+          "line": 210
+        },
+        {
+          "name": "CheckMissingScripts",
+          "line": 317
+        },
+        {
+          "name": "CheckOpenXRFeature",
+          "line": 333
+        },
+        {
+          "name": "CheckAndroidXrStartup",
+          "line": 348
+        },
+        {
+          "name": "CheckFile",
+          "line": 366
+        },
+        {
+          "name": "CheckReference",
+          "line": 371
+        },
+        {
+          "name": "Check",
+          "line": 378
+        },
+        {
+          "name": "RunDrawingSmokeTests",
+          "line": 388
+        },
+        {
+          "name": "RunTableToolMenuSmokeTests",
+          "line": 453
+        },
+        {
+          "name": "DrawCircle",
+          "line": 529
+        },
+        {
+          "name": "DrawCircle",
+          "line": 539
+        },
+        {
+          "name": "DrawLine",
+          "line": 549
+        },
+        {
+          "name": "DrawLine",
+          "line": 558
+        },
+        {
+          "name": "CreateLinePoints",
+          "line": 567
+        },
+        {
+          "name": "CirclePoint",
+          "line": 576
+        },
+        {
+          "name": "HasContinuousPath",
+          "line": 582
+        },
+        {
+          "name": "HasContinuousPath",
+          "line": 594
+        },
+        {
+          "name": "HasInkOnlyInCorridor",
+          "line": 627
+        },
+        {
+          "name": "IsTextureBlank",
+          "line": 653
+        },
+        {
+          "name": "InvokePrivate",
+          "line": 674
+        },
+        {
+          "name": "FindSceneObject",
+          "line": 707
+        },
+        {
+          "name": "GetRelativePath",
+          "line": 719
+        },
+        {
+          "name": "LogTableMeshComponents",
+          "line": 735
+        },
+        {
+          "name": "TransformTriangleBounds",
+          "line": 789
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Editor/XRStudyWhiteboardValidation.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Core/ClassroomAssetRuntimeSetup.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "e9b3fe82a290de7d0883c6a4b06bb16ee8012b08346230840fddccb156063579",
+      "methods": [
+        {
+          "name": "SetReferences",
+          "line": 25
+        },
+        {
+          "name": "Start",
+          "line": 31
+        },
+        {
+          "name": "DisableImportedLightingEffects",
+          "line": 60
+        },
+        {
+          "name": "IsImportedVisualEffectName",
+          "line": 85
+        },
+        {
+          "name": "DisableGeneratedEnvironment",
+          "line": 97
+        },
+        {
+          "name": "FitClassroomToRoom",
+          "line": 122
+        },
+        {
+          "name": "PlaceInteractiveWhiteboard",
+          "line": 141
+        },
+        {
+          "name": "ApplyWhiteboardUiLayout",
+          "line": 245
+        },
+        {
+          "name": "DisableOriginalBoard",
+          "line": 253
+        },
+        {
+          "name": "CreateStudentStationery",
+          "line": 271
+        },
+        {
+          "name": "FindTabletopBounds",
+          "line": 335
+        },
+        {
+          "name": "TransformTriangleBounds",
+          "line": 409
+        },
+        {
+          "name": "FindDeskObjects",
+          "line": 417
+        },
+        {
+          "name": "TryGetCombinedBounds",
+          "line": 434
+        },
+        {
+          "name": "CreateStationerySet",
+          "line": 457
+        },
+        {
+          "name": "ConfigurePaperForWriting",
+          "line": 486
+        },
+        {
+          "name": "CreatePrimitive",
+          "line": 508
+        },
+        {
+          "name": "AddGrabbable",
+          "line": 521
+        },
+        {
+          "name": "CreateRuntimeMaterial",
+          "line": 531
+        },
+        {
+          "name": "FindOriginalBoard",
+          "line": 544
+        },
+        {
+          "name": "IsImportedBoardTransform",
+          "line": 555
+        },
+        {
+          "name": "TryGetBounds",
+          "line": 571
+        },
+        {
+          "name": "TryGetDeskTopHeight",
+          "line": 596
+        },
+        {
+          "name": "FindChild",
+          "line": 622
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Core/ClassroomAssetRuntimeSetup.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Core/XRStudyWhiteboardManager.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "bd33be757ab0427e2bbb85b27ca2dc438736e42ae38262087a2fded36bef6df9",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 42
+        },
+        {
+          "name": "SetTool",
+          "line": 54
+        },
+        {
+          "name": "SetColour",
+          "line": 64
+        },
+        {
+          "name": "GetCurrentInkColour",
+          "line": 75
+        },
+        {
+          "name": "GetColour",
+          "line": 80
+        },
+        {
+          "name": "RequestClear",
+          "line": 95
+        },
+        {
+          "name": "ConfirmClear",
+          "line": 108
+        },
+        {
+          "name": "CancelClear",
+          "line": 122
+        },
+        {
+          "name": "SetReferences",
+          "line": 128
+        },
+        {
+          "name": "EnsureRecorder",
+          "line": 141
+        },
+        {
+          "name": "ApplyPlaybackSelection",
+          "line": 152
+        },
+        {
+          "name": "RefreshState",
+          "line": 159
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Core/XRStudyWhiteboardManager.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Hands/HandToolSwitchGesture.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "fed8fadb4eb0cf052d1deae8e693c2bd765c2a89c7e465e8e98e2d3fd896c7aa",
+      "methods": [],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Hands/HandToolSwitchGesture.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Hands/HandWhiteboardInteractor.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "01c4bf6d71af807846d5f6deb37d11e1760dc6149f89163e68c8aec2a60f6953",
+      "methods": [
+        {
+          "name": "OnEnable",
+          "line": 25
+        },
+        {
+          "name": "SetReferences",
+          "line": 30
+        },
+        {
+          "name": "Update",
+          "line": 36
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Hands/HandWhiteboardInteractor.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Recording/WhiteboardRecordingSession.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "8a25d160f22f606fbf848b2458a7c31596f5f03464b091f273f01e07c285035d",
+      "methods": [],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Recording/WhiteboardRecordingSession.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Recording/WhiteboardSessionRecorder.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "3459a9771c0db79eebe49cbb3a420fca7e91cc2c9d538393bba9cdb65d533008",
+      "methods": [
+        {
+          "name": "Configure",
+          "line": 35
+        },
+        {
+          "name": "StartRecording",
+          "line": 48
+        },
+        {
+          "name": "Stop",
+          "line": 73
+        },
+        {
+          "name": "Play",
+          "line": 97
+        },
+        {
+          "name": "Update",
+          "line": 114
+        },
+        {
+          "name": "ApplyEventsThrough",
+          "line": 125
+        },
+        {
+          "name": "OnDrawingEvent",
+          "line": 142
+        },
+        {
+          "name": "OnToolStateChanged",
+          "line": 162
+        },
+        {
+          "name": "AddSelectionEvent",
+          "line": 174
+        },
+        {
+          "name": "OnDisable",
+          "line": 186
+        },
+        {
+          "name": "OnDestroy",
+          "line": 191
+        },
+        {
+          "name": "Unsubscribe",
+          "line": 196
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Recording/WhiteboardSessionRecorder.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/ClearBoardConfirmation.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "a01fd6381766640bf225b0ae8f2a50e840b0044c6dbaac9f08639377a1e85134",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 15
+        },
+        {
+          "name": "Initialize",
+          "line": 21
+        },
+        {
+          "name": "BindListeners",
+          "line": 29
+        },
+        {
+          "name": "Show",
+          "line": 42
+        },
+        {
+          "name": "Hide",
+          "line": 47
+        },
+        {
+          "name": "Cancel",
+          "line": 52
+        },
+        {
+          "name": "Confirm",
+          "line": 60
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/ClearBoardConfirmation.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/StudySessionIcon.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "5ed48f68fc7248258d84fa14c71504226ec46d6662a5dc983bb87270a4890b81",
+      "methods": [
+        {
+          "name": "SetKind",
+          "line": 13
+        },
+        {
+          "name": "OnPopulateMesh",
+          "line": 19
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/StudySessionIcon.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/StudyTableToolMenu.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "e4d0fe7a7287988ed573a580d2ecb169edf3d3e4034fddd5a726b4d0a110fb75",
+      "methods": [
+        {
+          "name": "TryHandleDesktopScreenPoint",
+          "line": 27
+        },
+        {
+          "name": "EndDesktopPointer",
+          "line": 34
+        },
+        {
+          "name": "TryHandleAnyRay",
+          "line": 45
+        },
+        {
+          "name": "ContainsAnyRay",
+          "line": 51
+        },
+        {
+          "name": "TryHandleAnyRayInternal",
+          "line": 67
+        },
+        {
+          "name": "Initialize",
+          "line": 84
+        },
+        {
+          "name": "Initialize",
+          "line": 90
+        },
+        {
+          "name": "Initialize",
+          "line": 96
+        },
+        {
+          "name": "OnEnable",
+          "line": 104
+        },
+        {
+          "name": "OnDisable",
+          "line": 111
+        },
+        {
+          "name": "BuildMenu",
+          "line": 118
+        },
+        {
+          "name": "LateUpdate",
+          "line": 156
+        },
+        {
+          "name": "TryHandleRay",
+          "line": 193
+        },
+        {
+          "name": "SetPointerFeedback",
+          "line": 226
+        },
+        {
+          "name": "SelectTool",
+          "line": 248
+        },
+        {
+          "name": "ClearPaper",
+          "line": 254
+        },
+        {
+          "name": "RefreshSelection",
+          "line": 261
+        },
+        {
+          "name": "RefreshToolButton",
+          "line": 269
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/StudyTableToolMenu.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/StudyUiStyle.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "887d66eb7878c24aa551cf3d23f49a4e7a7195b0eb6722195e958e2ff90ce116",
+      "methods": [
+        {
+          "name": "CreatePanel",
+          "line": 20
+        },
+        {
+          "name": "SetRect",
+          "line": 29
+        },
+        {
+          "name": "StyleSurface",
+          "line": 40
+        },
+        {
+          "name": "CreateButton",
+          "line": 60
+        },
+        {
+          "name": "StyleButton",
+          "line": 71
+        },
+        {
+          "name": "CreateText",
+          "line": 98
+        },
+        {
+          "name": "StyleText",
+          "line": 108
+        },
+        {
+          "name": "RoundedSprite",
+          "line": 126
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/StudyUiStyle.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/VRControllerGuide.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "f39789848a07dc872b3205075108da1398d69cc5cbc0397e5177512d23e1a04f",
+      "methods": [
+        {
+          "name": "Initialize",
+          "line": 22
+        },
+        {
+          "name": "Start",
+          "line": 29
+        },
+        {
+          "name": "Build",
+          "line": 36
+        },
+        {
+          "name": "Update",
+          "line": 103
+        },
+        {
+          "name": "ShowGuide",
+          "line": 123
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/VRControllerGuide.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardClearButton.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "32dbbd36c17df8e27962ba7b3d4168e33785188366f470f0747302bac1b2a3b3",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 12
+        },
+        {
+          "name": "Initialize",
+          "line": 19
+        },
+        {
+          "name": "RequestClear",
+          "line": 24
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardClearButton.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardColourButton.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "2f85ea99ce9b0eb06ddf1655d32f2b3cf7591e8fed502ff5f34d61091984415e",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 16
+        },
+        {
+          "name": "OnDestroy",
+          "line": 28
+        },
+        {
+          "name": "Initialize",
+          "line": 34
+        },
+        {
+          "name": "SelectColour",
+          "line": 42
+        },
+        {
+          "name": "Refresh",
+          "line": 48
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardColourButton.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardControlPanel.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "4d333f904042dad0869d4abe85300012845f3feb5bf00d7e24cd0b6302f97d47",
+      "methods": [
+        {
+          "name": "Initialize",
+          "line": 22
+        },
+        {
+          "name": "Update",
+          "line": 104
+        },
+        {
+          "name": "OnDestroy",
+          "line": 115
+        },
+        {
+          "name": "RecordOrStop",
+          "line": 123
+        },
+        {
+          "name": "Play",
+          "line": 132
+        },
+        {
+          "name": "RefreshSession",
+          "line": 138
+        },
+        {
+          "name": "RefreshSelection",
+          "line": 174
+        },
+        {
+          "name": "TimeLabel",
+          "line": 195
+        },
+        {
+          "name": "Text",
+          "line": 201
+        },
+        {
+          "name": "LayoutButton",
+          "line": 209
+        },
+        {
+          "name": "AddSessionIcon",
+          "line": 218
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardControlPanel.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardStatusDisplay.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "46170703f1ff9ec5c9998fb8f1498664af14df674798482a992bacb2408794cc",
+      "methods": [
+        {
+          "name": "Initialize",
+          "line": 15
+        },
+        {
+          "name": "InitializeCompact",
+          "line": 23
+        },
+        {
+          "name": "Refresh",
+          "line": 30
+        },
+        {
+          "name": "SetDrawingState",
+          "line": 50
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardStatusDisplay.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardToolButton.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "da7fe834b44940dd4a54cbdb5f61cd3d8737d4f0ed5e77aa56ee631528aa0c8a",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 15
+        },
+        {
+          "name": "OnDestroy",
+          "line": 27
+        },
+        {
+          "name": "Initialize",
+          "line": 33
+        },
+        {
+          "name": "SelectTool",
+          "line": 40
+        },
+        {
+          "name": "Refresh",
+          "line": 46
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/WhiteboardToolButton.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/XRUIInputSetup.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "54946cff0da660dd07fd9eac21b3900b0cc8ea8e21a3cb9e36b3914625326384",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 17
+        },
+        {
+          "name": "Initialize",
+          "line": 40
+        },
+        {
+          "name": "Reference",
+          "line": 46
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/UI/XRUIInputSetup.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/PaperNoteCanvas.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "c15ced6f82b07ab0feb860b1165800afb32c1784d92166c59e4bfda3c41a68ca",
+      "methods": [
+        {
+          "name": "Configure",
+          "line": 51
+        },
+        {
+          "name": "ConfigureWritingSizes",
+          "line": 60
+        },
+        {
+          "name": "OnEnable",
+          "line": 66
+        },
+        {
+          "name": "OnDisable",
+          "line": 73
+        },
+        {
+          "name": "OnToolSelectionChanged",
+          "line": 80
+        },
+        {
+          "name": "Awake",
+          "line": 85
+        },
+        {
+          "name": "OnDestroy",
+          "line": 96
+        },
+        {
+          "name": "DestroyOwned",
+          "line": 104
+        },
+        {
+          "name": "LateUpdate",
+          "line": 111
+        },
+        {
+          "name": "InitializeSurface",
+          "line": 117
+        },
+        {
+          "name": "TryGetUV",
+          "line": 140
+        },
+        {
+          "name": "DrawAtUV",
+          "line": 145
+        },
+        {
+          "name": "DrawAtUV",
+          "line": 150
+        },
+        {
+          "name": "TryReacquireSurface",
+          "line": 229
+        },
+        {
+          "name": "UpdateCursor",
+          "line": 254
+        },
+        {
+          "name": "EndStroke",
+          "line": 281
+        },
+        {
+          "name": "ClearNote",
+          "line": 289
+        },
+        {
+          "name": "TryGetNearest",
+          "line": 298
+        },
+        {
+          "name": "TryGetPaperIntersection",
+          "line": 328
+        },
+        {
+          "name": "Stamp",
+          "line": 375
+        },
+        {
+          "name": "StampSegment",
+          "line": 419
+        },
+        {
+          "name": "FilterInputPoint",
+          "line": 479
+        },
+        {
+          "name": "CloseStrokeToLatestInput",
+          "line": 503
+        },
+        {
+          "name": "Median",
+          "line": 538
+        },
+        {
+          "name": "EnsureCrosshair",
+          "line": 543
+        },
+        {
+          "name": "EnsureWritingSurface",
+          "line": 559
+        },
+        {
+          "name": "CreateCrosshairBar",
+          "line": 620
+        },
+        {
+          "name": "Fill",
+          "line": 652
+        },
+        {
+          "name": "SetCrosshairBarScale",
+          "line": 659
+        },
+        {
+          "name": "ApplyTexture",
+          "line": 672
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/PaperNoteCanvas.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/PaperTool.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "e4b0ed6835a6e879c7df77520930334e2c259bd0f625ad9011acbc06d2a55e8f",
+      "methods": [
+        {
+          "name": "Select",
+          "line": 48
+        },
+        {
+          "name": "HasHeldTool",
+          "line": 62
+        },
+        {
+          "name": "Initialize",
+          "line": 80
+        },
+        {
+          "name": "OnEnable",
+          "line": 87
+        },
+        {
+          "name": "OnDisable",
+          "line": 94
+        },
+        {
+          "name": "Subscribe",
+          "line": 101
+        },
+        {
+          "name": "Unsubscribe",
+          "line": 114
+        },
+        {
+          "name": "OnSelectEntered",
+          "line": 123
+        },
+        {
+          "name": "OnSelectExited",
+          "line": 128
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/PaperTool.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/WhiteboardCanvas.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "1fc64a78e5a0d5cc584f808885461a143bac528bcf961de268530b0faa5dfad6",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 60
+        },
+        {
+          "name": "OnDestroy",
+          "line": 65
+        },
+        {
+          "name": "DestroyOwned",
+          "line": 73
+        },
+        {
+          "name": "LateUpdate",
+          "line": 80
+        },
+        {
+          "name": "SetManager",
+          "line": 89
+        },
+        {
+          "name": "ConfigureBoardWorldSize",
+          "line": 94
+        },
+        {
+          "name": "InitializeSurface",
+          "line": 99
+        },
+        {
+          "name": "TryGetUV",
+          "line": 143
+        },
+        {
+          "name": "BeginStroke",
+          "line": 200
+        },
+        {
+          "name": "ContinueStroke",
+          "line": 213
+        },
+        {
+          "name": "ContinueStroke",
+          "line": 218
+        },
+        {
+          "name": "EndStroke",
+          "line": 284
+        },
+        {
+          "name": "ClearBoard",
+          "line": 297
+        },
+        {
+          "name": "CapturePixels",
+          "line": 309
+        },
+        {
+          "name": "RestorePixels",
+          "line": 315
+        },
+        {
+          "name": "ApplyPlaybackEvent",
+          "line": 329
+        },
+        {
+          "name": "UpdateCursor",
+          "line": 358
+        },
+        {
+          "name": "GetFrontSurfaceLocalZ",
+          "line": 400
+        },
+        {
+          "name": "DrawPoint",
+          "line": 411
+        },
+        {
+          "name": "TryReacquireSurface",
+          "line": 423
+        },
+        {
+          "name": "FilterInputPoint",
+          "line": 448
+        },
+        {
+          "name": "CloseStrokeToLatestInput",
+          "line": 475
+        },
+        {
+          "name": "Median",
+          "line": 512
+        },
+        {
+          "name": "Stamp",
+          "line": 517
+        },
+        {
+          "name": "StampSegment",
+          "line": 577
+        },
+        {
+          "name": "BlendPixel",
+          "line": 623
+        },
+        {
+          "name": "EnsureCrosshair",
+          "line": 645
+        },
+        {
+          "name": "CreateCrosshairBar",
+          "line": 665
+        },
+        {
+          "name": "SetCrosshairBarScale",
+          "line": 697
+        },
+        {
+          "name": "Fill",
+          "line": 710
+        },
+        {
+          "name": "ApplyTexture",
+          "line": 717
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/WhiteboardCanvas.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/WhiteboardDrawer.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "fbe4b18778bafecf9f854ebca1316bb9d4ddb457ddea88b12f7b2a043a4dc7ee",
+      "methods": [
+        {
+          "name": "SetReferences",
+          "line": 15
+        },
+        {
+          "name": "DrawAtUV",
+          "line": 21
+        },
+        {
+          "name": "DrawAtUV",
+          "line": 26
+        },
+        {
+          "name": "OnDisable",
+          "line": 48
+        },
+        {
+          "name": "EndStroke",
+          "line": 53
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/Whiteboard/WhiteboardDrawer.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/ControllerHaptics.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "c82d4d7499a92950c3befc03658893f78ac44636757609402fafe2ac3ae11af4",
+      "methods": [
+        {
+          "name": "PulseRightController",
+          "line": 7
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/ControllerHaptics.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/DesktopSimulatorInputOwnership.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "3ef86420db33e86e8f4f6facb2a5686ddccb33d5a413655e4e6f8b72dd106480",
+      "methods": [
+        {
+          "name": "SetExplicitControllerMode",
+          "line": 60
+        },
+        {
+          "name": "GatedMouse",
+          "line": 67
+        },
+        {
+          "name": "Dispose",
+          "line": 76
+        },
+        {
+          "name": "DestroyOwned",
+          "line": 94
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/DesktopSimulatorInputOwnership.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/SeatAnchor.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "1d841df5ad41449cc7828cf50f783558ea33b71c16fac0dffe341202c387d5c1",
+      "methods": [
+        {
+          "name": "FindOrCreate",
+          "line": 14
+        },
+        {
+          "name": "OnDrawGizmosSelected",
+          "line": 38
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/SeatAnchor.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/StudyTableTeleportPoint.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "34e9b8b9bd2de161d680c2baa9831fc2f356ce1ed9a759f991cb7390108a19d2",
+      "methods": [
+        {
+          "name": "Initialize",
+          "line": 24
+        },
+        {
+          "name": "Initialize",
+          "line": 32
+        },
+        {
+          "name": "OnEnable",
+          "line": 51
+        },
+        {
+          "name": "OnDisable",
+          "line": 57
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/StudyTableTeleportPoint.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/XRStudyRoomLocomotion.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "f8149cb7c9076effdfc724bfd4d5461b59c3c55b84653aacc75baf6d9ad8d3b7",
+      "methods": [
+        {
+          "name": "SetOrigin",
+          "line": 100
+        },
+        {
+          "name": "Awake",
+          "line": 106
+        },
+        {
+          "name": "Update",
+          "line": 187
+        },
+        {
+          "name": "Start",
+          "line": 202
+        },
+        {
+          "name": "EnsureNavigationAnchors",
+          "line": 207
+        },
+        {
+          "name": "LateUpdate",
+          "line": 224
+        },
+        {
+          "name": "HandleDesktopInput",
+          "line": 256
+        },
+        {
+          "name": "HandleDesktopTeleportShortcuts",
+          "line": 337
+        },
+        {
+          "name": "RefreshTablePoints",
+          "line": 363
+        },
+        {
+          "name": "TryTeleportToTable",
+          "line": 381
+        },
+        {
+          "name": "GetTableViewPitch",
+          "line": 397
+        },
+        {
+          "name": "TeleportDesktop",
+          "line": 404
+        },
+        {
+          "name": "NavigateToTable",
+          "line": 411
+        },
+        {
+          "name": "NavigateToWhiteboard",
+          "line": 416
+        },
+        {
+          "name": "CalculateWhiteboardCameraPosition",
+          "line": 439
+        },
+        {
+          "name": "NavigateToAnchor",
+          "line": 454
+        },
+        {
+          "name": "NavigateToCameraPose",
+          "line": 460
+        },
+        {
+          "name": "AlignCameraToPose",
+          "line": 480
+        },
+        {
+          "name": "StandFromSeat",
+          "line": 500
+        },
+        {
+          "name": "HandleXRInput",
+          "line": 515
+        },
+        {
+          "name": "HandleQuestNavigationButtons",
+          "line": 543
+        },
+        {
+          "name": "NavigateToNextTable",
+          "line": 559
+        },
+        {
+          "name": "ReadButton",
+          "line": 570
+        },
+        {
+          "name": "MoveInViewDirection",
+          "line": 575
+        },
+        {
+          "name": "Turn",
+          "line": 597
+        },
+        {
+          "name": "ResetView",
+          "line": 605
+        },
+        {
+          "name": "ForceDesktopStartView",
+          "line": 611
+        },
+        {
+          "name": "FindCamera",
+          "line": 622
+        },
+        {
+          "name": "SetDesktopCameraOffset",
+          "line": 632
+        },
+        {
+          "name": "ConfigureDesktopSimulatorInput",
+          "line": 658
+        },
+        {
+          "name": "OnDestroy",
+          "line": 663
+        },
+        {
+          "name": "SelectDesktopController",
+          "line": 669
+        },
+        {
+          "name": "SelectBothControllersSimulator",
+          "line": 696
+        },
+        {
+          "name": "DetermineDesktopMode",
+          "line": 725
+        },
+        {
+          "name": "FindChild",
+          "line": 739
+        },
+        {
+          "name": "FindChildContaining",
+          "line": 756
+        },
+        {
+          "name": "FindSceneChildContaining",
+          "line": 773
+        },
+        {
+          "name": "OnGUI",
+          "line": 790
+        },
+        {
+          "name": "IsNavigationPointerInside",
+          "line": 945
+        },
+        {
+          "name": "CenterView",
+          "line": 972
+        },
+        {
+          "name": "ResetSimulatorControllers",
+          "line": 979
+        },
+        {
+          "name": "ClearSimulatorResetFlags",
+          "line": 1008
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/XRStudyRoomLocomotion.cs"
+    },
+    {
+      "file": "Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/XRWhiteboardInteractor.cs",
+      "category": "Runtime or optional runtime",
+      "sha256": "c2c4657d9819a79625857d8014c2ba2716d1f84dd7e2e4413afcd91ade2ce113",
+      "methods": [
+        {
+          "name": "Awake",
+          "line": 64
+        },
+        {
+          "name": "RestrictToolUiToRightController",
+          "line": 77
+        },
+        {
+          "name": "SetReferences",
+          "line": 99
+        },
+        {
+          "name": "ConfigureInputActions",
+          "line": 107
+        },
+        {
+          "name": "ResolveControllerTriggerAction",
+          "line": 113
+        },
+        {
+          "name": "LateUpdate",
+          "line": 158
+        },
+        {
+          "name": "SmoothDesktopPoint",
+          "line": 382
+        },
+        {
+          "name": "OnGUI",
+          "line": 416
+        },
+        {
+          "name": "EndDrawing",
+          "line": 510
+        },
+        {
+          "name": "GetDesktopScreenRay",
+          "line": 522
+        },
+        {
+          "name": "ResolveDesktopUiRaycaster",
+          "line": 529
+        },
+        {
+          "name": "ResolveXrRayOrigin",
+          "line": 567
+        },
+        {
+          "name": "TryHandleWhiteboardUiRay",
+          "line": 594
+        },
+        {
+          "name": "TryDispatchDesktopUiClick",
+          "line": 653
+        },
+        {
+          "name": "IsDesktopPointerOverUi",
+          "line": 764
+        },
+        {
+          "name": "IsScreenPointInside",
+          "line": 782
+        },
+        {
+          "name": "GetGameplayCamera",
+          "line": 805
+        },
+        {
+          "name": "IsEligibleProjectButton",
+          "line": 817
+        },
+        {
+          "name": "UpdateDesktopButtonFeedback",
+          "line": 829
+        },
+        {
+          "name": "OnDisable",
+          "line": 848
+        },
+        {
+          "name": "IsProjectWorldCanvas",
+          "line": 857
+        },
+        {
+          "name": "TryGetControllerInput",
+          "line": 866
+        }
+      ],
+      "github_url": "https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/0a57822af2d2708ea2eae36df198a9f8ef67a2e2/Whiteboard/Assets/XRStudyWhiteboard/Scripts/XR/XRWhiteboardInteractor.cs"
+    }
+  ]
+}

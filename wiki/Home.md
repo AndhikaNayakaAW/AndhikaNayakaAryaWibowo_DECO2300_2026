@@ -14,7 +14,9 @@ XR Study Whiteboard is a Unity VR classroom prototype for following a shared tea
 
 All five participants completed the recorded task categories in moderated headset sessions. All six rating measures were 5/5 for every participant. Two sessions were recorded and three have observation notes only. The results support the classroom interaction, while independent first use and educational benefit remain uncertain.
 
-Those existing records do not automatically establish attendance at the upcoming mandatory studio. The package includes blank results forms. Fresh headset verification, a working-prototype video, mandatory attendance, actual session outcomes, and Blackboard uploads remain pending.
+The student confirms that existing testing used the latest APK and has now supplied Syifa's original MOV. The local package contains that video and a 1080p MP4 copy. Sampled frames show headset/controller use and the running classroom. Attendance at the upcoming mandatory studio and course uploads remain separate pending steps. Blank forms are available for any additional observations.
+
+- [Detailed code study guide](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Code%20Study/Code%20Study%20Guide.pdf)
 
 ## Controller guide
 

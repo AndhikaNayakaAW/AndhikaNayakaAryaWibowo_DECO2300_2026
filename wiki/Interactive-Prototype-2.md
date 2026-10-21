@@ -18,13 +18,17 @@ The local folder contains the existing Quest APK, a portable tracked-source Unit
 
 The APK and large source archive exist locally and are excluded from Git. The full tracked Unity project is already on GitHub. The package README explains where the local submission binaries are located and how to open the project.
 
+Syifa's original 5-minute-38-second recording is now supplied locally, together with a 1080p MP4. Eight sampled frames show physical headset/controller use and the running classroom. The large videos remain local rather than being uploaded to GitHub. [Video evidence notes](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Media/Video%20Evidence.md) record review scope and submission access steps.
+
+The [Code Study Guide PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Code%20Study/Code%20Study%20Guide.pdf) explains all 34 custom C# scripts, file locations, key methods, input-to-drawing flow, paper, colour, navigation, replay, editor tests, and reused XR infrastructure.
+
 ## Pending
 
-- Complete a fresh physical-headset check.
-- Record and review the working-prototype video.
+- Briefly check the known working APK before the studio.
+- Check full video playback and marker access to its uploaded file or link.
 - Upload the plan before the first studio.
 - Attend the mandatory in-person studio.
-- Obtain consent and collect actual observations and ratings.
+- Obtain consent and record any additional testing requested during the studio. Existing participant testing is already completed evidence.
 - Verify the earlier evidence date and update the evaluation from the assessed session.
 - Submit source, video, plan, journal, and outcomes by the end of the session.
 

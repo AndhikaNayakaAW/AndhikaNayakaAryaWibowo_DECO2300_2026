@@ -2,4 +2,9 @@
 !Builds/
 Builds/*.apk
 Source Code/*.zip
+Media/*.MOV
+Media/*.mov
+Media/*.mp4
+Media/*.m4v
+Media/*.webm
 Tools/__pycache__/

@@ -1,6 +1,6 @@
 # Design Evaluation 3 and Reflection
 
-The report analyses the existing five-person headset dataset and reflects on the XR prototyping process. It has moved into the Interactive Prototype 2 preparation package. It is currently a draft pending confirmation of session dates and the actual assessed Week 12 outcomes. Earlier messages identified the records as final IP2b, while the mandatory studio is now described as upcoming. These are not five additional sessions.
+The report analyses the existing five-person headset dataset and reflects on the XR prototyping process. It has moved into the Interactive Prototype 2 package. The student confirms that testing was completed with the latest APK and has now supplied Syifa's actual camera recording. Keep the actual session dates separate from attendance at the upcoming mandatory studio. These are not five additional sessions, and blank forms do not require the earlier tests to be repeated.
 
 ## Submission files
 
@@ -11,7 +11,7 @@ The report analyses the existing five-person headset dataset and reflects on the
 
 The PDF uses A4, Times New Roman, black text, and APA 7 student-paper formatting. Page 1 is the title page. Pages 2 to 4 contain the assessed results and evaluation. Page 5 is the final reflection. Raw participant evidence begins on page 6.
 
-The [prospective testing plan and blank result sheets](Interactive-Prototype-2) are separate from this completed-results draft. Update the report after the actual studio. Its existing language does not establish attendance or a Blackboard upload.
+The [prospective testing plan and blank result sheets](Interactive-Prototype-2) support any additional studio testing. Update the report if the session adds relevant observations. Completed participant testing does not establish mandatory attendance or a Blackboard upload.
 
 ## Results
 

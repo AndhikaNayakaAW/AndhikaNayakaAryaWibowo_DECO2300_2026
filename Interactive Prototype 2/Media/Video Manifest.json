@@ -1,0 +1,31 @@
+{
+  "prepared_on": "2026-10-21",
+  "participant": "P02 Syifa",
+  "status": "Provided existing test recording. Copied and sampled, not newly recorded.",
+  "review_scope": "Container metadata and eight decoded frames across the recording. Full audio intelligibility and every action have not been independently verified.",
+  "observed_content": "Participant wearing a VR headset, using physical controllers, and classroom/board interaction visible on the laptop.",
+  "files": [
+    {
+      "audio_track_count": 1,
+      "display_height": 2160,
+      "display_width": 3840,
+      "duration_seconds": 337.8233333333333,
+      "frame_rate": 23.997751235961914,
+      "video_track_count": 1,
+      "filename": "Interview Participant 2 - XR Study Whiteboard Iteration 2.MOV",
+      "bytes": 850391430,
+      "sha256": "8108997dedaba2aa31ec46453f116405f397f6e873edbcc6fcb10d97ddb92c3c"
+    },
+    {
+      "audio_track_count": 1,
+      "display_height": 1080,
+      "display_width": 1920,
+      "duration_seconds": 337.8233333333333,
+      "frame_rate": 23.99774932861328,
+      "video_track_count": 1,
+      "filename": "Syifa XR Study Whiteboard Testing 1080p.mp4",
+      "bytes": 408906373,
+      "sha256": "dd9ea860b952a5aac394b7a53663a63752dd67b5901c5795bf0a9310cf47636c"
+    }
+  ]
+}

@@ -15,7 +15,7 @@
 | **Course** | DECO2300 – Digital Prototyping and Extended Reality |
 | **Student** | Andhika Nayaka Arya Wibowo |
 | **Concept** | XR Study Whiteboard |
-| **Current preparation** | IP2b package prepared for the mandatory 22 or 23 October studio. Existing five-person analysis is retained as a draft pending session provenance and actual assessed outcomes. |
+| **Current preparation** | IP2b package includes completed participant records, Syifa's supplied video, source, APK, plan, journal, and code study guide. Mandatory studio attendance and course uploads remain pending. |
 | **Testing methods** | Wizard-of-Oz, think aloud, and task-based user testing |
 
 The XR Study Whiteboard gives students a virtual study space with a shared teaching board and personal desk paper. The current evaluated interaction uses a headset and two physical controllers. Gesture interaction was explored in the earlier paper prototype and remains a separate development path.
@@ -26,6 +26,8 @@ The XR Study Whiteboard gives students a virtual study space with a shared teach
 - [New prospective testing plan](Interactive%20Prototype%202/Testing/Testing%20Plan.pdf)
 - [Participant record form](Interactive%20Prototype%202/Testing/Participant%20Record.pdf)
 - [Design journal](Interactive%20Prototype%202/Design%20Journal/Design%20Journal.pdf)
+- [Code study guide with all 34 custom scripts](Interactive%20Prototype%202/Code%20Study/Code%20Study%20Guide.pdf)
+- [Syifa video evidence and local filenames](Interactive%20Prototype%202/Media/Video%20Evidence.md)
 - [Week 2 — Paper demo, testing results, and reflection](DesignProcess/Week02_PaperPrototype/README.md)
 - [Design Evaluation 1](Design%20Evaluation/Design%20Evaluation%201%20Filled%20Out.pdf)
 - [Design Evaluation 2](Design%20Evaluation/Design%20Evaluation%202%20Testing%20Plan.pdf)
@@ -55,11 +57,11 @@ The original paper-prototyping process is preserved under `DesignProcess/`. Star
 
 ## Key outcome
 
-The existing Iteration 2 records describe five headset-and-controller sessions. All five completed the eight recorded task categories, and all six post-test measures were rated 5/5 by every participant. Kai has a voice recording, Syifa has a camera recording, and Amy, Serafina, and Safira have observation notes only. The mandatory Week 12 studio is now described as upcoming. Verify the date and assessed context of these records before treating them as its final outcomes. New collection templates are blank.
+The existing Iteration 2 records describe five headset-and-controller sessions completed using the latest APK, as confirmed by the student. All five completed the eight recorded task categories, and all six post-test measures were rated 5/5 by every participant. Kai has voice evidence, Syifa has camera evidence, and Amy, Serafina, and Safira have notes only. Syifa's original MOV and a 1080p MP4 copy are stored locally in the preparation package. Keep the actual testing dates separate from the upcoming mandatory studio. Additional collection templates are blank.
 
 Completion was achieved in moderated sessions. Syifa's transcript includes prompts and a repeated recording exercise, so the findings do not establish independent first-attempt success. Exact discovery time and stroke defect counts were not logged. The classroom workflow is supported, while improved learning, sustained attention, long-session comfort, hand tracking, and simulator controls remain untested by this participant dataset.
 
-The evaluation draft supports the shared seated view, fixed paper, and separate controller roles. It proposes a short practice activity, clearer recording states, note saving, and an exploratory passthrough AR comparison. These are future design directions rather than newly implemented or validated features. The working-prototype video, fresh headset check, mandatory attendance, actual outcomes, and Blackboard uploads remain pending.
+The evaluation supports the shared seated view, fixed paper, and separate controller roles. It proposes a short practice activity, clearer recording states, note saving, and an exploratory passthrough AR comparison. These are future design directions rather than newly implemented or validated features. Existing testing and a working-prototype recording are provided. Marker access to the media, mandatory attendance, and Blackboard uploads still need confirmation. A brief pre-studio check of the known working build is recommended.
 
 ## Design Evaluation 1 user testing
 
