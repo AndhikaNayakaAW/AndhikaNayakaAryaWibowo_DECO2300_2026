@@ -12,8 +12,9 @@ from docx import Document
 import pymupdf
 
 
-ROOT = Path(__file__).resolve().parents[2]
-FOLDER = ROOT / 'Interactive Prototype 2' / 'Evaluation'
+ROOT = Path(__file__).resolve().parents[3]
+FOLDER = ROOT / 'Working Files' / 'Interactive Prototype 2' / 'Evaluation'
+PDF_FOLDER = ROOT / 'Interactive Prototype 2' / 'Evaluation'
 STEM = 'Design Evaluation 3 and Reflection'
 
 
@@ -46,7 +47,7 @@ class Evaluation3Checks(unittest.TestCase):
                 self.assertEqual(str(run.font.color.rgb), '000000')
 
     def test_assessed_page_budget(self):
-        with pymupdf.open(FOLDER / f'{STEM}.pdf') as pdf:
+        with pymupdf.open(PDF_FOLDER / f'{STEM}.pdf') as pdf:
             pages = [p.get_text() for p in pdf]
         self.assertIn('Objective and Validation Metrics', pages[1])
         self.assertIn('Analysis and Insights', pages[2])
@@ -58,7 +59,7 @@ class Evaluation3Checks(unittest.TestCase):
             self.assertGreater(len(text.split()), 8, f'Empty page {number}')
 
     def test_pdf_uses_black_times_and_a4(self):
-        with pymupdf.open(FOLDER / f'{STEM}.pdf') as pdf:
+        with pymupdf.open(PDF_FOLDER / f'{STEM}.pdf') as pdf:
             for page in pdf:
                 self.assertAlmostEqual(page.rect.width, 595.28, delta=0.2)
                 self.assertAlmostEqual(page.rect.height, 841.89, delta=0.2)
@@ -70,7 +71,7 @@ class Evaluation3Checks(unittest.TestCase):
                                 self.assertEqual(span['color'], 0)
 
     def test_evidence_limits_and_reflection_are_present(self):
-        with pymupdf.open(FOLDER / f'{STEM}.pdf') as pdf:
+        with pymupdf.open(PDF_FOLDER / f'{STEM}.pdf') as pdf:
             text = '\n'.join(p.get_text() for p in pdf)
         compact = re.sub(r'\s+', ' ', text)
         for phrase in ('final IP2b', 'notes only', '15-second',
@@ -82,7 +83,7 @@ class Evaluation3Checks(unittest.TestCase):
             self.assertNotIn(symbol, text)
 
     def test_recording_links_are_preserved(self):
-        with pymupdf.open(FOLDER / f'{STEM}.pdf') as pdf:
+        with pymupdf.open(PDF_FOLDER / f'{STEM}.pdf') as pdf:
             urls = {link.get('uri') for p in pdf for link in p.get_links()}
         for evidence in ('1kFrLP1ncaq4-GqdgPC0OP1HqeC7Bd_w9',
                          '1gNw8L9R59p3xLFg-9AMe9GkxqopXuk_R'):

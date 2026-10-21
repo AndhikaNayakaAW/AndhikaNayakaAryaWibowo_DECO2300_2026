@@ -4,21 +4,21 @@ Prepared on 21 October 2026 for the allocated mandatory studio on 22 or 23 Octob
 
 ## Documents
 
-- [Package README and full checklist](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/README.md)
+- [Start Here PDF and checklist](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/START%20HERE.pdf)
 - [Prospective testing plan PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Testing/Testing%20Plan.pdf)
 - [Participant record PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Testing/Participant%20Record.pdf)
 - [Design journal PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Design%20Journal/Design%20Journal.pdf)
-- [Blank results templates](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/tree/main/Interactive%20Prototype%202/Results)
+- [Article evidence PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Research%20Evidence/XR_Study_Whiteboard_Article_Evidence.pdf)
 - [Evaluation draft](Design-Evaluation-3-and-Reflection)
 - [Unity source project](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/tree/main/Whiteboard)
 
 ## Prepared
 
-The local folder contains the existing Quest APK, a portable tracked-source Unity archive, a retrospective journal with the original paper photo and a new workflow sketch, a prospective plan, a participant form, blank task and rating spreadsheets, a ten-stroke record, a recording guide, and earlier evidence copies. The latest evaluation and tools moved into this folder. The main Unity project remains in its original location.
+The submission folder contains PDF documents, the existing Quest APK, a portable Unity source ZIP, and Syifa's 1080p MP4. The PDFs cover the plan, participant form, design journal, paper-prototype photograph, evaluations, research evidence, and code guide. The editable Unity project remains in Whiteboard.
 
-The APK and large source archive exist locally and are excluded from Git. The full tracked Unity project is already on GitHub. The package README explains where the local submission binaries are located and how to open the project.
+DOCX, Markdown, CSV, JSON indexes, helper scripts, and the original MOV are preserved separately under Working Files/Interactive Prototype 2. The submission folder contains no editable document duplicates. The large MP4, APK, and source ZIP are local and excluded from Git. The tracked Unity source and PDFs are on GitHub.
 
-Syifa's original 5-minute-38-second recording is now supplied locally, together with a 1080p MP4. Eight sampled frames show physical headset/controller use and the running classroom. The large videos remain local rather than being uploaded to GitHub. [Video evidence notes](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Media/Video%20Evidence.md) record review scope and submission access steps.
+Syifa's recording lasts about 5 minutes and 38 seconds. Eight sampled frames show physical headset/controller use and the running classroom. [Video evidence notes](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Working%20Files/Interactive%20Prototype%202/Media/Video%20Evidence.md) record review scope and submission access steps.
 
 The [Code Study Guide PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Code%20Study/Code%20Study%20Guide.pdf) explains all 34 custom C# scripts, file locations, key methods, input-to-drawing flow, paper, colour, navigation, replay, editor tests, and reused XR infrastructure.
 

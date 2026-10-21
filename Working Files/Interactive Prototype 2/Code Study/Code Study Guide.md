@@ -2,7 +2,7 @@
 
 ## How to Use This Guide
 
-This guide explains the code already present in the project. It does not add gameplay features or change the tested APK. Start with the feature map, then read the scripts in the suggested order. The code index beside this guide lists all 34 custom C# files, method line numbers, source hashes, and GitHub links. There are 27 runtime scripts and seven Unity Editor tools.
+This guide explains the code already present in the project. It does not add gameplay features or change the tested APK. Start with the feature map, then read the scripts in the suggested order. The guide covers all 34 custom C# files. A separate working index retains method line numbers, source hashes, and GitHub links. There are 27 runtime scripts and seven Unity Editor tools.
 
 Be ready to show the source rather than only describing the APK. An APK is the compiled Android application. The readable C# scripts, Unity scene, package manifest, and project settings are the source material. The assessor may ask you to open a relevant script or explain how a controller action produces a result.
 
@@ -12,8 +12,8 @@ Be ready to show the source rather than only describing the APK. An APK is the c
 | --- | --- |
 | Whiteboard | The real Unity project. Unity Hub opens this folder. It contains Assets, Packages, and ProjectSettings. Its location was preserved so existing scene and asset references keep working. |
 | Interactive Prototype 2 | The assessment package. It contains the plan, journal, forms, evidence, evaluation, video, APK, and a portable source archive. It organises submission material without creating another gameplay implementation. |
-| Interactive Prototype 2/Source Code | A ZIP snapshot and instructions for opening the source. The authoritative editable project is still Whiteboard. The archive contains tracked Assets, Packages, and ProjectSettings. |
-| Interactive Prototype 2/Tools | Python tools that build or check documents. They do not implement the VR classroom and do not run inside the Quest APK. |
+| Interactive Prototype 2/Source Code | A portable Unity project ZIP. The authoritative editable project is still Whiteboard. The archive contains tracked Assets, Packages, and ProjectSettings. |
+| Working Files/Interactive Prototype 2/Tools | Python tools that build or check documents. They do not implement the VR classroom and do not run inside the Quest APK. |
 
 The separate assessment folder is an organisational decision. It helps a marker find the required deliverables. It is not an extra Unity project, a different XR system, or a replacement for the C# code.
 

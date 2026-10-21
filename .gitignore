@@ -21,3 +21,10 @@
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local IP2 submission binaries. Documents remain tracked as PDFs.
+!/Interactive Prototype 2/Builds/
+/Interactive Prototype 2/Builds/*.apk
+/Interactive Prototype 2/Source Code/*.zip
+/Interactive Prototype 2/Media/*.mp4
+/Working Files/Interactive Prototype 2/Tools/__pycache__/

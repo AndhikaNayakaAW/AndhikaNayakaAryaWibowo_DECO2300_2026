@@ -8,7 +8,7 @@ The combined Iteration 2 evidence is stored in [Iteration2_XRStudyWhiteboard_Tra
 
 The completed [Design Evaluation 2 PDF](../Design%20Evaluation%202%20Testing%20Plan.pdf) and editable [DOCX](../Design%20Evaluation%202%20Testing%20Plan.docx) use a three-page assessed response followed by raw-evidence appendices.
 
-The latest report has moved to the [Interactive Prototype 2 preparation package](../../Interactive%20Prototype%202/README.md). That package has a new prospective plan and blank collection forms. The existing five-person records are reference evidence, not pre-filled outcomes for the upcoming mandatory studio. Check their actual session date and assessed context before final submission.
+The latest report has moved to the [Interactive Prototype 2 preparation package](../../Interactive%20Prototype%202/START%20HERE.pdf). That package has a new prospective plan and blank collection forms. The existing five-person records are reference evidence, not pre-filled outcomes for the upcoming mandatory studio. Check their actual session date and assessed context before final submission.
 
 ## At a glance
 

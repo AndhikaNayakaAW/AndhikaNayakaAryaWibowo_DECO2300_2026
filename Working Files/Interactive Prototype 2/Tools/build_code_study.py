@@ -7,8 +7,8 @@ import re
 import subprocess
 from urllib.parse import quote
 
-ROOT = Path(__file__).resolve().parents[2]
-PACK = ROOT / 'Interactive Prototype 2'
+ROOT = Path(__file__).resolve().parents[3]
+PACK = ROOT / 'Working Files' / 'Interactive Prototype 2'
 CUSTOM = ROOT / 'Whiteboard/Assets/XRStudyWhiteboard'
 
 

@@ -1,6 +1,6 @@
 """Build the APA 7 Evaluation 3 DOCX from the reviewable Markdown source.
 
-Usage: python 'Interactive Prototype 2/Tools/build_evaluation3.py'
+Usage: python 'Working Files/Interactive Prototype 2/Tools/build_evaluation3.py'
 Export the resulting DOCX to PDF with Word or LibreOffice, then run
 check_evaluation3.py. Requires python-docx.
 """
@@ -16,10 +16,10 @@ from docx.oxml.ns import qn
 from docx.shared import Inches, Mm, Pt, RGBColor
 
 
-ROOT = Path(__file__).resolve().parents[2]
-FOLDER = ROOT / 'Interactive Prototype 2' / 'Evaluation'
+ROOT = Path(__file__).resolve().parents[3]
+FOLDER = ROOT / 'Working Files' / 'Interactive Prototype 2' / 'Evaluation'
 STEM = 'Design Evaluation 3 and Reflection'
-EVIDENCE = ROOT / 'Interactive Prototype 2/Earlier Evidence/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md'
+EVIDENCE = ROOT / 'Working Files/Interactive Prototype 2/Earlier Evidence/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md'
 FONT = 'Times New Roman'
 BLACK = RGBColor(0, 0, 0)
 doc = Document()

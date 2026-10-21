@@ -22,18 +22,18 @@ The XR Study Whiteboard gives students a virtual study space with a shared teach
 
 ## Documentation
 
-- [Interactive Prototype 2 preparation folder and readiness checklist](Interactive%20Prototype%202/README.md)
+- [Interactive Prototype 2 preparation folder and readiness checklist](Interactive%20Prototype%202/START%20HERE.pdf)
 - [New prospective testing plan](Interactive%20Prototype%202/Testing/Testing%20Plan.pdf)
 - [Participant record form](Interactive%20Prototype%202/Testing/Participant%20Record.pdf)
 - [Design journal](Interactive%20Prototype%202/Design%20Journal/Design%20Journal.pdf)
 - [Code study guide with all 34 custom scripts](Interactive%20Prototype%202/Code%20Study/Code%20Study%20Guide.pdf)
-- [Syifa video evidence and local filenames](Interactive%20Prototype%202/Media/Video%20Evidence.md)
+- [Syifa video evidence and local filenames](Working%20Files/Interactive%20Prototype%202/Media/Video%20Evidence.md)
 - [Week 2 — Paper demo, testing results, and reflection](DesignProcess/Week02_PaperPrototype/README.md)
 - [Design Evaluation 1](Design%20Evaluation/Design%20Evaluation%201%20Filled%20Out.pdf)
 - [Design Evaluation 2](Design%20Evaluation/Design%20Evaluation%202%20Testing%20Plan.pdf)
 - [Design Evaluation 3 draft, PDF](Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
-- [Design Evaluation 3 draft, editable DOCX](Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
-- [Design Evaluation 3 draft, reviewable Markdown source](Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.md)
+- [Article evidence PDF](Interactive%20Prototype%202/Research%20Evidence/XR_Study_Whiteboard_Article_Evidence.pdf)
+- [Editable working files and document tools](Working%20Files/Interactive%20Prototype%202/README.md)
 - [Final IP2b participant evidence](Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md)
 - [Project wiki](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/wiki)
 - [Versioned wiki source](wiki/Home.md)
@@ -57,7 +57,7 @@ The original paper-prototyping process is preserved under `DesignProcess/`. Star
 
 ## Key outcome
 
-The existing Iteration 2 records describe five headset-and-controller sessions completed using the latest APK, as confirmed by the student. All five completed the eight recorded task categories, and all six post-test measures were rated 5/5 by every participant. Kai has voice evidence, Syifa has camera evidence, and Amy, Serafina, and Safira have notes only. Syifa's original MOV and a 1080p MP4 copy are stored locally in the preparation package. Keep the actual testing dates separate from the upcoming mandatory studio. Additional collection templates are blank.
+The existing Iteration 2 records describe five headset-and-controller sessions completed using the latest APK, as confirmed by the student. All five completed the eight recorded task categories, and all six post-test measures were rated 5/5 by every participant. Kai has voice evidence, Syifa has camera evidence, and Amy, Serafina, and Safira have notes only. Syifa's 1080p MP4 is stored locally in the submission folder. The original MOV is preserved in Working Files. Keep the actual testing dates separate from the upcoming mandatory studio. Additional collection templates are blank.
 
 Completion was achieved in moderated sessions. Syifa's transcript includes prompts and a repeated recording exercise, so the findings do not establish independent first-attempt success. Exact discovery time and stroke defect counts were not logged. The classroom workflow is supported, while improved learning, sustained attention, long-session comfort, hand tracking, and simulator controls remain untested by this participant dataset.
 
@@ -85,4 +85,6 @@ The implementation reuses the existing VR template XR Origin, OpenXR, XRI Starte
 
 ## Rebuilding and checking Evaluation 3
 
-The draft PDF uses A4, Times New Roman, black text, APA 7 student-paper formatting, three assessed results pages, and one reflection page. Raw evidence follows in appendices. To rebuild it, run `python 'Interactive Prototype 2/Tools/build_evaluation3.py'` with `python-docx` installed. Export using Times New Roman and run `python 'Interactive Prototype 2/Tools/check_evaluation3.py'` with `python-docx` and `PyMuPDF`. Run `python 'Interactive Prototype 2/Tools/check_preparation.py'` to check the preparation bundle. The plan, participant form, and journal are rebuilt with `python 'Interactive Prototype 2/Tools/build_preparation_documents.py'` using `python-docx` and Pillow.
+The draft PDF uses A4, Times New Roman, black text, APA 7 student-paper formatting, three assessed results pages, and one reflection page. Raw evidence follows in appendices. To rebuild it, run `python 'Working Files/Interactive Prototype 2/Tools/build_evaluation3.py'` with `python-docx` installed. Export using Times New Roman and run `python 'Working Files/Interactive Prototype 2/Tools/check_evaluation3.py'` with `python-docx` and `PyMuPDF`. Run `python 'Working Files/Interactive Prototype 2/Tools/check_preparation.py'` to check the preparation bundle. The plan, participant form, and journal are rebuilt with `python 'Working Files/Interactive Prototype 2/Tools/build_preparation_documents.py'` using `python-docx` and Pillow.
+
+The submission folder keeps documents as PDFs. DOCX, Markdown, CSV, JSON, original media, and helper scripts are preserved outside it under `Working Files/Interactive Prototype 2`. Builders write editable documents there. Export the final PDFs into the corresponding submission folders.

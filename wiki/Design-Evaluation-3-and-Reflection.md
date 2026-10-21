@@ -5,8 +5,8 @@ The report analyses the existing five-person headset dataset and reflects on the
 ## Submission files
 
 - [Draft PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
-- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
-- [Report source](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.md)
+- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Working%20Files/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
+- [Report source](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Working%20Files/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.md)
 - [Full participant evidence](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md)
 
 The PDF uses A4, Times New Roman, black text, and APA 7 student-paper formatting. Page 1 is the title page. Pages 2 to 4 contain the assessed results and evaluation. Page 5 is the final reflection. Raw participant evidence begins on page 6.

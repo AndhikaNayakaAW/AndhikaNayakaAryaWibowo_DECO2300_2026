@@ -9,12 +9,12 @@ XR Study Whiteboard is a Unity VR classroom prototype for following a shared tea
 
 - [Design Evaluation 3 and Reflection](Design-Evaluation-3-and-Reflection)
 - [Evaluation draft PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
-- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
+- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Working%20Files/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
 - [Participant evidence and transcripts](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md)
 
 All five participants completed the recorded task categories in moderated headset sessions. All six rating measures were 5/5 for every participant. Two sessions were recorded and three have observation notes only. The results support the classroom interaction, while independent first use and educational benefit remain uncertain.
 
-The student confirms that existing testing used the latest APK and has now supplied Syifa's original MOV. The local package contains that video and a 1080p MP4 copy. Sampled frames show headset/controller use and the running classroom. Attendance at the upcoming mandatory studio and course uploads remain separate pending steps. Blank forms are available for any additional observations.
+The student confirms that existing testing used the latest APK and has now supplied Syifa's original MOV. The submission folder contains the 1080p MP4. The original MOV is preserved separately in Working Files. Sampled frames show headset/controller use and the running classroom. Attendance at the upcoming mandatory studio and course uploads remain separate pending steps. Blank forms are available for any additional observations.
 
 - [Detailed code study guide](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Code%20Study/Code%20Study%20Guide.pdf)
 
