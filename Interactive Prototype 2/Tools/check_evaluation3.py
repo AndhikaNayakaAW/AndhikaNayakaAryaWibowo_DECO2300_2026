@@ -13,7 +13,7 @@ import pymupdf
 
 
 ROOT = Path(__file__).resolve().parents[2]
-FOLDER = ROOT / 'Design Evaluation'
+FOLDER = ROOT / 'Interactive Prototype 2' / 'Evaluation'
 STEM = 'Design Evaluation 3 and Reflection'
 
 

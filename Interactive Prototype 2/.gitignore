@@ -1,0 +1,5 @@
+# Local submission binaries. The Unity source remains versioned at /Whiteboard.
+!Builds/
+Builds/*.apk
+Source Code/*.zip
+Tools/__pycache__/

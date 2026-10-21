@@ -4,7 +4,7 @@ import csv
 import unittest
 from zipfile import ZipFile
 
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parents[2]
 PACK = ROOT / 'Interactive Prototype 2'
 
 

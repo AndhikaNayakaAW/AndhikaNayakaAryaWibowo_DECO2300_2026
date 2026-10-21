@@ -1,0 +1,11 @@
+{
+  "file": "Whiteboard Unity Project.zip",
+  "bytes": 120364723,
+  "sha256": "4218f3b2c0c0dc46a00df88a78965ec429448ef9f2b8bc28954e51fd8a07b534",
+  "prepared_on": "2026-10-21",
+  "status": "Prepared. Fresh headset verification is pending.",
+  "source_commit": "4cec367b147c78be980472e066e4d50f77edf4b6",
+  "unity_version": "6000.3.21f1",
+  "contents": "Tracked Assets, Packages, and ProjectSettings only. Open Whiteboard in Unity.",
+  "exclusions": "Unity caches, local uncommitted changes, APK files, and build backup folders."
+}

@@ -1,15 +1,17 @@
 # Design Evaluation 3 and Reflection
 
-The final report evaluates the five-person IP2b headset test and reflects on the XR prototyping process. The facilitator confirmed that the existing Iteration 2 participant records are the final Week 12 dataset. They are not an additional round of five sessions.
+The report analyses the existing five-person headset dataset and reflects on the XR prototyping process. It has moved into the Interactive Prototype 2 preparation package. It is currently a draft pending confirmation of session dates and the actual assessed Week 12 outcomes. Earlier messages identified the records as final IP2b, while the mandatory studio is now described as upcoming. These are not five additional sessions.
 
 ## Submission files
 
-- [Final PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
-- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
-- [Report source](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.md)
+- [Draft PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
+- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
+- [Report source](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.md)
 - [Full participant evidence](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md)
 
 The PDF uses A4, Times New Roman, black text, and APA 7 student-paper formatting. Page 1 is the title page. Pages 2 to 4 contain the assessed results and evaluation. Page 5 is the final reflection. Raw participant evidence begins on page 6.
+
+The [prospective testing plan and blank result sheets](Interactive-Prototype-2) are separate from this completed-results draft. Update the report after the actual studio. Its existing language does not establish attendance or a Blackboard upload.
 
 ## Results
 

@@ -2,14 +2,19 @@
 
 XR Study Whiteboard is a Unity VR classroom prototype for following a shared teaching board and taking personal notes at a desk. The current evaluated interaction uses a headset and two physical controllers.
 
-## Final evaluation
+## Interactive Prototype 2 preparation
+
+- [Preparation checklist and submission package](Interactive-Prototype-2)
+- [New prospective testing plan](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Testing/Testing%20Plan.pdf)
 
 - [Design Evaluation 3 and Reflection](Design-Evaluation-3-and-Reflection)
-- [Submission PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
-- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
+- [Evaluation draft PDF](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
+- [Editable DOCX](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Interactive%20Prototype%202/Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
 - [Participant evidence and transcripts](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md)
 
 All five participants completed the recorded task categories in moderated headset sessions. All six rating measures were 5/5 for every participant. Two sessions were recorded and three have observation notes only. The results support the classroom interaction, while independent first use and educational benefit remain uncertain.
+
+Those existing records do not automatically establish attendance at the upcoming mandatory studio. The package includes blank results forms. Fresh headset verification, a working-prototype video, mandatory attendance, actual session outcomes, and Blackboard uploads remain pending.
 
 ## Controller guide
 
