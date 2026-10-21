@@ -11,6 +11,13 @@ PACK = ROOT / 'Interactive Prototype 2'
 
 
 class IP2PreparationChecks(unittest.TestCase):
+    def test_submission_folder_contains_only_delivery_files(self):
+        allowed = {'.pdf', '.mp4', '.apk', '.zip'}
+        extras = [str(path.relative_to(PACK)) for path in PACK.rglob('*')
+                  if path.is_file() and not path.name.startswith('.')
+                  and path.suffix.lower() not in allowed]
+        self.assertEqual(extras, [], 'Editable and internal files belong outside the submission folder')
+
     def test_required_documents_exist(self):
         for relative in ('README.md', 'Testing/Testing Plan',
                          'Testing/Participant Record', 'Design Journal/Design Journal'):
