@@ -1,11 +1,12 @@
 {
   "file": "Whiteboard Unity Project.zip",
-  "bytes": 120364723,
-  "sha256": "4218f3b2c0c0dc46a00df88a78965ec429448ef9f2b8bc28954e51fd8a07b534",
+  "bytes": 120447503,
+  "sha256": "0dc97f261c15b430734647577e35ebd3b7ac3bae95c3b5d83dfb835645bdc089",
   "prepared_on": "2026-10-21",
   "status": "Prepared. Fresh headset verification is pending.",
-  "source_commit": "4cec367b147c78be980472e066e4d50f77edf4b6",
+  "source_commit": "ccb9161e74b5c38090eb3c58b927b85762a26be4",
   "unity_version": "6000.3.21f1",
   "contents": "Tracked Assets, Packages, and ProjectSettings only. Open Whiteboard in Unity.",
-  "exclusions": "Unity caches, local uncommitted changes, APK files, and build backup folders."
+  "exclusions": "Unity caches, local uncommitted changes, APK files, and build backup folders.",
+  "annotation_update": "The 27 runtime scripts include lowercase line explanations. Executable code is unchanged and Unity batch compilation passed."
 }
