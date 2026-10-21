@@ -73,7 +73,7 @@ class Evaluation3Checks(unittest.TestCase):
         with pymupdf.open(FOLDER / f'{STEM}.pdf') as pdf:
             text = '\n'.join(p.get_text() for p in pdf)
         compact = re.sub(r'\s+', ' ', text)
-        for phrase in ('No separate Week 12 dataset', 'notes only', '15-second',
+        for phrase in ('final IP2b', 'notes only', '15-second',
                        '90%', 'partially confirmed', 'passthrough AR',
                        'Prototype Session Review', 'Methodology and Concept',
                        'Improvements and Extensions'):

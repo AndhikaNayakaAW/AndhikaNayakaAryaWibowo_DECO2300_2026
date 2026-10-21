@@ -1,6 +1,6 @@
 # XR Study Whiteboard
 
-> A gesture-driven virtual whiteboard for studying, revision, brainstorming, and note-taking in XR.
+> A VR classroom prototype for following a shared whiteboard and taking personal study notes with physical controllers.
 
 <p align="center">
   <img src="DesignProcess/Week02_PaperPrototype/Images/lowfi-1.jpeg" alt="XR Study Whiteboard paper demo" width="560">
@@ -15,14 +15,22 @@
 | **Course** | DECO2300 – Digital Prototyping and Extended Reality |
 | **Student** | Andhika Nayaka Arya Wibowo |
 | **Concept** | XR Study Whiteboard |
-| **Demo outcome** | Week 2 paper demo completed; IP1 core workflow completed by five participants |
+| **Latest evaluation** | Final IP2b headset workflow completed by five participants in moderated testing. Design Evaluation 3 and final reflection completed. |
 | **Testing methods** | Wizard-of-Oz, think aloud, and task-based user testing |
 
-The XR Study Whiteboard gives students a focused virtual study space where they can write notes with simple hand gestures while keeping the atmosphere of a classroom.
+The XR Study Whiteboard gives students a virtual study space with a shared teaching board and personal desk paper. The current evaluated interaction uses a headset and two physical controllers. Gesture interaction was explored in the earlier paper prototype and remains a separate development path.
 
 ## Documentation
 
 - [Week 2 — Paper demo, testing results, and reflection](DesignProcess/Week02_PaperPrototype/README.md)
+- [Design Evaluation 1](Design%20Evaluation/Design%20Evaluation%201%20Filled%20Out.pdf)
+- [Design Evaluation 2](Design%20Evaluation/Design%20Evaluation%202%20Testing%20Plan.pdf)
+- [Design Evaluation 3 and Reflection, submission PDF](Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.pdf)
+- [Design Evaluation 3, editable DOCX](Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.docx)
+- [Design Evaluation 3, reviewable Markdown source](Design%20Evaluation/Design%20Evaluation%203%20and%20Reflection.md)
+- [Final IP2b participant evidence](Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md)
+- [Project wiki](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/wiki)
+- [Versioned wiki source](wiki/Home.md)
 
 ## Digital Prototype
 
@@ -33,15 +41,21 @@ Current features include:
 - Continuous controller and hand pinch drawing on the whiteboard, with interpolated marker strokes and a wider eraser.
 - Black, red, blue, and green marker colours with visible tool/status feedback.
 - Clear-board confirmation.
-- Student tables with paper-only surfaces. Each table has a `TOOLS` button that opens floating `PENCIL`, `ERASER`, and `CLEAR PAPER` actions. The paper pencil line is intentionally finer than the whiteboard marker.
-- Table teleport/view shortcuts that focus the paper while keeping the whiteboard visible, plus floor teleportation and snap turning.
+- Fixed student paper with `PENCIL`, `ERASER`, and `CLEAR PAPER` controls. The right trigger writes rather than grabbing the paper.
+- Left `X` moves to the whiteboard and left `Y` moves through the student tables. Seated views retain the teaching board and personal paper together.
+- A controller guide that can be reopened with right `A`.
+- Timed whiteboard-action recording with `Record`, `Stop`, and `Play`. This replays drawing actions and does not capture microphone audio.
 - Editor testing through the XR Device Simulator and desktop fallback controls.
 
 The original paper-prototyping process is preserved under `DesignProcess/`. Start with the [digital prototype setup guide](Whiteboard/Documentation/SETUP.md).
 
 ## Key outcome
 
-The first five participant sessions show that the core writing workflow can be completed on both the wall whiteboard and table paper. The whiteboard was the easiest surface to use, while the table tools were the main discoverability issue. Participants also saw the classroom concept as useful for students who are easily distracted during online classes and for homeschooling because it can recreate some of the focus and structure of a classroom.
+The final IP2b test used a headset and two physical controllers with five classmates. All five completed the eight recorded task categories, and all six post-test measures were rated 5/5 by every participant. Kai has a voice recording, Syifa has a camera recording, and Amy, Serafina, and Safira have observation notes only. These are the same five sessions documented in the Iteration 2 evidence file, confirmed as the final Week 12 dataset.
+
+Completion was achieved in moderated sessions. Syifa's transcript includes prompts and a repeated recording exercise, so the findings do not establish independent first-attempt success. Exact discovery time and stroke defect counts were not logged. The classroom workflow is supported, while improved learning, sustained attention, long-session comfort, hand tracking, and simulator controls remain untested by this participant dataset.
+
+The final evaluation keeps the shared seated view, fixed paper, and separate controller roles. It proposes a short practice activity, clearer recording states, note saving, and an exploratory passthrough AR comparison. These are future design directions rather than newly implemented or validated features.
 
 ## Design Evaluation 1 user testing
 
@@ -59,6 +73,10 @@ Read the [interview evidence README](Design%20Evaluation/Interview%20Transcripts
 
 ## Digital XR Implementation
 
-The existing `Whiteboard` Unity project now contains the main scene at [`Whiteboard/Assets/XRStudyWhiteboard/Scenes/XRStudyClassroom.unity`](Whiteboard/Assets/XRStudyWhiteboard/Scenes/XRStudyClassroom.unity). It includes a lightweight classroom, a runtime whiteboard with black/red/blue/green marker colours, Marker/Eraser modes, clear-board confirmation, controller drawing, optional pinch drawing, teleportation, snap turning, and a grabbable marker.
+The existing `Whiteboard` Unity project contains the main scene at [`Whiteboard/Assets/XRStudyWhiteboard/Scenes/XRStudyClassroom.unity`](Whiteboard/Assets/XRStudyWhiteboard/Scenes/XRStudyClassroom.unity). It includes a classroom, a runtime whiteboard with four marker colours, Marker/Eraser modes, clear-board confirmation, controller drawing, fixed desk paper, navigation shortcuts, a controller guide, and board-action replay. Optional pinch drawing is implemented separately and was not evaluated in the final physical-controller sessions. Notes are not yet saved between sessions.
 
 The implementation reuses the existing VR template XR Origin, OpenXR, XRI Starter Assets, XRI input actions, locomotion, and XR Hands infrastructure. See [`Whiteboard/Documentation/SETUP.md`](Whiteboard/Documentation/SETUP.md) for setup, [`Whiteboard/Documentation/CONTROLS.md`](Whiteboard/Documentation/CONTROLS.md) for controls, and [`Whiteboard/Documentation/IMPLEMENTATION_STATUS.md`](Whiteboard/Documentation/IMPLEMENTATION_STATUS.md) for testing status and limitations.
+
+## Rebuilding and checking Evaluation 3
+
+The submitted PDF uses A4, Times New Roman, black text, APA 7 student-paper formatting, three assessed results pages, and one reflection page. Raw evidence follows in appendices. To rebuild the DOCX, install `python-docx` and run `python 'Design Evaluation/tools/build_evaluation3.py'`. Export the DOCX to PDF using Times New Roman, then run `python 'Design Evaluation/tools/check_evaluation3.py'` with `python-docx` and `PyMuPDF` installed. The checks cover page limits, typography, evidence boundaries, recording links, and document navigation.
