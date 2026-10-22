@@ -1,0 +1,483 @@
+# Participant 1
+
+**Voice Record link:** Link
+
+**Nayaka:** Hi, I'm Nayaka. Before we start, what name would you like me to use for this interview?
+
+**Participant 1:** You can just call me Participant 1. I don't need my name included.
+
+**Nayaka:** Okay, no problem. Today, you'll be testing my XR Study Whiteboard using a VR headset and two controllers. I want to see how well the prototype works, so please tell me what you think while using it, especially if something is confusing. You can take a break or stop whenever you want. Are you happy to take part?
+
+**Participant 1:** Yeah, that's fine.
+
+**Nayaka:** Is it okay if I record our conversation for my course assessment? You can still take part even if you don't want to be recorded.
+
+**Participant 1:** Yes, that's okay. You can record it.
+
+**Nayaka:** Just to make sure, are you happy for me to record your voice during this interview?
+
+**Participant 1:** Yes, that's fine.
+
+**Nayaka:** Since we're all using VR for our course projects, how comfortable are you with using the VR headset and controllers?
+
+**Participant 1:** I'm pretty comfortable with it now. At first, I needed some time to get used to the controls, but using VR for our course project has helped me understand how everything works.
+
+**Nayaka:** That's good. Please put on the headset and have a look around. What can you see?
+
+**Participant 1:** I can see a classroom with a whiteboard and some desks. There's also a guide showing me how to use the controllers.
+
+**Nayaka:** Based on what you can see, what do you think you can do in this classroom?
+
+**Participant 1:** I think I can move between the desks, write on the paper, and use the whiteboard like a teacher would.
+
+**Nayaka:** Okay, now slowly move both of your hands. Do the controllers in VR follow your real hands properly?
+
+**Participant 1:** Yeah, they're following my hands properly. I can see both controllers moving when I move my hands.
+
+**Nayaka:** Good. Now try moving to one of the student desks using the controller buttons.
+
+**Participant 1:** Okay, the guide says I need to press Y to move to the next table. Yeah, that worked. I'm at the desk now.
+
+**Nayaka:** Great. What can you see from where you're sitting?
+
+**Participant 1:** The paper is right in front of me, and I can still see the whiteboard. I just need to look down to see the paper and look up to see the board.
+
+**Nayaka:** Now choose the tool you think you should use to write on the paper.
+
+**Participant 1:** I'll choose Pencil. That seems pretty simple.
+
+**Nayaka:** Okay. Please copy the date, a straight horizontal line, and a circle from the whiteboard onto your paper.
+
+**Participant 1:** Alright, I'll write the date first, then the line, and then the circle. Okay, done.
+
+**Nayaka:** How did that feel? Was it comfortable?
+
+**Participant 1:** Yeah, it was comfortable. I didn't need to move away from the desk to look at the whiteboard.
+
+**Nayaka:** Now write a short word on the paper. After that, try erasing a small part and then clearing the whole paper.
+
+**Participant 1:** Okay, I'll write "hello." Now I'll use Eraser to remove part of it. And Clear Paper removes everything. Yeah, that's working.
+
+**Nayaka:** Good. Next, I want you to draw five things: a horizontal line, a vertical line, a circle, an L shape, and a short word with joined letters. Then do the same five things again. Make sure you release the writing control between each one.
+
+**Participant 1:** Okay. The writing follows where I'm pointing. When I let go of the control, it stops drawing. The separate shapes also don't join together, which is good.
+
+**Nayaka:** Now please move to another desk and then go back to the main whiteboard.
+
+**Participant 1:** Okay, Y takes me to another table. Then X takes me back to the whiteboard. That's pretty easy to remember.
+
+**Nayaka:** Now try writing something on the whiteboard. Then change the colour, erase part of your writing, and test the Clear Board option.
+
+**Participant 1:** Okay, I've written a word in black. Now I'm adding something in red. The eraser is working too. When I press Clear and cancel the message, my writing stays there. But when I confirm it, everything gets cleared.
+
+**Nayaka:** Good. Now look at the recording controls. What do you think they will do?
+
+**Participant 1:** I think they will record what I draw on the whiteboard and then show it again when I press Play.
+
+**Nayaka:** Okay, please try making a short recording and playing it back.
+
+**Participant 1:** Alright, I'll press Record, draw a circle, then press Stop. Now I'll press Play. Oh yeah, it's drawing the same circle again.
+
+**Nayaka:** How are you feeling physically? Any dizziness or discomfort?
+
+**Participant 1:** No, I feel fine. I'm not dizzy or uncomfortable.
+
+**Nayaka:** That's good. Now I'd like you to rate six things from 1 to 5, where 1 means very poor and 5 means excellent. How would you rate seated comfort, paper reliability, paper controls, movement, recording controls, and your overall confidence?
+
+**Participant 1:** I'd give seated comfort a 5, paper reliability a 5, paper controls a 5, movement a 5, recording controls a 5, and overall confidence a 5 too.
+
+**Nayaka:** What was the easiest part of using the prototype? And is there anything you think could be improved?
+
+**Participant 1:** I think writing was the easiest part. At the start, I needed a little time to read the controller guide, but after that, everything was easy to use. I don't really have any major changes to suggest.
+
+**Nayaka:** Would you consider using something like this for studying remotely?
+
+**Participant 1:** Yeah, I would. I think having the whiteboard and my own notes in the same place is useful.
+
+**Nayaka:** Thank you for your time and feedback. I'll stop the recording now.
+
+---
+
+# Participant 2
+
+**Voice Record link:** Link
+
+**Nayaka:** Hi, I'm Nayaka. Before we begin, what name would you like me to use in the interview notes?
+
+**Participant 2:** You can just use Participant 2.
+
+**Nayaka:** Okay. Today, you'll be testing a virtual classroom using a VR headset and two controllers. While you're using it, please tell me what you're thinking and how you feel about the different features. You can take a break or stop at any time. Are you happy to participate?
+
+**Participant 2:** Yes, absolutely.
+
+**Nayaka:** Is it also okay if I record your voice for my course assessment?
+
+**Participant 2:** Yeah, that's fine with me.
+
+**Nayaka:** Since we're all using VR for our course projects, how comfortable are you with using the VR headset and controllers?
+
+**Participant 2:** I'm pretty comfortable using VR. I've also used it for games before, so the controllers feel familiar to me. Working on our course project has given me more practice too.
+
+**Nayaka:** Okay, please look around the classroom. What's the first thing you notice?
+
+**Participant 2:** The whiteboard stands out the most. I can also see paper on the desks. It looks like a classroom where you can move between teaching on the board and taking your own notes.
+
+**Nayaka:** Have a look at the controller guide. What do you understand from it?
+
+**Participant 2:** It looks like the left controller is for moving around, and the right controller is for writing and interacting with things. I can also press A to bring the guide back if I need it.
+
+**Nayaka:** Good. Now move both of your hands. Are the virtual controllers following your hand movements properly?
+
+**Participant 2:** Yeah, they're lined up correctly with my hands. I'm moving them separately, and both are responding properly.
+
+**Nayaka:** Now please move to a student desk and choose the tool you would use to write on the paper.
+
+**Participant 2:** Okay, I'm at the desk now. I can see Pencil next to the paper, so I'll choose that.
+
+**Nayaka:** How comfortable is the view from the desk? Can you see the paper and whiteboard clearly?
+
+**Participant 2:** Yeah, it's good. The paper is close enough for me to write on, and I can still see the main whiteboard.
+
+**Nayaka:** Now please copy the date, a horizontal line, and a circle from the whiteboard onto your paper.
+
+**Participant 2:** Okay, done. I can easily look back at the whiteboard without needing to move to another seat.
+
+**Nayaka:** Good. Now write a short word on the paper, erase a small part of it, and then clear the whole paper.
+
+**Participant 2:** I'll write "study." Okay, now the eraser removes the end of the word. Then Clear Paper makes the whole paper blank again. Nice.
+
+**Nayaka:** Next is the ten-stroke test. Please draw a horizontal line, a vertical line, a circle, an L shape, and a short word with joined letters. Then repeat those five things again.
+
+**Participant 2:** Alright. Umm, my circle is probably the messiest one, but that's because of how I drew it. The drawing itself is smooth and connected properly.
+
+**Nayaka:** Did the writing continue after you released the writing control?
+
+**Participant 2:** No, it stopped each time I stopped drawing.
+
+**Nayaka:** Now try moving to another desk, then return to the main whiteboard.
+
+**Participant 2:** Yeah, that works. The controllers also stayed in the correct position with my hands while I moved.
+
+**Nayaka:** Great. Now use the whiteboard to write something, change the writing colour, erase a part, and then test the Clear Board option.
+
+**Participant 2:** Okay, I'll write in black first, then change it to blue. I can see the selected colour on the panel, which is helpful. The eraser is easy to use too. I cancelled the clear message first, and my writing stayed there. Now I've confirmed it, and everything is cleared.
+
+**Nayaka:** What do you think the recording feature is supposed to record?
+
+**Participant 2:** I think it records the things I draw and the order I draw them in. I wouldn't expect it to record my voice unless it specifically said that.
+
+**Nayaka:** Okay, now try recording a short drawing and playing it back.
+
+**Participant 2:** Alright, I'm recording a blue line and then a red circle. Now I'll press Stop and then Play. Yeah, it shows the same drawings in the same order.
+
+**Nayaka:** Did you feel any discomfort while using the headset or moving around?
+
+**Participant 2:** No, everything felt fine. The movement and the viewing position were comfortable.
+
+**Nayaka:** Now I'd like you to rate six things from 1 to 5: seated comfort, paper reliability, paper control clarity, movement predictability, recording clarity, and overall confidence.
+
+**Participant 2:** I'd give all six a 5. So 5 for comfort, paper reliability, paper controls, movement, recording, and overall confidence.
+
+**Nayaka:** What do you think was the best part of the prototype?
+
+**Participant 2:** Probably how the paper and whiteboard work together. Everything feels organised, and it's easy to move between them.
+
+**Nayaka:** Is there anything you would like to improve or change?
+
+**Participant 2:** Nothing important from this test. Maybe having a feature to save notes could be useful in the future, but I'm happy with how everything works right now.
+
+**Nayaka:** Would you use this kind of virtual classroom for studying remotely?
+
+**Participant 2:** Yes, especially for lessons where I need to copy diagrams or examples from the whiteboard.
+
+**Nayaka:** Thank you for taking part. That finishes the interview, and I'll stop the recording now.
+
+---
+
+# Participant 3
+
+**Nayaka:** Hi, thanks for helping me test my prototype today. Before we start, would you like me to use your real name, or would you prefer a participant number?
+
+**Participant 3:** Just Participant 3, please.
+
+**Nayaka:** Okay, no problem. Today, you'll be testing my VR classroom. I'd like you to tell me what you're thinking while you use it, especially if anything is confusing. You can take a break or stop whenever you want. Are you happy to take part?
+
+**Participant 3:** Yes, that's fine.
+
+**Nayaka:** Is it okay if I record your voice during the test for my course assessment?
+
+**Participant 3:** Yeah, that's okay.
+
+**Nayaka:** Since we're all using VR for our course projects, how comfortable are you with using the VR headset and controllers?
+
+**Participant 3:** I'm getting more comfortable with VR because of our course project. Before the course, I didn't really have much experience with it. Now I understand the basics, but sometimes I still need to check the controls.
+
+**Nayaka:** That's good. Please put on the headset and look around. What can you see?
+
+**Participant 3:** I can see a classroom with a big whiteboard and a few desks. There's also a guide showing me what the controller buttons do.
+
+**Nayaka:** Based on what you see, what do you think this classroom is for?
+
+**Participant 3:** I think it's for following a lesson and writing your own notes.
+
+**Nayaka:** Okay. Now please move both hands and see how the virtual controllers respond.
+
+**Participant 3:** Yeah, both controllers are following my hands properly. They don't look like they're in the wrong position.
+
+**Nayaka:** Good. Now move to a student desk and choose the tool you would use to write on the paper.
+
+**Participant 3:** Okay, I'll press Y to go to the desk. Now I'll choose Pencil.
+
+**Nayaka:** Can you tell me what the view looks like from the desk?
+
+**Participant 3:** I can see the paper in front of me and the whiteboard ahead. It's kind of like sitting at a normal desk in a classroom.
+
+**Nayaka:** Now please copy the date, a straight line, and a circle from the whiteboard onto your paper.
+
+**Participant 3:** Okay, let me check the date again. Alright, I've written that. Now the line and the circle. Done.
+
+**Nayaka:** Did you find it difficult to look between the paper and the whiteboard?
+
+**Participant 3:** No, not really. I just looked up and down. It was easy.
+
+**Nayaka:** Now write something else on the paper, erase a small part, and then try clearing the whole sheet.
+
+**Participant 3:** Okay, I'll write "hi." Now I can erase just that part. And Clear Paper makes the whole page blank again.
+
+**Nayaka:** Good. Next, I'd like you to do the ten-stroke test. You'll draw a horizontal line, a vertical line, a circle, an L shape, and a short word with joined letters, then repeat them. Make sure to release the writing control between each drawing.
+
+**Participant 3:** Okay. The lines are appearing where I expect them to. And when I release the writing control, it stops drawing straight away.
+
+**Nayaka:** Now please move to another desk and then return to the main whiteboard.
+
+**Participant 3:** Okay, I press Y to move to another table, then X to return to the whiteboard. Yeah, I understand it now.
+
+**Nayaka:** Great. Now try the whiteboard tools. Write something, change the colour, erase part of it, and test the Clear Board option.
+
+**Participant 3:** I'll write something in green first. Now I'll change it to blue and write another word. The eraser removes the part I'm pointing at. I also like that the clear message lets me cancel if I don't want to delete everything. Now I'll confirm it to clear the board.
+
+**Nayaka:** What do you think the Record and Play buttons will do?
+
+**Participant 3:** Umm, I think Record will remember what I draw, and Play will draw it again.
+
+**Nayaka:** Okay, let's test that. Please record a short drawing and then play it back.
+
+**Participant 3:** Alright, I pressed Record and drew a little diagram. Now I've stopped it. I'll press Play. Yeah, it's drawing the same diagram again. That's what I expected.
+
+**Nayaka:** How do your hands feel after using the controllers? Are you comfortable?
+
+**Participant 3:** Yeah, the controllers are still responding properly, and I feel comfortable.
+
+**Nayaka:** Good. Now please rate these six things from 1 to 5: seated comfort, paper reliability, paper controls, movement, recording controls, and overall confidence.
+
+**Participant 3:** I'd give seated comfort a 5, paper reliability a 5, paper controls a 5, movement a 5, recording controls a 5, and confidence a 5.
+
+**Nayaka:** What was the easiest part of using the prototype?
+
+**Participant 3:** I think understanding what the classroom was for. The whiteboard and the paper make it pretty clear that it's for studying and taking notes.
+
+**Nayaka:** And what was the hardest part?
+
+**Participant 3:** Probably getting used to the controller buttons for this classroom at the beginning. Even though we've been using VR for our course project, the controls can be different in each application. The guide helped me, so it wasn't really a problem.
+
+**Nayaka:** Would you use this VR classroom for studying remotely?
+
+**Participant 3:** Yes, I would. I like having one place to look at the lesson and another place to write my notes.
+
+**Nayaka:** Do you have any other suggestions or anything you would like to change?
+
+**Participant 3:** Nothing major. I'm happy with how everything worked.
+
+**Nayaka:** Thank you for your feedback. I'll stop the recording now.
+
+---
+
+# Participant 4
+
+**Nayaka:** Hi, I'm Nayaka. Before we begin, what name would you like me to use for this interview?
+
+**Participant 4:** Participant 4 is fine.
+
+**Nayaka:** Okay. Today, you'll be testing my virtual classroom prototype. I want you to try the different features and tell me what you think, including anything that feels confusing. We're testing the design, so there are no right or wrong answers. You can pause or stop whenever you want. Are you happy to participate?
+
+**Participant 4:** Yes, I am.
+
+**Nayaka:** Is it okay if I record your voice during the test for my assessment?
+
+**Participant 4:** Yes, that's fine.
+
+**Nayaka:** Since we're all using VR for our course projects, how comfortable are you with using the VR headset and controllers?
+
+**Participant 4:** I'm quite comfortable with VR now. I've used it before, and working on our course project has given me more practice. I'm familiar with the controllers, but I know different VR applications can have different controls.
+
+**Nayaka:** Okay, please put on the headset and look around the classroom. What do you notice?
+
+**Participant 4:** There's a guide at the start, which is helpful. I can also see the main whiteboard and the papers on the desks.
+
+**Nayaka:** What do you think you can do in this environment?
+
+**Participant 4:** I think I can move between different places, take notes on the paper, and write on the main whiteboard.
+
+**Nayaka:** Good. Now move both of your hands. Do the virtual controllers match your real hand movements?
+
+**Participant 4:** Yeah, they match properly. I don't notice any delay when I move my hands.
+
+**Nayaka:** Now please move to one of the desks and choose the tool you would use to write on the paper.
+
+**Participant 4:** I'll choose Pencil. The name is clear, and I can also see which tool is currently selected.
+
+**Nayaka:** How comfortable is the view from the desk?
+
+**Participant 4:** It's pretty comfortable. I can see both the paper and the whiteboard clearly. Neither of them is hidden.
+
+**Nayaka:** Now please copy the date, a horizontal line, and a circle from the whiteboard onto your paper.
+
+**Participant 4:** Okay, done. I looked back at the whiteboard a couple of times, but I didn't need to move from where I was sitting.
+
+**Nayaka:** Good. Now write a short word, erase part of it, and clear the whole paper.
+
+**Participant 4:** Yeah, that works. I also like that when I clear the paper, it doesn't remove anything from the main whiteboard.
+
+**Nayaka:** Next, I'd like you to complete ten separate drawing attempts. Please draw a horizontal line, a vertical line, a circle, an L shape, and a short word with joined letters. Then repeat them, making sure you release the writing control between each one.
+
+**Participant 4:** Umm, yeah, no problems there. Each mark stays separate when I release the control.
+
+**Nayaka:** Great. Now move to another desk and then return to the main whiteboard.
+
+**Participant 4:** Okay, that works too. I can tell where I'm going to arrive, and the controllers stay in the correct position with my hands when I move.
+
+**Nayaka:** Now test the whiteboard tools. Try writing, changing colours, erasing, and using the Clear Board confirmation.
+
+**Participant 4:** Okay, I'll write in red first, then switch to green. I can clearly see the colour changing. The eraser only removes the part I'm pointing at. If I cancel the Clear option, everything stays. But if I confirm it, the whole board gets cleared.
+
+**Nayaka:** What do you think the recording feature will record?
+
+**Participant 4:** I think it records what I do on the whiteboard, like writing, changing colours, and the order of those actions.
+
+**Nayaka:** Now please make a short recording and play it back.
+
+**Participant 4:** Okay, recording is on. I'll draw a line, change the colour, and add a circle. Now I'll stop it and press Play. Yeah, it repeats everything in the same order.
+
+**Nayaka:** Did the playback work the way you expected?
+
+**Participant 4:** Yes, it did. I also like that the status text tells me when the recording is playing.
+
+**Nayaka:** Did you experience any discomfort or problems with the controller tracking?
+
+**Participant 4:** No, I didn't have any problems with either of those.
+
+**Nayaka:** Good. Now please rate the six things from 1 to 5: comfort, paper reliability, paper controls, movement, recording controls, and overall confidence.
+
+**Participant 4:** I'd give all six a 5 out of 5.
+
+**Nayaka:** What was the easiest part of the prototype for you?
+
+**Participant 4:** Choosing the tools was probably the easiest. The labels are clear, and I can see which tool is selected.
+
+**Nayaka:** Is there anything you think should be improved?
+
+**Participant 4:** Maybe having an option to save notes in the future would be useful. But for the activities I tested today, I don't really have any major issues.
+
+**Nayaka:** Would you consider using something like this for remote learning?
+
+**Participant 4:** Yes, definitely. I think it could work well for tutorials where someone explains things using a whiteboard.
+
+**Nayaka:** Thank you for your time and feedback. I'll stop the recording now.
+
+---
+
+# Participant 5
+
+**Nayaka:** Hi, I'm Nayaka. Before we start, would you like me to use your name in the interview transcript, or would you prefer a participant number?
+
+**Participant 5:** You can just call me Participant 5.
+
+**Nayaka:** Okay, no problem. Today, you'll be testing my XR Study Whiteboard. While you're using it, please tell me what you expect to happen when you try something and what actually happens. I also want to know if anything feels confusing. You can take a break or stop at any time. Are you happy to take part?
+
+**Participant 5:** Yeah, happy to help.
+
+**Nayaka:** Is it okay if I record your voice for my course assessment?
+
+**Participant 5:** Yes.
+
+**Nayaka:** Since we're all using VR for our course projects, how comfortable are you with using the VR headset and controllers?
+
+**Participant 5:** I'm very comfortable with VR. I've used different VR headsets and applications before, and we've also been using VR for our course project. So I'm pretty confident with the controllers and how VR works.
+
+**Nayaka:** Okay, please put on the headset and have a look around. What's your first impression?
+
+**Participant 5:** It clearly looks like a classroom. There's a main whiteboard at the front and separate writing spaces on the desks. The controller guide is also helpful because it shows me where to start.
+
+**Nayaka:** What do you understand about how the controllers work?
+
+**Participant 5:** From what I can see, the left controller is mainly used for moving around, and the right one is for interacting with things and writing.
+
+**Nayaka:** Now please move both of your hands and check whether the virtual controllers follow them correctly.
+
+**Participant 5:** Yeah, both controllers are tracking properly. They stay in the correct position when I move my hands.
+
+**Nayaka:** Good. Now please move to one of the student desks and choose the tool you would use to write on the paper.
+
+**Participant 5:** Okay, I'm at a desk now, and I've selected Pencil.
+
+**Nayaka:** How is the view from there? Can you see both the paper and the whiteboard?
+
+**Participant 5:** Yeah, it's good. I can still see the whiteboard while having the paper right in front of me.
+
+**Nayaka:** Now please copy the date, a horizontal line, and a circle from the whiteboard onto your paper.
+
+**Participant 5:** Okay, done. It feels pretty natural. I just look at the board, write something down, and then look at the board again if I need to.
+
+**Nayaka:** Good. Now write another word, erase part of it, and then clear the whole paper.
+
+**Participant 5:** I'll write "notes." Now I'll erase the last part of the word. And Clear Paper removes everything. Yeah, it all worked the way I expected.
+
+**Nayaka:** Next, please complete the ten-stroke test. Draw a horizontal line, a vertical line, a circle, an L shape, and a short word with joined letters. Then repeat them, making sure each drawing is separate.
+
+**Participant 5:** Okay. The drawing is consistent. Umm, the main thing for me is that the writing stops properly when I release the control, and it does.
+
+**Nayaka:** Now try moving to another desk and then returning to the main whiteboard.
+
+**Participant 5:** Yeah, that's working. I can tell where I'm going to end up, and the controllers don't move away from my hands during the movement.
+
+**Nayaka:** Great. Now try writing on the main whiteboard, changing colours, erasing a part, and using the Clear Board confirmation.
+
+**Participant 5:** Okay, I'll write in black first, then use blue for another mark. The eraser removes the part I select. I can also cancel the clear option if I don't want to delete everything, and then confirm it when I do want to clear the board.
+
+**Nayaka:** What do you expect the recording feature to do?
+
+**Participant 5:** I think it will record what I do on the board and play it back in the same order and with the same timing. It looks more like replaying my actions rather than recording everything I see through the headset.
+
+**Nayaka:** Okay, now please record a short drawing and play it back.
+
+**Participant 5:** Alright, I'm recording now. I'll write a short word and add a coloured underline. Now I'll press Stop and then Play. Yeah, it's showing the same thing I did.
+
+**Nayaka:** How could you tell whether the recording was active or playing back?
+
+**Participant 5:** The label and button change depending on what's happening. When it's playing, I can also see it drawing the same marks again.
+
+**Nayaka:** Have you noticed any discomfort or problems with the controller tracking during the test?
+
+**Participant 5:** No, everything has felt stable and comfortable so far.
+
+**Nayaka:** Good. Now please give a rating from 1 to 5 for seated comfort, paper reliability, paper control clarity, movement predictability, recording clarity, and overall confidence.
+
+**Participant 5:** I'd give seated comfort a 5, paper reliability a 5, paper controls a 5, movement a 5, recording clarity a 5, and overall confidence a 5.
+
+**Nayaka:** What do you think was the best part of the whole experience?
+
+**Participant 5:** I think the way everything works together was the best part. I can move to a desk, take notes, and then go back to the main whiteboard. It all feels connected and makes sense.
+
+**Nayaka:** Is there anything you think should be improved?
+
+**Participant 5:** Nothing important for this version. There are probably other features you could add in the future, but I'm happy with the current prototype.
+
+**Nayaka:** Would you use this kind of virtual classroom for remote studying?
+
+**Participant 5:** Yes, especially for lessons where someone is explaining things or drawing diagrams. I'd also be interested in trying it for a longer study session.
+
+**Nayaka:** Is there anything else you'd like to say about your experience?
+
+**Participant 5:** No, I think that's everything. Overall, it was easy to understand and use.
+
+**Nayaka:** Thank you for taking part and sharing your feedback. That finishes the interview, and I'll stop the recording now.

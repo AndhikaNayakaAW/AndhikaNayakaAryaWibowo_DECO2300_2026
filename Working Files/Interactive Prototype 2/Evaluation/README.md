@@ -1,9 +1,11 @@
 # Evaluation status
 
-The existing Design Evaluation 3 DOCX, PDF, and Markdown source moved here from `Design Evaluation`. The report is preserved as the analysis already prepared from the five supplied headset records.
+The current report evaluates the five participant accounts supplied for the IP2b session on 22 October 2026. The student confirmed the Meta Quest 3S, two physical controllers, and `XRStudyWhiteboard_Quest_v1.4.apk` build. All five accounts contribute to the analysis. Only two interviews were recorded. The other three are written accounts.
 
-Status: PREPARED FROM COMPLETED EXISTING TESTING. The student confirms that the five sessions used the latest APK and has now supplied Syifa's original camera recording. Keep the real session dates and distinguish completed participant testing from attendance at the upcoming mandatory studio. Update the report if that studio adds relevant observations. The existing results are not discarded because new blank forms were prepared. The original records have not been altered or relabelled.
+The submission PDF is `Interactive Prototype 2/Evaluation/Design Evaluation 3 and Reflection.pdf` relative to the repository root. It contains three assessed results pages and one reflection page, plus a title page and raw evidence appendices, for 28 pages overall. It uses A4 pages, black Times New Roman, APA-style headings and tables, justified double-spaced body text, and page numbers alone.
 
-The existing report contains three assessed results pages and one reflection page, plus title and evidence appendices. Its completed-result language is not proof of attendance at the upcoming mandatory studio. Preparing this file does not satisfy the prototype demonstration or working-video requirements.
+Before submission, add the two recording links in Appendix A. The student will supply these links. Do not reuse recording links from earlier sessions. The report does not invent missing discovery times, prompt logs, or stroke scores.
 
-Use the blank forms in `../Testing` and `../Results` for any new data. If updates are needed, rebuild the DOCX, export its PDF, and run `../Tools/check_evaluation3.py`. Do not claim new measurements that were not collected.
+The DOCX and Markdown are editable working files. `Supplied Interview Records - 22 October 2026.txt` preserves the supplied text. `Interview Records - 22 October 2026.md` provides the formatted appendix source with name questions and replies omitted. The previous evaluation is preserved separately in the local `Archive/21 October 2026` folder and Git history, and is not merged with the current dataset.
+
+After editing the Markdown, run `../Tools/build_evaluation3.py`, export the DOCX to the submission PDF with LibreOffice, and run `../Tools/check_evaluation3.py`. Mandatory attendance, the working prototype, the working-video requirement, Blackboard submission, and GitHub submission remain separate requirements. No code changes are committed by the report build.

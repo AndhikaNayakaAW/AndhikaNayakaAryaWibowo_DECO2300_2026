@@ -19,7 +19,7 @@ from docx.shared import Inches, Mm, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[3]
 FOLDER = ROOT / 'Working Files' / 'Interactive Prototype 2' / 'Evaluation'
 STEM = 'Design Evaluation 3 and Reflection'
-EVIDENCE = ROOT / 'Working Files/Interactive Prototype 2/Earlier Evidence/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md'
+EVIDENCE = FOLDER / 'Interview Records - 22 October 2026.md'
 FONT = 'Times New Roman'
 BLACK = RGBColor(0, 0, 0)
 doc = Document()
@@ -110,7 +110,8 @@ def paragraph(text='', center=False, bold=False, indent=True, page=False, keep=F
     p.paragraph_format.first_line_indent = Inches(.5 if indent else 0)
     p.paragraph_format.page_break_before = page
     p.paragraph_format.keep_with_next = keep
-    p.alignment = WD_ALIGN_PARAGRAPH.CENTER if center else WD_ALIGN_PARAGRAPH.LEFT
+    p.alignment = (WD_ALIGN_PARAGRAPH.CENTER if center else
+                   WD_ALIGN_PARAGRAPH.JUSTIFY if indent else WD_ALIGN_PARAGRAPH.LEFT)
     inline(p, text, bold=bold)
     return p
 
@@ -126,7 +127,7 @@ def apa_table(headers, rows):
     available = 6.2677
     widths = ([1.6, available - 1.6] if len(headers) == 2 else
               [.55, 1.0, available - 1.55] if len(headers) == 3 and headers[0] == 'ID' else
-              [2, .6, available - 2.6] if len(headers) == 3 else
+              [2.4, 2.0, available - 4.4] if len(headers) == 3 else
               [1.6, .5, .6, available - 2.7] if len(headers) == 4 else
               [2.35] + [(available - 2.35) / (len(headers)-1)] * (len(headers)-1))
     for grid_column, width in zip(table._tbl.tblGrid.gridCol_lst, widths):
@@ -182,20 +183,8 @@ def render(markdown, raw=False):
             continue
         if line == '<!-- raw-evidence -->':
             heading('Appendix B', page=True)
-            heading('Supplied Interview Transcripts and Notes', level=1)
-            evidence = EVIDENCE.read_text()
-            for participant in range(1, 6):
-                marker = f'## P0{participant}'
-                start = evidence.index(marker)
-                end_marker = f'## P0{participant+1}' if participant < 5 else '## Combined results'
-                end = evidence.index(end_marker, start)
-                block = evidence[start:end]
-                if participant <= 2:
-                    title = block.splitlines()[0]
-                    transcript = block.split('### Transcript\n', 1)[1]
-                    render(title + '\n\n' + transcript, raw=True)
-                else:
-                    render(block, raw=True)
+            heading('Interview Accounts', level=1)
+            render(EVIDENCE.read_text(), raw=True)
             continue
         if line.startswith('#'):
             count = len(line) - len(line.lstrip('#'))
@@ -243,7 +232,7 @@ paragraph('Andhika Nayaka Arya Wibowo', center=True, indent=False)
 paragraph('The University of Queensland', center=True, indent=False)
 paragraph('DECO2300: Digital Prototyping and Extended Reality', center=True, indent=False)
 paragraph('DECO2300 Teaching Team', center=True, indent=False)
-paragraph('21 October 2026', center=True, indent=False)
+paragraph('22 October 2026', center=True, indent=False)
 
 source = (FOLDER / f'{STEM}.md').read_text()
 render('<!-- page -->\n' + source)

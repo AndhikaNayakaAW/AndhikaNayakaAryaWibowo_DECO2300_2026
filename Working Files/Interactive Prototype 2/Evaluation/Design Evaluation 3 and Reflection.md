@@ -2,28 +2,30 @@
 
 ## Objective and Validation Metrics
 
-The final IP2b test examined whether students could follow a board lesson and take notes in VR. It retested the seated view, paper tools, drawing, navigation, tracking, and replay after the earlier usability problems. This evaluation uses the final five-person headset test, documented in the Iteration 2 records. Success measures came from the existing testing plan. The aim was to judge whether the classroom workflow was usable before considering wider educational benefits.
+The IP2b evaluation tested whether a learner could follow the teaching board, write personal notes, navigate, and replay board actions in VR. It retested earlier problems with paper controls, writing reliability, viewing position, and navigation. Success was defined in the testing plan before interpreting the results. The study assessed interaction usability, not learning gains or sustained attention.
 
 **Table 1**
-*Planned Success Measures*
+*Success Criteria From the Testing Plan*
 
 | Aim | Criterion |
 | --- | --- |
-| Shared view and note taking | At least four of five view both surfaces and copy the lesson content. |
-| Paper tools and drawing | At least four of five use the tools. Discovery within 15 seconds and 90% correct strokes were also planned. |
-| Navigation and replay | At least four of five move and complete Record, Stop, and Play. Controllers remain aligned. |
-| Confidence and comfort | Median confidence is at least 4/5 with no severe comfort, tracking, or data loss issue. |
+| Shared view and notes | At least four of five view both surfaces and copy the date, line, and circle from the desk. |
+| Paper tools and drawing | At least four of five select Pencil independently within 15 seconds and produce nine acceptable strokes out of ten. |
+| Navigation and replay | At least four of five reach the board and a table, then complete Record, draw, Stop, and Play. No persistent tracking failure blocks use. |
+| Confidence and comfort | Median confidence reaches 4/5. No severe discomfort, data loss, or unresolved blocker occurs. |
 
-## Method and Results
+## Results
 
-Five classmates used the Unity build, a headset, and two physical controllers in moderated task tests. Kai had a voice recording and Syifa had a camera recording. Amy, Serafina, and Safira have notes only. All five completed the eight recorded task categories, including copying the date, line, and circle onto paper. All six rating measures were 5/5 for every participant. No severe comfort problem or technical blocker was recorded. Appendix A contains the results and Appendix B contains the supplied session records.
+Five classmates tested the Unity APK XRStudyWhiteboard_Quest_v1.4.apk on a Meta Quest 3S with two physical controllers on 22 October 2026. I used moderated tasks and think aloud. Only two interviews were recorded. The other three were documented in writing. I included all five accounts in the same task and rating analysis.
+
+All five accounts describe completing the eight task areas, including copying board content, paper tools, navigation, whiteboard tools, and replay. Every participant gave 5/5 on all six ratings. No discomfort or controller misalignment was reported. Participants 2 and 4 suggested saved notes. The records do not include discovery times, prompt counts, or individual stroke scores. Appendix A summarises the results, and Appendix B contains the session accounts.
 
 <!-- page -->
 
 # Analysis and Insights
 
 **Table 2**
-*Post-Test Ratings Across Five Participants*
+*Post-Test Ratings for the Five Participants*
 
 | Measure | P01 | P02 | P03 | P04 | P05 | Median |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -34,25 +36,25 @@ Five classmates used the Unity build, a headset, and two physical controllers in
 | Recording control clarity | 5 | 5 | 5 | 5 | 5 | 5 |
 | Overall confidence | 5 | 5 | 5 | 5 | 5 | 5 |
 
-The shared view supported the study task. Kai described looking between the board and paper without moving away from the desk. All five completed note copying. Comfortable placement therefore deserves priority over adding classroom decoration. The fixed paper also gave the right trigger a clear purpose. These results are consistent with the earlier viewpoint and paper fixes, although the study did not isolate each change.
+The strongest pattern was the connection between shared teaching and personal writing. Participants 1 and 3 described looking between the board and paper without leaving the desk. Participant 4 distinguished clearing personal paper from clearing the shared board. These accounts support preserving the shared seated view and separate writing surfaces. They suggest a coherent study workflow, although this test cannot isolate which interface change caused the improvement.
 
-Task completion did not mean immediate understanding. Kai initially explored the teleport controls before understanding them. Syifa reopened the guide and received instructions about colour selection and recording order. The transcript includes a second recording exercise, despite the checklist listing one attempt. I therefore report completion with support rather than five independent first-attempt successes. The guide helped recovery, but independent discovery remains uncertain.
+Clear controls still required initial orientation. Participants 1 and 3 needed time to understand this application's buttons, despite having course-related VR experience. The guide helped them proceed. Successful completion therefore supports use with guidance, while unaided discovery remains uncertain. All participants recognised board-action replay. Participant 2 distinguished it from voice recording, and Participant 4 noticed the playback status. Visible selection and session feedback should be retained.
 
-All five completed replay, and Kai expected it to reproduce his marks. Syifa said playback matched her expectation. This supports replay as a review tool. It does not prove that replay improves recall. Likewise, positive remote-learning comments show interest, not increased concentration. The highest possible score on every rating also hides small differences between users and should be read alongside the observed need for help.
+The uniformly high ratings show satisfaction but offer little separation between features. My repeated approval and some leading questions may have encouraged positive answers. Classmates familiar with VR may also find the controls easier than first-time users. Requests for saved notes from Participants 2 and 4 identify a practical gap beyond the successful demonstration: a learner needs to keep their work. Positive remote-study comments indicate interest, not measured improvements in attention or recall.
 
 <!-- page -->
 
 # Evaluation of Aims
 
-The shared view and lesson-to-notes aims were met in all five sessions. Navigation and physical controller tracking also passed across the group. Recording was completed by everyone, with explicit moderator support in Syifa's transcript. These findings support the tested workflow under moderated conditions. No severe comfort problem was recorded, but short sessions cannot establish comfort during a full lesson.
+The shared-view and note-copying aims were met in all five session records. Navigation, controller alignment, and Record, Stop, and Play were also completed across the group. The confidence target was met with a median of 5/5. No severe discomfort or unresolved blocker was reported. These findings support the workflow under short, moderated testing conditions. They do not establish independent first-attempt completion or comfort throughout a full lesson.
 
-Paper tools and drawing were supported by task completion and ratings. The planned 15-second discovery target cannot be verified because selection times and prompt levels were not logged. The 90% stroke target cannot be calculated without raw stroke and defect counts. Those two thresholds remain uncertain. Simulator T/Y controls and hand tracking were outside the physical-controller test. No aim was disproved, but unmeasured aims should not be labelled as passed.
+Paper tools and drawing received positive reports, but the 15-second discovery target remains uncertain without timestamps and assistance logs. The 90% stroke target also remains uncertain because individual attempts and defects were not recorded, even though the ten-stroke activity was requested. No aim was contradicted by the session records. Hand tracking, simulator T/Y input, note persistence, and learning effectiveness were outside this test.
 
 ## Updated Concept and Design Decisions
 
-XR Study Whiteboard is a VR classroom where a learner follows the shared board while writing on fixed personal paper. The left controller handles navigation and the right controller selects tools and writes. Visible tool feedback and board-action replay support the study activity. The concept is partially confirmed. Participants could use and understand it, but better learning and sustained attention remain untested.
+XR Study Whiteboard is a VR study space where a learner follows a shared teaching board and writes on fixed personal paper. Left-controller navigation, right-controller interaction, visible tool selection, and timed board-action replay connect the activities. The concept is partially confirmed: participants could use and understand this workflow, while its wider educational benefits remain untested.
 
-I would keep the seated viewpoints, fixed paper, and clear controller roles. I would improve first use with a brief practice task and a guide that remains easy to reopen. Recording needs clearer Ready, Recording, Stopped, and Playing states because Syifa needed sequence reminders. Saved notes should be tested before larger rooms or multiplayer, since preserving study work directly supports the core task. These are proposed refinements, not features validated by this test.
+I would retain the fixed paper, seated viewpoints, clear labels, and replay feedback. I would add an optional practice activity for first use and prioritise saving and reopening notes, following Participants 2 and 4. Both changes need testing before adoption. A longer lesson should compare note accuracy and later recall. Expanding the room or adding multiplayer would introduce new questions before resolving whether the current study work can be retained and reviewed effectively.
 
 <!-- page -->
 
@@ -60,15 +62,19 @@ I would keep the seated viewpoints, fixed paper, and clear controller roles. I w
 
 ## Prototype Session Review
 
-I chose Syifa's final IP2b session. She copied board content and completed paper tools and replay. Keeping both surfaces visible supported note taking. However, she reopened the guide and needed recording instructions. Her 5/5 ratings showed satisfaction, while the transcript revealed support needs that the pass checklist missed.
+I chose Participant 3's IP2b session. They copied the lesson by looking up and down, used paper tools, and replayed a diagram. Keeping both surfaces visible supported the task. However, the classroom buttons still required familiarisation. Their 5/5 ratings coexisted with this initial uncertainty. The guide helped recovery, but I should have measured discovery rather than equating completion with immediate understanding.
 
-## Methodology and Concept
+## Methodological Reflection
 
-Paper Wizard-of-Oz testing helped me explore gesture meanings quickly, but manually simulating responses could not test tracking. IP1 exposed hidden paper tools and viewing problems. The IP2a/IP2b development cycle moved this work into headset testing. Think aloud revealed expectations, but my leading questions and demonstrations reduced evidence of independent use. Consistent tasks helped comparison, yet three notes-only records and missing timings weakened measurement. I learned to separate task completion from learning effectiveness. The classroom interaction is supported, while the wider educational claim is only partially confirmed.
+Paper Wizard-of-Oz work tested gesture meanings cheaply, but could not establish tracking reliability. IP1 exposed paper-tool and viewing problems. IP2a and IP2b moved those questions into physical-controller testing. Consistent tasks enabled comparison, while think aloud revealed expectations. My praise and leading questions weakened neutrality. Only two interviews were recorded, and missing timings and stroke sheets limited verification. I would log attempts and assistance during testing and use neutral prompts.
+
+## Concept Evaluation
+
+The concept is partially confirmed. All five accounts support the classroom workflow, but a familiar peer sample and short tasks cannot establish better learning, concentration, or long-session comfort. I learned to separate a usable interaction from its intended educational benefit.
 
 ## Improvements and Extensions
 
-I would test five new users with neutral prompts and log time, assistance, stroke defects, and comfort. A longer lesson should check note quality and later recall. I would also prototype passthrough AR with a virtual board above a real desk. This might support physical note taking, but anchoring, readability, and distractions need comparison with VR before choosing it. AR might also weaken the classroom feeling that motivated VR.
+I would test onboarding and saved notes with new users. I would also compare VR with passthrough AR, placing a virtual teaching board above a real desk. AR might support physical writing and comfort, but needs tests of anchoring, readability, distraction, and note accuracy. It could also weaken the classroom presence that motivates the VR concept.
 
 <!-- appendices -->
 
@@ -76,64 +82,68 @@ I would test five new users with neutral prompts and log time, assistance, strok
 
 # Participant Results and Evidence Register
 
-The facilitator confirmed that the five-person Iteration 2 headset dataset represents the final IP2b/Week 12 test. Participant IDs here belong to that dataset. They should not be combined with the earlier IP1 IDs as if they identify the same people. Only Kai and Syifa have recording links. The other three records are observation notes, not reconstructed interviews.
+The five accounts refer to the IP2b session on 22 October 2026 using XRStudyWhiteboard_Quest_v1.4.apk on a Meta Quest 3S and two physical controllers. P01 to P05 identify this session's participants. They are not additional names for the earlier testing dataset.
+
+All five accounts contribute to the analysis. Only two interviews were recorded. The remaining three are written accounts. Their dialogue format does not mean that every session has an audio recording. The two recordings can be cross-checked using the links below.
 
 **Table A1**
-*Evidence Available for Each Participant*
+*Participant Records Included in the Evaluation*
 
-| ID | Name | Evidence |
+| ID | Record | Included material |
 | --- | --- | --- |
-| P01 | Kai | Voice recording and supplied transcript |
-| P02 | Syifa | Camera recording and supplied transcript |
-| P03 | Amy | In-class notes only |
-| P04 | Serafina | In-class notes only |
-| P05 | Safira | In-class notes only |
-
-**Table A2**
-*Observed Task Completion*
-
-| Task | P01 | P02 | P03 | P04 | P05 |
-| --- | --- | --- | --- | --- | --- |
-| Explore | Pass | Pass | Pass | Pass | Pass |
-| Seat and shared view | Pass | Pass | Pass | Pass | Pass |
-| Follow and take notes | Pass | Pass | Pass | Pass | Pass |
-| Paper tools and strokes | Pass | Pass | Pass | Pass | Pass |
-| Move and return | Pass | Pass | Pass | Pass | Pass |
-| Whiteboard workflow | Pass | Pass | Pass | Pass | Pass |
-| Record and replay | Pass | Pass | Pass | Pass | Pass |
-| Physical controller tracking | Pass | Pass | Pass | Pass | Pass |
-| Simulator T/Y selection | N/A | N/A | N/A | N/A | N/A |
-
-The source checklist lists one attempt per category. Syifa's supplied transcript contains a repeated recording exercise and several prompts. Pass therefore means the task was completed during a moderated session. It does not establish that every task was completed independently on the first attempt. Table 2 in the assessed response reports all six supplied ratings for each participant. Informal 10/10 satisfaction comments are separate from those 1-to-5 measures.
+| P01 | Participant 1 | Task account, six ratings, comfort response, and final feedback. |
+| P02 | Participant 2 | Task account, six ratings, comfort response, and suggestion to save notes. |
+| P03 | Participant 3 | Task account, six ratings, guide feedback, and final reflection. |
+| P04 | Participant 4 | Task account, six ratings, playback feedback, and suggestion to save notes. |
+| P05 | Participant 5 | Task account, six ratings, workflow feedback, and final reflection. |
 
 ## Recording Evidence
 
-[Kai voice recording](https://drive.google.com/file/d/1kFrLP1ncaq4-GqdgPC0OP1HqeC7Bd_w9/view?usp=sharing)
+Recording 1 Google Drive link:
 
-[Syifa camera recording](https://drive.google.com/file/d/1gNw8L9R59p3xLFg-9AMe9GkxqopXuk_R/view?usp=sharing)
+________________________________________________________________
 
-The supplied transcripts and notes are the basis of this report. The linked media have not been independently retranscribed for this submission. Kai's transcript refers to mouse input in one answer. The facilitator's note identifies the session as headset and physical-controller testing. Both statements are retained in Appendix B so the discrepancy remains visible.
+Recording 2 Google Drive link:
 
-<!-- raw-evidence -->
+________________________________________________________________
 
 <!-- page -->
 
-# Appendix C
+# Appendix A Continued
 
-# Evidence Audit and Development Trace
+**Table A2**
+*Task Completion Described in the Session Records*
 
-## Earlier Prototype Evidence
+| Task | P01 | P02 | P03 | P04 | P05 |
+| --- | --- | --- | --- | --- | --- |
+| Explore the classroom and guide | Complete | Complete | Complete | Complete | Complete |
+| Shared seated view | Complete | Complete | Complete | Complete | Complete |
+| Follow the board and take notes | Complete | Complete | Complete | Complete | Complete |
+| Paper tools and drawing activity | Complete | Complete | Complete | Complete | Complete |
+| Move to another desk and return | Complete | Complete | Complete | Complete | Complete |
+| Whiteboard tools and confirmation | Complete | Complete | Complete | Complete | Complete |
+| Record, Stop, and Play | Complete | Complete | Complete | Complete | Complete |
+| Physical controller alignment | Reported aligned | Reported aligned | Reported aligned | Reported aligned | Reported aligned |
 
-Two participants tested gesture meanings in the Week 2 paper prototype. Simulated responses could not establish tracking quality. IP1 has three recorded interviews and two checklist-only sessions. It identified hidden paper tools, one paper-drawing complaint, inconsistent teleport discovery, and viewing difficulty. Later headset results suggest improvement, but different participants and input conditions prevent a controlled comparison.
+Completion describes the session account. It does not establish a timed, independent first attempt. The ten-stroke task was requested in each account, but separate initial-attempt scores, defects, retries, and prompt levels are absent from the session records. No acceptable-stroke percentage has been calculated.
 
-## Implementation Trace
+<!-- page -->
 
-Repository commits document seat and simulator fixes in 76d76ece, drawing and replay in 279ef661, study controls in 1661a5b4, Quest navigation in 11375c85, and paper interaction in 88a59400. These records show development. The participant records provide the usability evidence.
+# Appendix A Continued
 
-## Audit of Claims
+**Table A3**
+*Checks Against the Planned Targets*
 
-The records support task completion, ratings, reported controller alignment, and short-session comfort. Discovery time, stroke percentages, prompt counts, learning gain, long-session comfort, and independent first use remain unmeasured. AR, saved notes, and new studies are proposals. No new participant data have been added.
+| Target | Available result | Decision |
+| --- | --- | --- |
+| At least four of five use the shared view and copy the lesson | Five accounts describe completion. | Met in the session records. |
+| At least four of five discover Pencil independently within 15 seconds | No selection timestamps or prompt logs. | Uncertain. |
+| At least four of five produce nine acceptable strokes out of ten | No individual stroke scoring sheets. | Uncertain. |
+| At least four of five navigate with stable tracking | Five describe movement and aligned controllers. | Met in the session records. |
+| At least four of five record and replay board actions | Five describe completing the sequence. | Met under moderated conditions. |
+| Median confidence of at least 4/5 | All five give 5/5. | Met. |
+| No severe discomfort or unresolved blocker | None reported in these short sessions. | No issue reported. |
 
-## Source Record
+The six rating measures are presented in Table 2. Optional hand input, simulator controls, long-session comfort, and learning gains were not assessed. Missing measures remain uncertain.
 
-The repository preserves the complete [final session records](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Interview%20Transcripts/Iteration2_XRStudyWhiteboard_Transcript_and_Results.md), [IP1 evidence](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/Design%20Evaluation/Interview%20Transcripts/README.md), and [paper prototype record](https://github.com/AndhikaNayakaAW/AndhikaNayakaAryaWibowo_DECO2300_2026/blob/main/DesignProcess/Week02_PaperPrototype/README.md). Participant findings and development history are kept distinct throughout this evaluation.
+<!-- raw-evidence -->

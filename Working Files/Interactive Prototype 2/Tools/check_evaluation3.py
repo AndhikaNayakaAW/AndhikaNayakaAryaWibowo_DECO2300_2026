@@ -74,20 +74,27 @@ class Evaluation3Checks(unittest.TestCase):
         with pymupdf.open(PDF_FOLDER / f'{STEM}.pdf') as pdf:
             text = '\n'.join(p.get_text() for p in pdf)
         compact = re.sub(r'\s+', ' ', text)
-        for phrase in ('final IP2b', 'notes only', '15-second',
+        for phrase in ('IP2b', 'Only two interviews were recorded', '15-second',
                        '90%', 'partially confirmed', 'passthrough AR',
-                       'Prototype Session Review', 'Methodology and Concept',
+                       'Prototype Session Review', 'Methodological Reflection', 'Concept Evaluation',
                        'Improvements and Extensions'):
             self.assertIn(phrase, compact)
         for symbol in (';', '—', '–', '--'):
             self.assertNotIn(symbol, text)
 
-    def test_recording_links_are_preserved(self):
+    def test_current_session_and_recording_slots(self):
         with pymupdf.open(PDF_FOLDER / f'{STEM}.pdf') as pdf:
-            urls = {link.get('uri') for p in pdf for link in p.get_links()}
-        for evidence in ('1kFrLP1ncaq4-GqdgPC0OP1HqeC7Bd_w9',
-                         '1gNw8L9R59p3xLFg-9AMe9GkxqopXuk_R'):
-            self.assertTrue(any(evidence in (url or '') for url in urls))
+            text = '\n'.join(page.get_text() for page in pdf)
+        compact = re.sub(r'\s+', ' ', text)
+        for phrase in ('22 October 2026', 'Meta Quest 3S',
+                       'XRStudyWhiteboard_Quest_v1.4.apk',
+                       'Recording 1 Google Drive link',
+                       'Recording 2 Google Drive link'):
+            self.assertIn(phrase, compact)
+        for participant in range(1, 6):
+            self.assertIn(f'P0{participant}: Participant {participant}', compact)
+        for previous_name in ('Kai', 'Syifa', 'Serafina', 'Safira'):
+            self.assertNotIn(previous_name, text)
 
     def test_readme_and_wiki_navigation(self):
         readme = (ROOT / 'README.md').read_text()
